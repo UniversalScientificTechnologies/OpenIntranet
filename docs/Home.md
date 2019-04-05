@@ -92,9 +92,9 @@ Systém využívá NoSQL databázi MongoDB.
 ```
 
 
-##Instalace
+## Závislosti
 ```
 sudo apt install python3-mongoengine python3-hashids
-sudo pip3 install pyooclient fpdf python-barcode code128
+sudo pip3 install pyocclient fpdf python-barcode code128 gitpython pandas
 ```
 
