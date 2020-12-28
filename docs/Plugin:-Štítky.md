@@ -59,7 +59,7 @@ Data:
 DataMatrix code
 
 ```
-[)><RS>06<GS>L[PosId]<GS>1P4L0014-163B<GS>SSA10197<RS><EOT>
+[)><RS>06<GS>L[PositionId]<GS>T[PacketId]<GS>1P[ComponentID]<GS>5D[DateOfPrint]<RS><EOT>
 ```
 
 # TODO:
