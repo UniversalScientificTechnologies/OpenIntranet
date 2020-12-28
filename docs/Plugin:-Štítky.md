@@ -31,6 +31,7 @@ Obsah a význam dat
 | 22L | 1Loc | *** Level (internally assigned) | -- |
 | 23L | 1Loc | *** Level (internally assigned) | -- |
 | 24L | 1Loc | Fift Level (internally assigned) | -- |
+| T | LOT | | Sáček - u součástek to může mít význam sarže (do sloučení) |
 | 3Z | | Free Text | Vlastní popis |
 | 10Z| | Structured Free Text  (Header Data) | |
 | 11Z - 99Z | | Structured Free Text (Line 1-89 Data) | |
@@ -45,6 +46,21 @@ Kód se skládá ze tří částí: Hlavičky, dat a patičky.
 Hlavička: `[)><RS>06`, kde `06` značí typ datového formátu 'Format 06'. 
 Data: Data jsou uvedena kódem, který se skládá z `<GS>`, maximálně dvou čísel a jednoho písmene. Následuje samotný obsah. 
 Patička: zpráva končí neviditelnými znaky `<RS><EOT>`
+
+
+# Typy štítků
+
+## Packet (Sáček)
+Data:
+* Packet ID 
+* Pozice sáčku
+
+### Štítek: 7x3, Format 06
+DataMatrix code
+
+```
+[)><RS>06<GS>L[PosId]<GS>1P4L0014-163B<GS>SSA10197<RS><EOT>
+```
 
 # TODO:
 Seznam věcí, co jsou v plánu a nejsou dokončené:
