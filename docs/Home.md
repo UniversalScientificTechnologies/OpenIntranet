@@ -1,4 +1,4 @@
-OpenIntranet je open-source software pro potřeby řízení firmy a jejích potřeb. Aplikace je založená na webovém frameworku `tornado`. Díky uživatelského rozhraní formou webu je možné tento systém používat na všech běžných operačních systémech pouze v moderním webovém prohlížeči. Systém je založen na principu pluginů, kdy každý nabízí jiné, potřebné, operace.
+OpenIntranet je open-source software pro potřeby řízení organizace a jejích potřeb. Aplikace je založená na webovém frameworku `tornado`. Díky uživatelského rozhraní formou webu je možné tento systém používat na všech běžných operačních systémech vybaveným webovým prohlížečem. Systém je založen na principu pluginů, kdy každý nabízí jiné, potřebné operace.
 
 # Popis aktuálních modulů
 
@@ -9,6 +9,7 @@ Modul sklad slouží k základním úpravám položek v databázi skladu.
 Modul je rozdělen do dvou sloupců. V pravém sloupci je seznam všech položek, které odpovídají zvolenému filtru. V levém sloupci je detail aktuálně vybrané položky, vyhledávání a filtrování položek a nástroje pro tisk štítků a tiskových sestav.
 
 ### Seznam položek
+
 Seznam modulů nyní podporuje dva režimy. Jeden 'standartní' a druhý 'inventura'.
 
 Standartní režim slouží k prohlížení seznamu. Obsahuje informace jako název položky, její ID, popis.
@@ -17,6 +18,7 @@ Dalším režimem je 'inventura'
 
 
 ### Detail položky
+
 Detail položky zobrazuje veškeré informace o aktuálně načtené položce. Pokud je položka v pravém sloupci, je žlutě zvýrazněna.
 
 
