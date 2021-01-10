@@ -1,18 +1,21 @@
-Pro tvorbu štítků existuje samostatný plugin, který shlukuje jednotlivé štítky do skupin. Jednotlivé skupiny slouží k tisku a k tvorbě tiskových sestav. Systém zná několik typů štítků, které se liší dle obsahu a užití. 
+Pro tvorbu štítků existuje samostatný plugin, který shlukuje jednotlivé štítky do skupin. Jednotlivé skupiny slouží k tisku a k tvorbě tiskových sestav na archy samolepek. Systém zná několik typů štítků, které se liší dle obsahu a užití. 
 
 
 
 ## Čárové kódy
+
 Na štících může být užito několik typů čárových kódů. 
 
 V možných případech je preferováno ve štítkách uživat standardy:
- * [ECIA - Labeling Specification for Productand ShipmentIdentificationin the Electronics Industry](https://www.ecianow.org/assets/docs/GIPC/EIGP-114.2018%20ECIA%20Labeling%20Specification%20for%20Product%20and%20Shipment%20Identification%20in%20the%20Electronics%20Industry%20-%202D%20Barcode.pdf)
+ * [ECIA - Labeling Specification for Product and ShipmentIdentificationin the Electronics Industry](https://www.ecianow.org/assets/docs/GIPC/EIGP-114.2018%20ECIA%20Labeling%20Specification%20for%20Product%20and%20Shipment%20Identification%20in%20the%20Electronics%20Industry%20-%202D%20Barcode.pdf)
  * [Format 06 ISO/IEC 15434](https://static.spiceworks.com/attachments/post/0016/2204/data_dictionary.pdf)
  * Format DD 
 
 Obecný popis o standardu [ISO/IEC 15434 Barcode Specifications](https://www.barcodefaq.com/2d/data-matrix/iso-iec-15434/)
+
 ### 1D Code 128
 
+Tento typ byl jeden z prvních pokusů o čárové kódy využívané v intranetu, jeho nevýhodou je vysoká optimalizace především pro číselné stringy při použití na jiné znaky se kód stává rychle neefektivní. 
 
 
 ### 2D Datamatrix
@@ -20,8 +23,7 @@ Obecný popis o standardu [ISO/IEC 15434 Barcode Specifications](https://www.bar
 
 
 
-##
-Obsah a význam dat 
+#### Obsah a význam dat 
 
 | Kód | Zkratka | Název | Význam |
 |-----|---------|-------|--------|
