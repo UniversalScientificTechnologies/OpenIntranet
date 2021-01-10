@@ -20,7 +20,7 @@ Tento typ byl jeden z prvních pokusů o čárové kódy využívané v intranet
 
 ### 2D Datamatrix
 
-
+[data Matric code](https://en.wikipedia.org/wiki/Data_Matrix)
 
 
 #### Obsah a význam dat 
