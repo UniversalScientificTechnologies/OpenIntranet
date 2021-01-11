@@ -49,6 +49,17 @@ Hlavička: `[)><RS>06`, kde `06` značí typ datového formátu 'Format 06'.
 Data: Data jsou uvedena kódem, který se skládá z `<GS>`, maximálně dvou čísel a jednoho písmene. Následuje samotný obsah. 
 Patička: zpráva končí neviditelnými znaky `<RS><EOT>`
 
+## RFID čipy 
+
+Při konstrukci skladového systému zvažujeme i možnost použití RFID čipů, zejména variant čitelných NFC čtečkou v mobilních telefonech. 
+Jejich použití by pak vypadalo obdobně, jako použití tištěných štítků, ale byly by hozené uvnitř sáčku, nebo nalepeny na zařízení. 
+
+Potenciální výhody oproti použití tištěných štítků jsou tyto: 
+
+* Možnost recyklace (NFC tag lze použít opakovaně pro různé skladové položky)
+* NFC čip může nést některé informace i bez přímého přístupu do databáze (Například informaci o vypůjčení a komu se předmět má vrátit, nebo jaká je aktuální expirace)
+* RFID čip lze využít k dohledání položek ve vymezeném prostoru (nopříklad v krabici, na stole a podobně)
+
 
 # Typy štítků
 
