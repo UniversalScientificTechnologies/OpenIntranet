@@ -2,6 +2,7 @@ Celý systém je naprogramovaný v Python3 a je postavený na databázovém syst
 
 
 ## Instalace
+ * Vytvořit si klon repozitáře (nebo stáhnout release)
  * Nanistalovat mongodb databázi podle oficiálního návodu (Verze > xxx) 
  * Nainstalovat python3 a knihovny z [requirements.txt](https://github.com/UniversalScientificTechnologies/OpenIntranet/blob/master/requirements.txt) - Seznam díky aktivnímu vývoji nemusí být vždy aktuální. 
 
