@@ -1,4 +1,4 @@
-OpenIntranet je open-source software pro potřeby řízení organizace a jejích potřeb. Aplikace je založená na webovém frameworku `tornado`. Díky uživatelského rozhraní formou webu je možné tento systém používat na všech běžných operačních systémech vybaveným webovým prohlížečem. Systém je založen na principu pluginů, kdy každý nabízí jiné, potřebné operace.
+OpenIntranet je open-source software pro účely logistiky organizace a dalších potřeb. Aplikace je založená na webovém frameworku `tornado`. Díky uživatelského rozhraní formou webu je možné tento systém používat na všech běžných operačních systémech vybaveným webovým prohlížečem. Systém je založen na principu pluginů, kdy každý nabízí jiné, potřebné operace.
 
 # Popis aktuálních modulů
 
@@ -16,37 +16,15 @@ Standartní režim slouží k prohlížení seznamu. Obsahuje informace jako ná
 
 Dalším režimem je 'inventura'
 
-
 ### Detail položky
 
 Detail položky zobrazuje veškeré informace o aktuálně načtené položce. Pokud je položka v pravém sloupci, je žlutě zvýrazněna.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Databáze
-Systém využívá NoSQL databázi MongoDB.
-
-
-##### Položky skladu
-
-
-
 
 ## Závislosti
 ```
 sudo apt install python3-mongoengine python3-hashids
 sudo pip3 install pyocclient fpdf python-barcode code128 gitpython pandas
 ```
+
+Systém využívá NoSQL databázi MongoDB.
 
