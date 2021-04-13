@@ -26,6 +26,8 @@ Při práci s drobnými položkami, jako jsou například šrouby by se hodil n�
 
 Počet položek by se v průběhu aktualizoval v databázi.  Zařízení by velmi usnadnilo oddělování konkrétního počtu položek do sáčků pro přepravu, nebo přípravu experimentů. 
 
+**Integrace váhy v systému zatím není implementována**
+
 ### Organizér s LED podsvětlením 
 
 V dílenských prostorech jsou často používané [závěsné skříňky s průhlednými šuplíky](https://www.svarecky-obchod.cz/dilenske-vybaveni/zavesne-skrinky/15109-zavesna-skrinka-30-m-4-s-2-v-modra-6765m.htm). 
