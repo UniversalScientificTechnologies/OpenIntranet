@@ -49,6 +49,9 @@ Hlavička: `[)><RS>06`, kde `06` značí typ datového formátu 'Format 06'.
 Data: Data jsou uvedena kódem, který se skládá z `<GS>`, maximálně dvou čísel a jednoho písmene. Následuje samotný obsah. 
 Patička: zpráva končí neviditelnými znaky `<RS><EOT>`
 
+Tato implementace odpovídá standardu: https://www.iso.org/standard/43692.html
+
+
 ## RFID čipy 
 
 Při konstrukci skladového systému zvažujeme i možnost použití RFID čipů, zejména variant čitelných NFC čtečkou v mobilních telefonech. 
