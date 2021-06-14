@@ -29,7 +29,7 @@ plugins = ['', 'store','system', 'stocktaking', 'stocktaking_view_positions', 'p
 
 ## Inicializace databáze
 
-### sklad
+### Sklad
 
 Je potřeba v databázi vytvořit položku skladu. A pak tento sklad nastavit jako výchozí. 
 
@@ -71,7 +71,7 @@ kolekce databáze `intranet` by měla obsahovat:
 * address - je lokace skladu
 
 
-### sklad
+### Uživatel
 
 Nově vytvořený uživatel z webového rozhraní nemá žádná práva. Ty je potřeba ručně nastavit v DB - pak to lze provádět přes UI. Ale potíž instalece je předpoklad, že už takový uživatel exesituje. 
 
