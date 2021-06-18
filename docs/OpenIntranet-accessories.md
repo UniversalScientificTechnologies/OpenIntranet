@@ -26,6 +26,8 @@ Při práci s drobnými položkami, jako jsou například šrouby by se hodil n�
 
 Počet položek by se v průběhu aktualizoval v databázi.  Zařízení by velmi usnadnilo oddělování konkrétního počtu položek do sáčků pro přepravu, nebo přípravu experimentů. 
 
+Standardním řešením tohoto problému jsou [počítací váhy](https://www.expondo.cz/steinberg-systems-pocitaci-vaha-3-kg-0-05-g-baterie-80-h-10030498)
+
 **Integrace váhy v systému zatím není implementována**
 
 ### Organizér s LED podsvětlením 
