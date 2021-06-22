@@ -2,10 +2,19 @@ Celý systém je naprogramovaný v Python3 a je postavený na databázovém syst
 
 
 ## Instalace
+
  * Vytvořit si klon repozitáře (nebo stáhnout release)
- * Nanistalovat mongodb databázi podle oficiálního návodu (Verze > xxx) 
+ * Nanistalovat mongodb databázi podle [oficiálního návodu](https://docs.mongodb.com/manual/installation/) (Verze > xxx) 
  * Nainstalovat python3 a knihovny z [requirements.txt](https://github.com/UniversalScientificTechnologies/OpenIntranet/blob/master/requirements.txt) - Seznam díky aktivnímu vývoji nemusí být vždy aktuální. 
 
+### stažení repozitáře
+
+Zdrojové kódy jsou umístěny v repozitáři obsahujícím submoduly. Proto je potřeba submoduly inicializovat v naklonovaném repozitáři. Submoduly jsou ale do repozitáře napojeny přes ssh, tudíž je potřeba mít [na githubu zaregistrovaný veřejný ssh klíč](https://www.inmotionhosting.com/support/server/ssh/how-to-add-ssh-keys-to-your-github-account/). 
+
+    git clone git@github.com:UniversalScientificTechnologies/OpenIntranet.git
+    git submodule update --init --recursive 
+
+Pokud v průběhu tohoto procesu není vypsána žádná chyba, tak výsledkem by měl být repozitář, který má postahované všechny submoduly.
 
 ## Konfigurace
 
