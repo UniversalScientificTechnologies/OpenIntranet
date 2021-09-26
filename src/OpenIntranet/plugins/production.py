@@ -119,6 +119,7 @@ def get_plugin_handlers():
              (r'/{}/(.*)/print/'.format(plugin_name), print_bom),
              (r'/{}/(.*)/edit/'.format(plugin_name), edit),
              (r'/{}/(.*)/get_bom_table/'.format(plugin_name), get_bom_table),
+             (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
              (r'/{}'.format(plugin_name), home),
              (r'/{}/'.format(plugin_name), home),
@@ -238,6 +239,53 @@ class get_production_list(BaseHandlerJson):
 
         self.set_header("Production-Price", "Je")
         self.write(out)
+
+
+'''
+    Vrátí strom výrobních podkladů
+'''
+class get_production_tree(BaseHandler):
+    role_module = ['production-sudo', 'production-access', 'production-manager', 'production-read']
+    def post(self):
+        self.set_header('Content-Type', 'application/json')
+        type = self.get_argument('type', 'jstree')
+        print("api_categories_list .. ", type)
+
+        if type == 'jstree':
+            new = []
+            dout = list(self.mdb.production_tree.aggregate([
+            ]))
+            for i, out in enumerate(dout):
+                pos = {}
+                pos['_id'] = str(out['_id'])
+                pos['id'] = str(out['_id'])
+                pos['text'] = str(out['text'])
+                #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
+                #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
+                #pos['li_attr'] = {"name": out['name'], 'text': out['description']}
+                
+                pos['parent'] = str(out.get('parent', '#'))
+                new.append(pos)
+
+
+            dout = list(self.mdb.production.aggregate([
+            ]))
+            for i, out in enumerate(dout):
+                pos = {}
+                pos['_id'] = str(out['_id'])
+                pos['id'] = str(out['_id'])
+                pos['text'] = str(out['name'])
+                pos['parent'] = str(out.get('parent', '#'))
+                pos['icon'] = "jstree-icon jstree-file"
+                new.append(pos)
+
+            output = bson.json_util.dumps(new)
+
+        else:
+            self.write("unsupported")
+
+        self.write(output)
+
 
 
 
