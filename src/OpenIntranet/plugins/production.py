@@ -254,13 +254,14 @@ class get_production_tree(BaseHandler):
 
         if type == 'jstree':
             new = []
-            dout = list(self.mdb.production_tree.aggregate([
-            ]))
+            dout = list(self.mdb.production_tree.aggregate([]))
+
             for i, out in enumerate(dout):
                 pos = {}
                 pos['_id'] = str(out['_id'])
                 pos['id'] = str(out['_id'])
                 pos['text'] = str(out['text'])
+                pos['type'] = 'folder'
                 #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
                 #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
                 #pos['li_attr'] = {"name": out['name'], 'text': out['description']}
@@ -277,7 +278,8 @@ class get_production_tree(BaseHandler):
                 pos['id'] = str(out['_id'])
                 pos['text'] = str(out['name'])
                 pos['parent'] = str(out.get('parent', '#'))
-                pos['icon'] = "jstree-icon jstree-file"
+                #pos['icon'] = "jstree-icon jstree-file"
+                pos['type'] = 'product'
                 new.append(pos)
 
             output = bson.json_util.dumps(new)

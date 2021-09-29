@@ -11,8 +11,48 @@
 
 <div class="container">
 
-<div id="production-list-tree">
+	<div class="row">
+		<div class="col">
+
+	<div class="card">
+		<div class="card-header">
+			Seznam výrobních podkladů
+
+          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('refresh')"><i class="bi bi-arrow-counterclockwise"></i></a>
+          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')"><i class="bi bi-arrows-expand"></i></a>
+          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')"><i class="bi bi-arrows-collapse"></i></a>
+		</div>
+	<div id="production-list-tree">
+	</div>
+</div>
+</div>
+
+
+		<div class="col">
+<div class="card" id="product_info" style="display: none;">
+	<div class="card-header">
+		Verze produktu
+
+          <a href="#" class="float-right mx-1" onclick="$("#product_info").hide();"><i class="bi bi-x"></i></a>
+          <a href="#" class="float-right mx-1" onclick=""><i class="bi bi-save"></i></a>
+	</div>
+	<div class="card-body">
+
+		<p>TODO: Přehled základních parametrů z production... </p>
+
+		<p>Název, popis.. Bude to převzané ze součástky? Bude se z production tvořit skladová položka nebo naopak? </p>
+
+		<p>Seznam všech dosavadních výrob včetně jejich přesných BOM tabulek. </p>
 		
+	</div>
+</div>
+</div>
+
+</div>
+
+
+<div style="height: 5cm;">
+	
 </div>
 
 <a href="/production/new/edit/" class="btn btn-sm btn-primary">Nový produkt</a>
@@ -81,11 +121,11 @@ function load_production_tree(){
   			"check_callback" : true
         },
         "plugins" : [
-              "checkbox",
-			  "contextmenu",
+            //  "checkbox",
+			//  "contextmenu",
 			  "dnd",
-			  "massload",
-			  "search",
+			//  "massload",
+			//  "search",
 			  "sort",
 			  "state",
 			  "types",
@@ -96,7 +136,15 @@ function load_production_tree(){
 		'dnd':{
 		  'is_draggable': true,
 		  'use_html5': true,
-		},
+		}
+		,"types" : {
+	      "folder" : {
+	        "icon" : "bi bi-inboxes"
+	      },
+	      "product" : {
+	        "icon" : "bi bi-cpu"
+	      }
+	    },
     });
 
 
@@ -112,12 +160,29 @@ function load_production_tree(){
     	});
     });
 
-	production_tree.bind("dnd_stop.vakata", function(e, data) {
-   		console.log("Presouvam pozici " + data.node.id + " to " + data.parent);
+	production_tree.on('changed.jstree', function (e, data) {
+		if(data.event && data.event.type == 'click'){
 
-    });
+			if(data.node.type == 'product'){
+				// tady je kliknuti na produkt
+				console.log("ON change", data);
+
+				load_product_info(data.node.id);
+			}
+
+		}
+	});
+
+
 }
 load_production_tree();
+
+
+function load_product_info(id){
+
+	console.log("Nacitam data o polozce", id);
+	$("#product_info").show();
+}
 
 </script>
 
