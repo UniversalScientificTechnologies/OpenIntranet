@@ -121,6 +121,7 @@ def get_plugin_handlers():
              (r'/{}/(.*)/get_bom_table/'.format(plugin_name), get_bom_table),
              (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
+             (r'/{}/api/productionTree/move/'.format(plugin_name), production_tree_move_elemen),
              (r'/{}'.format(plugin_name), home),
              (r'/{}/'.format(plugin_name), home),
         ]
@@ -287,6 +288,19 @@ class get_production_tree(BaseHandler):
         self.write(output)
 
 
+class production_tree_move_elemen(BaseHandler):
+    def post(self):
+        source = bson.ObjectId(self.get_argument('id'))
+        destination = self.get_argument('parent')
+
+        if destination != "#":
+            destination = bson.ObjectId(destination)
+
+        print("Presun production z/do..", source, destination)
+
+        self.mdb.production.update( {"_id": source}, {"$set": {"parent": destination}} )
+
+        self.write("ok")
 
 
 '''

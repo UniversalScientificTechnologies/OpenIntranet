@@ -77,37 +77,45 @@ function load_production_tree(){
            'data' : {
               'type': "POST",
               'url' : "/production/api/getProductionTree/?jstree=True"
-            }
+            },
+  			"check_callback" : true
         },
         "plugins" : [
-            "checkbox",
-            "massload",
-            "sort",
-            "state",
-            "types",
-            "dnd"
+              "checkbox",
+			  "contextmenu",
+			  "dnd",
+			  "massload",
+			  "search",
+			  "sort",
+			  "state",
+			  "types",
         ],
-				'dnd':{
-				  'is_draggable': true,
-				  'use_html5': true,
-				},
         'checkbox':{
             'whole_node': false,
-        }
+        },
+		'dnd':{
+		  'is_draggable': true,
+		  'use_html5': true,
+		},
     });
 
 
-		production_tree.bind("move_node.jstree", function(e, data) {
+	production_tree.bind("move_node.jstree", function(e, data) {
    		console.log("Presouvam pozici " + data.node.id + " to " + data.parent);
 
-	    //$.ajax({
-	    //  type: "POST",
-	    //  url: "/store/api/set_positions/move/",
-	    //  data: {'id': data.node.id, 'parent': data.parent},
+	    $.ajax({
+	      type: "POST",
+	      url: "/production/api/productionTree/move/",
+	      data: {'id': data.node.id, 'parent': data.parent},
 	      //success: success,
 	      //dataType: dataType
+    	});
     });
-    
+
+	production_tree.bind("dnd_stop.vakata", function(e, data) {
+   		console.log("Presouvam pozici " + data.node.id + " to " + data.parent);
+
+    });
 }
 load_production_tree();
 
