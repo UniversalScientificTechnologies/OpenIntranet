@@ -122,6 +122,7 @@ def get_plugin_handlers():
              (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
              (r'/{}/api/productionTree/move/'.format(plugin_name), production_tree_move_elemen),
+             (r'/{}/api/getProductionGroup/(.*)/'.format(plugin_name), get_production_group),
              (r'/{}'.format(plugin_name), home),
              (r'/{}/'.format(plugin_name), home),
         ]
@@ -254,8 +255,9 @@ class get_production_tree(BaseHandler):
 
         if type == 'jstree':
             new = []
-            dout = list(self.mdb.production_tree.aggregate([]))
 
+            # tady se ziskaji stromova struktura
+            dout = list(self.mdb.production_tree.find())
             for i, out in enumerate(dout):
                 pos = {}
                 pos['_id'] = str(out['_id'])
@@ -270,14 +272,16 @@ class get_production_tree(BaseHandler):
                 new.append(pos)
 
 
-            dout = list(self.mdb.production.aggregate([
-            ]))
+            # tady se ziskaji skupiny
+            dout = list(self.mdb.production_groups.find())
             for i, out in enumerate(dout):
+                print(i, out)
                 pos = {}
                 pos['_id'] = str(out['_id'])
                 pos['id'] = str(out['_id'])
                 pos['text'] = str(out['name'])
-                pos['parent'] = str(out.get('parent', '#'))
+                pos['parent'] = str(out.get('parent', "#"))
+                #pos['parent'] = "#"
                 #pos['icon'] = "jstree-icon jstree-file"
                 pos['type'] = 'product'
                 new.append(pos)
@@ -300,9 +304,23 @@ class production_tree_move_elemen(BaseHandler):
 
         print("Presun production z/do..", source, destination)
 
-        self.mdb.production.update( {"_id": source}, {"$set": {"parent": destination}} )
+        self.mdb.production_tree.update( {"_id": source}, {"$set": {"parent": destination}} )
+        self.mdb.production_groups.update( {"_id": source}, {"$set": {"parent": destination}} )
 
         self.write("ok")
+
+
+
+class get_production_group(BaseHandler):
+    def post(self, group_id):
+        print(group_id)
+
+        out = self.mdb.production_groups.aggregate([
+            {"$match": {"_id": bson.ObjectId(group_id)}}])
+
+
+        self.write(bson.json_util.dumps(out))
+
 
 
 '''

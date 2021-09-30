@@ -2,7 +2,7 @@
 {% block title %} | Produkce, uvod{% end %}
 {% block body %}
 
-<nav style="margin: 0.5rem;" style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+<nav style="margin: 0.5rem;" style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' widtd='8' height='8'%3E%3Cpatd d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="./../../..">Home</a></li>
     <li class="breadcrumb-item"><a href="./../..">Production</a></li>
@@ -22,28 +22,62 @@
           <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')"><i class="bi bi-arrows-expand"></i></a>
           <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')"><i class="bi bi-arrows-collapse"></i></a>
 		</div>
-	<div id="production-list-tree">
+	<div id="production-list-tree" class="mb-2">
 	</div>
 </div>
 </div>
 
 
 		<div class="col">
-<div class="card" id="product_info" style="display: none;">
+<div class="card" id="production_info" style="display: none;">
 	<div class="card-header">
 		Verze produktu
 
-          <a href="#" class="float-right mx-1" onclick="$("#product_info").hide();"><i class="bi bi-x"></i></a>
+          <a href="#" class="float-right mx-1" onclick="$('#production_info').hide();"><i class="bi bi-x"></i></a>
           <a href="#" class="float-right mx-1" onclick=""><i class="bi bi-save"></i></a>
 	</div>
-	<div class="card-body">
+	<div class="card-body" id="production_info_loading">
+		<div class="spinner-border" role="status">
+			<span class="sr-only">Loading...</span>
+		</div>
+	</div>
+	<div class="card-body" id="production_info_data">
 
-		<p>TODO: Přehled základních parametrů z production... </p>
+		<form>
+			<div class="form-group">
+				<label>Název: <small class="text-muted">(<span class="production_info_id">00000000000000000</span>)</small></label>
+				<input type="text" class="form-control" name="" id="production_group_name">
+			</div>
+			<div class="form-group">
+				<label>Popis: </label>
+				<textarea class="form-control" name="" id="production_group_description"></textarea>
+			</div>
 
-		<p>Název, popis.. Bude to převzané ze součástky? Bude se z production tvořit skladová položka nebo naopak? </p>
+		</form>
 
-		<p>Seznam všech dosavadních výrob včetně jejich přesných BOM tabulek. </p>
-		
+		<div class="card">
+			<table class="table table-hover"><tbody>
+				<tr>
+					<td>VARIANTA 11 <span class="badge bg-info">9</span></td>
+					<td><small>2021-01-10 - 2021-05-14</small></td>
+					<td>
+						<i class="bi bi-clipboard-plus"></i>
+						<i class="bi bi-building"></i></td>
+				</tr>
+				<tr>
+					<td>VARIANTA 11 <span class="badge bg-info">9</span></td>
+					<td><small>2021-01-10 - 2021-05-14</small></td>
+					<td><i class="bi bi-clipboard-plus"></i>
+					<i class="bi bi-building"></i></td>
+				</tr>
+				<tr>
+					<td>Testovací osazení.. Součastky dostupné ve skladu <span class="badge bg-info">9</span></td>
+					<td><small>2021-01-10 - 2021-05-14</small></td>
+					<td><i class="bi bi-clipboard-plus"></i>
+					<i class="bi bi-building"></i></td>
+				</tr>
+			</tbody></table>
+		</div>
 	</div>
 </div>
 </div>
@@ -55,59 +89,11 @@
 	
 </div>
 
+
+Následující obsah bude v budoucnu odstraněn.... <br>
 <a href="/production/new/edit/" class="btn btn-sm btn-primary">Nový produkt</a>
-<div>
-	<div class="row">
-		<div class="col-12">
-			<div id="production-list-table" class="table table-sm"></div>
-		</div>
-		<div class="col-6">
-
-		</div>
-	</div>
-</div>
 
 </div>
-
-<script type="text/javascript">
-
-function loadProductionTable() {
-	var table = new Tabulator("#production-list-table", {
-		width: '100%',
-        initialSort:[
-            {column:"id", dir:"desc"}, //sort by this first
-        ],
-		columns:[
-	        {title:"ID", field:"id", width:100},
-	        {title:"Name", field:"name", sorter:"string"},
-	        {title:"Autor", field:"author_text", sorter:"string"},
-	        {title:"Components", field:"components", sorter:"number", align:"right", width:100},
-	        {title:"Created", field:"created", sorter:"date", align:"center"},
-	        //{title:"status", field:"status", sorter:"string", align:"center"},
-	    ],
-	    rowClick:function(e, row){
-	    	var event_id = row._row.cells[0].value
-	    	stocktakingLoadEvent(event_id);
-	    },
-	    rowDblClick:function(e, row){
-	    	var event_id = row._row.cells[0].value
-	    	window.location.href = "/production/"+event_id+"/edit/";
-	    },
-	    ajaxURL:"/production/api/getProductionList",
-	    ajaxConfig:{
-	        method:"POST",
-	        headers: {
-	            "Content-type": 'application/json; charset=utf-8',
-	        },
-	    }
-	});
-}
-
-
-loadProductionTable();
-
-</script>
-
 
 <script type="text/javascript">
 
@@ -122,7 +108,7 @@ function load_production_tree(){
         },
         "plugins" : [
             //  "checkbox",
-			//  "contextmenu",
+			  "contextmenu",
 			  "dnd",
 			//  "massload",
 			//  "search",
@@ -167,7 +153,7 @@ function load_production_tree(){
 				// tady je kliknuti na produkt
 				console.log("ON change", data);
 
-				load_product_info(data.node.id);
+				load_production_info(data.node.id);
 			}
 
 		}
@@ -178,10 +164,38 @@ function load_production_tree(){
 load_production_tree();
 
 
-function load_product_info(id){
+function load_production_info(id){
 
+	$("#production_info_loading").show();
+	$("#production_info_data").hide();
+	$("#production_info").show();
+	
 	console.log("Nacitam data o polozce", id);
-	$("#product_info").show();
+
+    $.ajax({
+		type: "POST",
+		url: "/production/api/getProductionGroup/"+id+"/",
+		//contentType : 'application/json',
+		data: {
+			//'selected': active_categories(),
+			//'position': $('#position_select').val(),
+		},
+		success: function( data, textStatus, jQxhr ){
+			data = JSON.parse(data)[0]
+			console.log(data);
+
+			$("#production_group_name").val(data['name']);
+			$("#production_group_description").val(data['description']);
+
+			$("#production_info_loading").hide();
+			$("#production_info_data").show();
+		},
+		error: function( jqXhr, textStatus, errorThrown ){
+			console.log('ERR, /store/api/products/')
+			console.log( errorThrown );
+		}
+	});
+
 }
 
 </script>
