@@ -11,6 +11,10 @@ Hlavní vlastnosti jsou:
   * Udržování identifikace sérií
   * Zajištění dohledatelné kvality během celého výrobního procesu
 
+Použité technologie
+  * NoSQL databáze MongoDB
+  * Python Tornado
+
 
 ## Motivace
 
