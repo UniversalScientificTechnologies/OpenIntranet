@@ -5,6 +5,7 @@ Celý systém je určen pro správu výroby a zajištění kvality výroby. Mome
 
 Hlavní vlastnosti jsou:
 
+  * Databáze běží na interních podnikových serverech, data tak neopouští firmu na rozdíl od jiných bězně cloudových řešení
   * Zjednodušení výroby správou materiálu
   * Správa verzí a dílčích materiálových položek
   * Udržování identifikace sérií
