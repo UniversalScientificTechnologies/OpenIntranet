@@ -7,8 +7,6 @@ pandas
 barcode
 mongomock
 code128
-socks
-#(distribucni python3-socks?)
 si_prefix
 python-barcode
-gitpython ?
+gitpython
