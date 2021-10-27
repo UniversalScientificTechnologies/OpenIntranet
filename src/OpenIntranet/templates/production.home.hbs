@@ -45,7 +45,7 @@
 
 		<form>
 			<div class="form-group">
-				<label>Název: <small class="text-muted">(<span class="production_info_id">00000000000000000</span>)</small></label>
+				<label>Název: <small class="text-muted">(<span class="production_group_id"></span>)</small></label>
 				<input type="text" class="form-control" name="" id="production_group_name">
 			</div>
 			<div class="form-group">
@@ -185,6 +185,7 @@ function load_production_info(id){
 			console.log(data);
 
 			$("#production_group_name").val(data['name']);
+			$("#production_group_id").html(data['_id']);
 			$("#production_group_description").val(data['description']);
 
 			$("#production_info_loading").hide();
