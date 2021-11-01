@@ -312,15 +312,37 @@ class production_tree_move_elemen(BaseHandler):
 
 
 class get_production_group(BaseHandler):
+
+    def get(self, group_id):
+        if group_id == 'new':
+            new_id = bson.ObjectId()
+
+            self.mdb.production_groups.insert_one(
+                {
+                    '_id': new_id,
+                    'name': "Nová skupina výroby",
+                    'type': "module",
+                    'description': "",
+                    'parent': '#'
+                }
+            )
+
+            self.write(str(new_id))
+
     def post(self, group_id):
         print(group_id)
 
         out = self.mdb.production_groups.aggregate([
-            {"$match": {"_id": bson.ObjectId(group_id)}}])
-
+            {"$match": {"_id": bson.ObjectId(group_id)}},
+            {"$lookup": {
+               "from": "production",
+               "localField": "_id",
+               "foreignField": "production_group",
+               "as": "variants"
+             }}
+        ])
 
         self.write(bson.json_util.dumps(out))
-
 
 
 '''

@@ -18,11 +18,14 @@
 		<div class="card-header">
 			Seznam výrobních podkladů
 
-          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('refresh')"><i class="bi bi-arrow-counterclockwise"></i></a>
-          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')"><i class="bi bi-arrows-expand"></i></a>
-          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')"><i class="bi bi-arrows-collapse"></i></a>
+		<span class="float-right" style="display: block;">
+          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('refresh')" title="Obnovit seznam"><i class="bi bi-arrow-counterclockwise"></i></a>
+          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')" title="Rozevřít všechny položky"><i class="bi bi-arrows-expand"></i></a>
+          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')" title="Srolovat celý seznam"><i class="bi bi-arrows-collapse"></i></a>
+          <a href="#" class="float-right mx-1" onclick="new_production_article()" title="Přidat novou skupinu"><i class="bi bi-file-plus"></i></a>
+          </span>
 		</div>
-	<div id="production-list-tree" class="mb-2">
+	<div id="production-list-tree" class="mb-0" style="max-height: 80vh; overflow:scroll;">
 	</div>
 </div>
 </div>
@@ -45,7 +48,7 @@
 
 		<form>
 			<div class="form-group">
-				<label>Název: <small class="text-muted">(<span class="production_group_id"></span>)</small></label>
+				<label>Název: <small class="text-muted">(<span id="production_group_id"></span>)</small></label>
 				<input type="text" class="form-control" name="" id="production_group_name">
 			</div>
 			<div class="form-group">
@@ -55,28 +58,11 @@
 
 		</form>
 
-		<div class="card">
-			<table class="table table-hover"><tbody>
-				<tr>
-					<td>VARIANTA 11 <span class="badge bg-info">9</span></td>
-					<td><small>2021-01-10 - 2021-05-14</small></td>
-					<td>
-						<i class="bi bi-clipboard-plus"></i>
-						<i class="bi bi-building"></i></td>
-				</tr>
-				<tr>
-					<td>VARIANTA 11 <span class="badge bg-info">9</span></td>
-					<td><small>2021-01-10 - 2021-05-14</small></td>
-					<td><i class="bi bi-clipboard-plus"></i>
-					<i class="bi bi-building"></i></td>
-				</tr>
-				<tr>
-					<td>Testovací osazení.. Součastky dostupné ve skladu <span class="badge bg-info">9</span></td>
-					<td><small>2021-01-10 - 2021-05-14</small></td>
-					<td><i class="bi bi-clipboard-plus"></i>
-					<i class="bi bi-building"></i></td>
-				</tr>
-			</tbody></table>
+		<div><label>Varianty: </label> <span class="float-right"><a class="bi bi-file-plus"></a></span></div>
+		<div class="card mt-0 mb-0">
+			<ul class="list-group list-group-flush" id="variants_list">
+				
+			</ul>
 		</div>
 	</div>
 </div>
@@ -136,13 +122,10 @@ function load_production_tree(){
 
 	production_tree.bind("move_node.jstree", function(e, data) {
    		console.log("Presouvam pozici " + data.node.id + " to " + data.parent);
-
 	    $.ajax({
 	      type: "POST",
 	      url: "/production/api/productionTree/move/",
 	      data: {'id': data.node.id, 'parent': data.parent},
-	      //success: success,
-	      //dataType: dataType
     	});
     });
 
@@ -152,7 +135,6 @@ function load_production_tree(){
 			if(data.node.type == 'product'){
 				// tady je kliknuti na produkt
 				console.log("ON change", data);
-
 				load_production_info(data.node.id);
 			}
 
@@ -163,6 +145,16 @@ function load_production_tree(){
 }
 load_production_tree();
 
+function new_production_article(){
+	$.ajax({
+	   url:'/production/api/getProductionGroup/new/',
+	   type:'GET',
+	   success: function(data){
+	   		console.log("Nova skupina", data);
+	   		load_production_info(data);
+	   }
+	});
+}
 
 function load_production_info(id){
 
@@ -185,11 +177,35 @@ function load_production_info(id){
 			console.log(data);
 
 			$("#production_group_name").val(data['name']);
-			$("#production_group_id").html(data['_id']);
+			$("#production_group_id").text(data['_id']['$oid']);
 			$("#production_group_description").val(data['description']);
+
+			$("#variants_list").empty();
+			
+			if(!data.variants.length){
+				$("#variants_list").append("<p class='text-muted m-2'> Skupina neobsahuje žádné výrobní podklady.</p>");
+			}else{
+				for (variant_i in data.variants) {
+					var variant = data.variants[variant_i]
+
+					tab = '<li class="list-group-item"> <div class="small text-muted"> Varianta: ' + variant['_id']['$oid'] + '</div>';
+					tab += '<div class="d-flex justify-content-between">';
+					tab += '<span> #' + variant_i + ' <span class="badge bg-info">' + ' - ' + '</span></span>';
+					tab += '<span>' + 'xxx' +'</span>';
+					tab += '<span>';
+					tab += '	<a class="bi bi-hammer" href="/production/'+ variant['_id']['$oid'] +'/edit/"></a>';
+					tab += '	<i class="bi bi-building"></i>';
+					tab += '</span></div></li>';
+
+					console.log(tab)
+
+					$("#variants_list").append(tab);
+				}
+			}
 
 			$("#production_info_loading").hide();
 			$("#production_info_data").show();
+
 		},
 		error: function( jqXhr, textStatus, errorThrown ){
 			console.log('ERR, /store/api/products/')
