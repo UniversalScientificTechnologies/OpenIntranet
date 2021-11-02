@@ -2,7 +2,7 @@
 
 Modul sklad slouží pro agendu ohledně správy skladu a skladových zásob. 
 
-Nejmenší skladová entita je sáček. 
+Nejmenší skladová entita je sáček obsahující určitý počet identických součástek. 
 
 ## Schopnosti
  * Vytvářet skladové položky
@@ -10,8 +10,15 @@ Nejmenší skladová entita je sáček.
  * Přehled všech skladových zásob
  * Rozdělování na sáčky
 
+## Editace názvu součástky 
+
+Název položky se edituje dvojklikem na samotný název. Pak se otevře takové okno (tzv. modal).
+
+![Component name change](https://raw.githubusercontent.com/UniversalScientificTechnologies/OpenIntranet/master/doc/img/item_name_edit.png)
+
 
 ## Access rights
+
  | Označení | Název | Popis | 
  |----------|-------|-------|
  | ```stock-sudo``` | Správce skladu | Kompletní přístup ke všem funkcím skladu. Včetně možnosti pokročilé editace |
