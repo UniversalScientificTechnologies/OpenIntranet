@@ -10,74 +10,65 @@
 </nav>
 
 <div class="container">
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				Seznam výrobních podkladů
 
-	<div class="row">
-		<div class="col">
+			<span class="float-right" style="display: block;">
+	          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('refresh')" title="Obnovit seznam"><i class="bi bi-arrow-counterclockwise"></i></a>
+	          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')" title="Rozevřít všechny položky"><i class="bi bi-arrows-expand"></i></a>
+	          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')" title="Srolovat celý seznam"><i class="bi bi-arrows-collapse"></i></a>
+	          <a href="#" class="float-right mx-1" onclick="new_production_article()" title="Přidat novou položku"><i class="bi bi-file-plus"></i></a>
+	          <a href="#" class="float-right mx-1" onclick="new_production_folder()" title="Přidat novou složku"><i class="bi bi-folder-plus"></i></a>
+	          </span>
+			</div>
+			<div id="production-list-tree" class="mb-0" style="max-height: 80vh; overflow:scroll;">
+			</div>
+		</div>
+	</div>
 
-	<div class="card">
+
+<div class="col">
+	<div class="card" id="production_info" style="display: none;">
 		<div class="card-header">
-			Seznam výrobních podkladů
-
-		<span class="float-right" style="display: block;">
-          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('refresh')" title="Obnovit seznam"><i class="bi bi-arrow-counterclockwise"></i></a>
-          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')" title="Rozevřít všechny položky"><i class="bi bi-arrows-expand"></i></a>
-          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')" title="Srolovat celý seznam"><i class="bi bi-arrows-collapse"></i></a>
-          <a href="#" class="float-right mx-1" onclick="new_production_article()" title="Přidat novou skupinu"><i class="bi bi-file-plus"></i></a>
-          </span>
+			Přehled výrobních podkladů
+	          	<span class="float-right">
+		          <a href="#" class="float-right mx-1" onclick="$('#production_info').hide();" title="Zavřít skupinu podkladů"><i class="bi bi-x-lg"></i></a>
+		          <a href="#" class="float-right mx-1" onclick="save_current_production()" title="Uložit aktuální změny"><i class="bi bi-sd-card"></i></a>
+	      		</span>
 		</div>
-	<div id="production-list-tree" class="mb-0" style="max-height: 80vh; overflow:scroll;">
-	</div>
-</div>
-</div>
-
-
-		<div class="col">
-<div class="card" id="production_info" style="display: none;">
-	<div class="card-header">
-		Verze produktu
-
-          <a href="#" class="float-right mx-1" onclick="$('#production_info').hide();"><i class="bi bi-x"></i></a>
-          <a href="#" class="float-right mx-1" onclick=""><i class="bi bi-save"></i></a>
-	</div>
-	<div class="card-body" id="production_info_loading">
-		<div class="spinner-border" role="status">
-			<span class="sr-only">Loading...</span>
-		</div>
-	</div>
-	<div class="card-body" id="production_info_data">
-
-		<form>
-			<div class="form-group">
-				<label>Název: <small class="text-muted">(<span id="production_group_id"></span>)</small></label>
-				<input type="text" class="form-control" name="" id="production_group_name">
+		<div class="card-body" id="production_info_loading">
+			<div class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
 			</div>
-			<div class="form-group">
-				<label>Popis: </label>
-				<textarea class="form-control" name="" id="production_group_description"></textarea>
+		</div>
+		<div class="card-body" id="production_info_data">
+
+			<form>
+				<div class="form-group">
+					<label>Název: <small class="text-muted">(<span id="production_group_id"></span>)</small></label>
+					<input type="text" class="form-control" name="" id="production_group_name">
+				</div>
+				<div class="form-group">
+					<label>Popis: </label>
+					<textarea class="form-control" name="" id="production_group_description"></textarea>
+				</div>
+
+			</form>
+
+			<div><label>Varianty: </label> <span class="float-right"><a class="bi bi-plus-lg" id="href_create_new_production_workflow" title="Vytvořit prázné workflow"></a></span> </div>
+			<div class="card mt-0 mb-0">
+				<ul class="list-group list-group-flush" id="variants_list">
+					
+				</ul>
 			</div>
-
-		</form>
-
-		<div><label>Varianty: </label> <span class="float-right"><a class="bi bi-file-plus"></a></span></div>
-		<div class="card mt-0 mb-0">
-			<ul class="list-group list-group-flush" id="variants_list">
-				
-			</ul>
 		</div>
 	</div>
 </div>
-</div>
 
 </div>
-
-
-<div style="height: 5cm;">
-	
-</div>
-
-
-Následující obsah bude v budoucnu odstraněn.... <br>
-<a href="/production/new/edit/" class="btn btn-sm btn-primary">Nový produkt</a>
 
 </div>
 
@@ -129,6 +120,15 @@ function load_production_tree(){
     	});
     });
 
+	production_tree.on('rename_node.jstree', function (e, data) {
+		//console.log(e, data);
+	    $.ajax({
+	      type: "POST",
+	      url: "/production/api/productionTree/rename/",
+	      data: {'id': data.node.id, 'new_name': data.text},
+    	});
+	});
+
 	production_tree.on('changed.jstree', function (e, data) {
 		if(data.event && data.event.type == 'click'){
 
@@ -137,11 +137,8 @@ function load_production_tree(){
 				console.log("ON change", data);
 				load_production_info(data.node.id);
 			}
-
 		}
 	});
-
-
 }
 load_production_tree();
 
@@ -152,6 +149,42 @@ function new_production_article(){
 	   success: function(data){
 	   		console.log("Nova skupina", data);
 	   		load_production_info(data);
+	   }
+	});
+}
+
+function new_production_folder(){
+	$.ajax({
+	   url:'/production/api/productionTree/new_folder/',
+	   type:'POST',
+	   success: function(data){
+	   		$('#production-list-tree').jstree('refresh');
+	   }
+	});
+}
+
+function delete_current_production(){
+	current = $("#production_group_id").text();
+	$.ajax({
+	   url:'/production/api/deleteProductionGroup/'+current+'/',
+	   type:'POST',
+	   success: function(data){
+	   		$('#production-list-tree').jstree('refresh');
+	   }
+	});
+}
+
+function save_current_production(){
+	current_id = $("#production_group_id").text();
+	$.ajax({
+	   url:'/production/api/updateProductionGroup/'+current_id+'/',
+	   type:'POST',
+	   data: {
+	   		'name' : $("#production_group_name").val(),
+	   		'description' : $("#production_group_description").val()
+	   },
+	   success: function(data){
+	   		$('#production-list-tree').jstree('refresh');
 	   }
 	});
 }
@@ -180,6 +213,8 @@ function load_production_info(id){
 			$("#production_group_id").text(data['_id']['$oid']);
 			$("#production_group_description").val(data['description']);
 
+			$("#href_create_new_production_workflow").attr('href', '/production/new/edit/?group='+data['_id']['$oid'])
+
 			$("#variants_list").empty();
 			
 			if(!data.variants.length){
@@ -190,12 +225,12 @@ function load_production_info(id){
 
 					tab = '<li class="list-group-item"> <div class="small text-muted"> Varianta: ' + variant['_id']['$oid'] + '</div>';
 					tab += '<div class="d-flex justify-content-between">';
-					tab += '<span> #' + variant_i + ' <span class="badge bg-info">' + ' - ' + '</span></span>';
+					tab += '<span> ' + variant['name'] + ' <span class="badge bg-info">' + ' - ' + '</span></span>';
 					tab += '<span>' + 'xxx' +'</span>';
 					tab += '<span>';
-					tab += '	<a class="bi bi-hammer" href="/production/'+ variant['_id']['$oid'] +'/edit/"></a>';
-					tab += '	<i class="bi bi-building"></i>';
-					tab += '</span></div></li>';
+					tab += '	<a class="bi bi-hammer" href="/production/' + variant['_id']['$oid'] + '/edit/" title="Otevřít okno výroby"></a>';
+					tab += '	<a class="bi bi-back" href="production/' + variant['_id']['$oid'] + '/duplicate/" title="Vytvořit kopii"></a>';
+					tab += '</span></div> <div class="small text-muted"> ' + variant['description'] + '</div> </li>';
 
 					console.log(tab)
 
