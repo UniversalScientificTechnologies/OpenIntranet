@@ -943,6 +943,7 @@ class RegistrationHandler(BaseHandler):
             'created': datetime.datetime.now(),
             'type': 'user',
             'role': role,
+            'workspans': []
         })
 
         print("Registrován email", email)

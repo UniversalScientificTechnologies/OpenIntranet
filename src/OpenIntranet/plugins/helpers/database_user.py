@@ -106,6 +106,7 @@ def add_users(coll: pymongo.collection.Collection, ids: list):
     users = [{"_id": _id,
               "user": _id,
               "role": [],
+              "workpans": [],
               "created": datetime.now().replace(microsecond=0),
               "type": "user",
               "email_validated": "no",
