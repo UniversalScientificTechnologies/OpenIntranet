@@ -118,8 +118,15 @@ def get_plugin_handlers():
              (r'/{}/(.*)/upload/bom/ust/'.format(plugin_name), ust_bom_upload),
              (r'/{}/(.*)/print/'.format(plugin_name), print_bom),
              (r'/{}/(.*)/edit/'.format(plugin_name), edit),
+             (r'/{}/(.*)/duplicate/'.format(plugin_name), duplicate),
              (r'/{}/(.*)/get_bom_table/'.format(plugin_name), get_bom_table),
+             (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
+             (r'/{}/api/productionTree/move/'.format(plugin_name), production_tree_move_elemen),
+             (r'/{}/api/productionTree/rename/'.format(plugin_name), production_tree_rename_elemen),
+             (r'/{}/api/productionTree/new_folder/'.format(plugin_name), production_tree_new_elemen),
+             (r'/{}/api/getProductionGroup/(.*)/'.format(plugin_name), get_production_group),
+             (r'/{}/api/updateProductionGroup/(.*)/'.format(plugin_name), update_production_group),
              (r'/{}'.format(plugin_name), home),
              (r'/{}/'.format(plugin_name), home),
         ]
@@ -240,6 +247,156 @@ class get_production_list(BaseHandlerJson):
         self.write(out)
 
 
+'''
+    Vrátí strom výrobních podkladů
+'''
+class get_production_tree(BaseHandler):
+    role_module = ['production-sudo', 'production-access', 'production-manager', 'production-read']
+    def post(self):
+        self.set_header('Content-Type', 'application/json')
+        type = self.get_argument('type', 'jstree')
+        print("api_categories_list .. ", type)
+
+        if type == 'jstree':
+            new = []
+
+            # tady se ziskaji stromova struktura
+            dout = list(self.mdb.production_tree.find())
+            for i, out in enumerate(dout):
+                pos = {}
+                pos['_id'] = str(out['_id'])
+                pos['id'] = str(out['_id'])
+                pos['text'] = str(out['text'])
+                pos['type'] = 'folder'
+                #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
+                #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
+                #pos['li_attr'] = {"name": out['name'], 'text': out['description']}
+                
+                pos['parent'] = str(out.get('parent', '#'))
+                new.append(pos)
+
+
+            # tady se ziskaji skupiny
+            dout = list(self.mdb.production_groups.find())
+            for i, out in enumerate(dout):
+                print(i, out)
+                pos = {}
+                pos['_id'] = str(out['_id'])
+                pos['id'] = str(out['_id'])
+                pos['text'] = str(out['name'])
+                pos['parent'] = str(out.get('parent', "#"))
+                #pos['parent'] = "#"
+                #pos['icon'] = "jstree-icon jstree-file"
+                pos['type'] = 'product'
+                new.append(pos)
+
+            output = bson.json_util.dumps(new)
+
+        else:
+            self.write("unsupported")
+
+        self.write(output)
+
+
+class production_tree_move_elemen(BaseHandler):
+    def post(self):
+        source = bson.ObjectId(self.get_argument('id'))
+        destination = self.get_argument('parent')
+
+        validated = True
+
+        if destination != "#":
+            destination = bson.ObjectId(destination)
+
+            valid = list(self.mdb.production_tree.find({'_id': destination}))
+
+            if not len(valid):
+                print("Nelze presunout, pravdepodobne presouvas spatne")
+                self.write("Fail")
+                validated = False
+
+
+        if validated:
+            print("Presun production z/do..", source, destination)
+
+            self.mdb.production_tree.update( {"_id": source}, {"$set": {"parent": destination}} )
+            self.mdb.production_groups.update( {"_id": source}, {"$set": {"parent": destination}} )
+
+            self.write("ok")
+
+
+class production_tree_rename_elemen(BaseHandler):
+    def post(self):
+        source = bson.ObjectId(self.get_argument('id'))
+        new_name = self.get_argument('new_name')
+
+        self.mdb.production_tree.update( {"_id": source}, {"$set": {"text": new_name}} )
+        self.mdb.production_groups.update( {"_id": source}, {"$set": {"name": new_name}} )
+
+        self.write("ok")
+
+
+class production_tree_new_elemen(BaseHandler):
+    def post(self):
+        self.mdb.production_tree.insert_one(
+            {
+                "parent": "#",
+                "text": "Nová složka",
+                "icon": ""
+            }
+        )
+        self.write("ok")
+
+
+class get_production_group(BaseHandler):
+
+    # Vytvoreni nove skupiny vyroby
+    def get(self, group_id):
+        if group_id == 'new':
+            new_id = bson.ObjectId()
+
+            self.mdb.production_groups.insert_one(
+                {
+                    '_id': new_id,
+                    'name': "Nová položka výroby",
+                    'type': "module",
+                    'description': "",
+                    'parent': '#'
+                }
+            )
+
+            self.write(str(new_id))
+
+    def post(self, group_id):
+        print(group_id)
+
+        out = self.mdb.production_groups.aggregate([
+            {"$match": {"_id": bson.ObjectId(group_id)}},
+            {"$lookup": {
+               "from": "production",
+               "localField": "_id",
+               "foreignField": "production_group",
+               "as": "variants"
+             }}
+        ])
+
+        self.write(bson.json_util.dumps(out))
+
+class update_production_group(BaseHandler):
+
+    def post(self, group_id):
+        group_id = bson.ObjectId(group_id)
+        name = self.get_argument('name')
+        description = self.get_argument('description')
+
+        self.mdb.production_groups.update({'_id': group_id}, 
+            { "$set": {"name": name, "description": description}}
+        )
+
+        self.write("")
+            
+
+
 
 '''
     Tabulka s BOMem pro zobrazeni v production
@@ -322,6 +479,7 @@ class edit(BaseHandler):
     def get(self, name):
         print("Vyhledavam polozku", name)
         if name == 'new':
+            parent = bson.ObjectId(self.get_argument('group'))
             product = self.mdb.production.insert({
                     'name': 'Without name',
                     'created': datetime.datetime.now(),
@@ -331,15 +489,16 @@ class edit(BaseHandler):
                     'tags': [],
                     'priority': 0,
                     'type': 'module',
-                    'components': []
+                    'components': [],
+                    'production_group': parent
                 })
             print(product)
             self.redirect('/production/{}/edit/'.format(product))
-
-        product = self.mdb.production.aggregate([
-                {'$match': {'_id': bson.ObjectId(name)}}
-            ])
-        self.render('production.flow.hbs', id = name, product = list(product))
+        else:
+            product = self.mdb.production.aggregate([
+                    {'$match': {'_id': bson.ObjectId(name)}}
+                ])
+            self.render('production.flow.hbs', id = name, product = list(product))
 
     def post(self, name):
         self.set_header('Content-Type', 'application/json')
@@ -686,6 +845,27 @@ class edit(BaseHandler):
             data = list(data)
             output = bson.json_util.dumps(data)
             self.write(output)
+
+'''
+   
+   Vytvoř duplikat vyrobniho postupu a nech ho ve stejne slozce
+   
+'''
+class duplicate(BaseHandler):
+    def get(self, name):
+
+        name = bson.ObjectId(name)
+        product = self.mdb.production.find_one({'_id': name})
+
+        product['_id'] = bson.ObjectId()
+        product['name'] += " Duplicate"
+
+        self.mdb.production.insert_one(product)
+
+        print(product)
+        self.redirect('/production/{}/edit/'.format(product['_id']))
+
+
 
 class ust_bom_upload(BaseHandler):
 

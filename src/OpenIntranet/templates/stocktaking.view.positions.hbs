@@ -86,9 +86,15 @@
 		</tr>
 	</thead>
 	<tbody>
+
+{% set total_price = 0 %}
+{% set total_count = 0 %}
+{% set error_count = 0 %}
+
 	{%for pi, packet in enumerate(packets) %}
 	    {% set component = packet['component'] %}
 	    {% set position = packet.get('position_info', None) %}
+                {% set total_count += 1 %}
 		{% set has_inventory = 0 %}
 		{% set has_error = 0 %}
 		{% for operation in packet['operations']%}{%if operation.get("inventory_id", "") == inventory['_id'] %}{%set has_inventory += 1 %}{%end%}{%end%}
@@ -118,15 +124,22 @@
 				Inventura provedena
 			{% else %}
 				<i class="bi bi-bug"></i> Jiná chyba
+                                {% set has_error += 1%}
 			{% end %}
 
 			</td>
 			<!-- <small>{{packet}}</small><br> -->
 
 		</tr>
+                {% if has_error %} {% set error_count += 1%} {% end %}
+                {% set total_price += packet.get('packet_count', 0)%}
 		
 	{% end %}</tbody></table>
 		
+
+        <ul> Celková cena skladu: {{total_price}} Czk</ul>
+        <ul> Počet sáčků: {{total_count}} ks </ul>
+        <ul> Počet sáčků s chybou {{error_count}} ks </ul>       
 
 	</div>
 
