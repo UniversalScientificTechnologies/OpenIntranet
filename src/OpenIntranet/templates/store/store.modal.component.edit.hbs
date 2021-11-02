@@ -42,7 +42,7 @@
             </div>
 
             <div class="form-group row mb-1">
-              <label class="col-sm-3 col-form-label" data-toggle="tooltip" title="Tato cena je určena jako základní pro samostatný prodej. Zaškrtávátko určuje, jestli tato položka je samostatně prodejná.">Cena (prodejní) <i class="material-icons">help</i></label>
+              <label class="col-sm-3 col-form-label" data-bs-toggle="tooltip" title="Tato cena je určena jako základní pro samostatný prodej. Zaškrtávátko určuje, jestli tato položka je samostatně prodejná.">Cena (prodejní) <i class="material-icons">help</i></label>
               <div class="input-group input-group-sm col-sm-9">
                 <div class="input-group-prepend">
                   <div class="input-group-text">
@@ -57,7 +57,7 @@
             </div>
 
             <div class="form-group row mb-1">
-              <label class="col-sm-3 col-form-label" data-toggle="tooltip" title="Nákupní cena skladových položek LIFO metodou">Cena (skladová)<i class="material-icons">help</i></label>
+              <label class="col-sm-3 col-form-label" data-bs-toggle="tooltip" title="Nákupní cena skladových položek LIFO metodou">Cena (skladová)<i class="material-icons">help</i></label>
               <div class="input-group input-group-sm col-sm-9">
                 <input class="form-control" id="input_warehouse_unit_price" placeholder="Cena (prodejní)" readonly>
                 <!-- <div class="input-group-append">
@@ -76,7 +76,7 @@
 
 
             <div class="form-group row mb-1 hide-on-new">
-              <label class="col-sm-3 col-form-label" data-toggle="tooltip" title="Jsou zobrazeny pouze pozice z akutálního skladu. Barevně je vyznačena primární pozice. Pro zobrazení pozic z ostatních skladů použijte nástroj 'Nastení pozic'.">Pozice ve skladu <i class="material-icons">help</i></label>
+              <label class="col-sm-3 col-form-label" data-bs-toggle="tooltip" title="Jsou zobrazeny pouze pozice z akutálního skladu. Barevně je vyznačena primární pozice. Pro zobrazení pozic z ostatních skladů použijte nástroj 'Nastení pozic'.">Pozice ve skladu <i class="material-icons">help</i></label>
               <div class="col-sm-9">
                   <div class="d-flex flex-row" id="inputPOSITION_list">
                   </div>
@@ -85,7 +85,7 @@
 
 
             <div class="form-group row mb-1 hide-on-new">
-              <label class="col-sm-3 col-form-label" data-toggle="tooltip" title="Seznam sáčků">Packets <i class="material-icons muted">help</i></label>
+              <label class="col-sm-3 col-form-label" data-bs-toggle="tooltip" title="Seznam sáčků">Packets <i class="material-icons muted">help</i></label>
               <div class="col-sm-9">
                   <div class="" id="inputPACKET_list">
                   </div>
@@ -94,7 +94,7 @@
 
 
             <div class="form-group row mb-1 hide-on-new">
-              <label class="col-sm-3 col-form-label" data-toggle="tooltip" title="Seznam sáčků">Packets (new)<i class="material-icons muted">help</i></label>
+              <label class="col-sm-3 col-form-label" data-bs-toggle="tooltip" title="Seznam sáčků">Packets (new)<i class="material-icons muted">help</i></label>
               <div class="col-sm-9">
                   <div class="" id="inputPACKET_display">
                   </div>
@@ -116,7 +116,7 @@
             </div>
 
             <div class="form-group row mb-1">
-               <label class="col-sm-3 col-form-label" data-toggle="tooltip" title="Pokud nebude kategorie zadána, položka bude zařazena do 'Nezařazeno'.">Kategorie<i class="material-icons">help</i></label>
+               <label class="col-sm-3 col-form-label" data-bs-toggle="tooltip" title="Pokud nebude kategorie zadána, položka bude zařazena do 'Nezařazeno'.">Kategorie<i class="material-icons">help</i></label>
               <div class="input-group input-group-sm col-sm-9">
                 <select class="form-control js-example-basic-multiple" name="states[]" multiple="multiple" id="inputCATEGORY_edit">
                 {% for cat in category %}
@@ -141,7 +141,7 @@
                 <div id="selected_operations">
                   <div class="btn-group btn-group-justified">
                     <div class="btn-group" role="group">
-                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Do košíku</button>
+                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Do košíku</button>
                         <div class="dropdown-menu form-group p-0 mb-1" aria-labelledby="btnGroupDrop1">
                           <input class="form-control" type="number" id="add_to_cart_count" min="0" value="0">
                           <button class="form-control btn btn-success" onclick="add_to_cart_count(null, '#add_to_cart_count')">Přidat</button>
