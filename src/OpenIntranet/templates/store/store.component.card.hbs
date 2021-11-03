@@ -43,7 +43,11 @@ function select_package_formatter(data) {
   <div class="col-6 my-2 mr-1 p-0 bg-white rounded box-shadow">
     <div class="d-flex">
       <div class="d-inline-block p-2">
-        <img style="width: 200pt; height: 200pt;">
+        {%if len(component.get('images', [])) %}
+          <img class="img-thumbnail" style="width: 200pt; height: 200pt;">
+        {% else %}
+          <img class="component_image img-thumbnail" src="/static/img/image-alt.svg" style="width: 200pt; height: 200pt;">
+        {% end %}
       </div>
       <div class="d-inline-stretch p-2">
         <div class="row">
@@ -61,14 +65,14 @@ function select_package_formatter(data) {
 
 
         <div class="row">
-          <div class="col-4" data-bs-toggle="popover" title="V aktuálním skladu; {{warehouse['name']}}">{{warehouse['code'].upper()}}:</div>
-          <div class="col"> <span class="badge big bg-primary" data-bs-toggle="popover" title="K dispozici (celkem ve skladu včetně rezervovaných)"> <span class="material-icons">store</span> {{"{} ks".format(current_warehouse.get('count', 0) - current_warehouse.get('reserv', 0))}} <span class="small">({{"{} ks".format(current_warehouse.get('count', 0))}})</span> </span>
+          <div class="col-4" data-bs-target="popover" title="V aktuálním skladu; {{warehouse['name']}}">{{warehouse['code'].upper()}}:</div>
+          <div class="col"> <span class="badge big bg-primary" data-bs-target="popover" title="K dispozici (celkem ve skladu včetně rezervovaných)"> <span class="material-icons">store</span> {{"{} ks".format(current_warehouse.get('count', 0) - current_warehouse.get('reserv', 0))}} <span class="small">({{"{} ks".format(current_warehouse.get('count', 0))}})</span> </span>
             <span class="badge bg-secondary"><span class="material-icons"> local_shipping </span> -- ks <span class="material-icons"> shopping_cart </span> -- ks</span>
         </div>
         </div>
 
         <div class="row">
-          <div class="col-4" data-bs-toggle="popover" title="Ve všech skladech">Celkem:</div>
+          <div class="col-4" data-bs-target="popover" title="Ve všech skladech">Celkem:</div>
           <div class="col"> <span class="badge big bg-primary"> <span class="material-icons">business</span> {{"{} ks".format(other_warehouse.get('count', 0) - other_warehouse.get('reserv', 0))}} <span class="small">({{"{} ks".format(other_warehouse.get('count', 0))}})</span> </span>
             <span class="badge bg-secondary"><span class="material-icons"> local_shipping </span> -- ks <span class="material-icons"> shopping_cart </span> -- ks</span>
 
@@ -77,12 +81,12 @@ function select_package_formatter(data) {
 
 
         <div class="row">
-          <div class="col-4" data-bs-toggle="popover" title="Nákupní ceny vycházejí z provedených nákupů">Nákupní ceny:</div>
+          <div class="col-4" data-bs-target="popover" title="Nákupní ceny vycházejí z provedených nákupů">Nákupní ceny:</div>
           <div class="col">
-            <span class="badge bg-primary" data-bs-toggle="popover" title="Cena posledního nákupu"><span class="material-icons">update</span> {{prices.get('last_price', 'null')}} czk </span>
-            <span class="badge bg-primary" data-bs-toggle="popover" title="Nejnižší cena nákupu"><span class="material-icons">vertical_align_bottom</span> {{prices.get('min_price', 'null')}} czk </span>
-            <span class="badge bg-primary" data-bs-toggle="popover" title="Průměrná cena nákupu"><span class="material-icons">vertical_align_center</span> {{round(prices.get('avg_price', 0), 4)}} czk</span>
-            <span class="badge bg-primary" data-bs-toggle="popover" title="Nejvyšší cena nákupu"><span class="material-icons">vertical_align_top</span> {{prices.get('max_price', 'null')}} czk</span>
+            <span class="badge bg-primary" data-bs-target="popover" title="Cena posledního nákupu"><span class="material-icons">update</span> {{prices.get('last_price', 'null')}} czk </span>
+            <span class="badge bg-primary" data-bs-target="popover" title="Nejnižší cena nákupu"><span class="material-icons">vertical_align_bottom</span> {{prices.get('min_price', 'null')}} czk </span>
+            <span class="badge bg-primary" data-bs-target="popover" title="Průměrná cena nákupu"><span class="material-icons">vertical_align_center</span> {{round(prices.get('avg_price', 0), 4)}} czk</span>
+            <span class="badge bg-primary" data-bs-target="popover" title="Nejvyšší cena nákupu"><span class="material-icons">vertical_align_top</span> {{prices.get('max_price', 'null')}} czk</span>
           </div>
         </div>
 
@@ -91,7 +95,7 @@ function select_package_formatter(data) {
         <div class="row">
           <div class="col-4">Prodejní cena:</div>
           <div class="col">
-            <span class="badge bg-success" data-bs-toggle="popover" title="Prodejní cena"> <span class="material-icons">add</span> --- czk </span>
+            <span class="badge bg-success" data-bs-target="popover" title="Prodejní cena"> <span class="material-icons">add</span> --- czk </span>
           </div>
         </div>
 
@@ -105,33 +109,33 @@ function select_package_formatter(data) {
       <ul class="nav nav-tabs pt-0 px-3" id="myTab" role="tablist">
 
         <li class="nav-item" role="presentation">
-          <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#param_tab" role="tab" aria-controls="param_tab" aria-selected="true"> <i class="bi bi-list-nested"></i> Parametry</a>
+          <a class="nav-link active" id="home-tab" data-bs-target="tab" href="#param_tab" role="tab" aria-controls="param_tab" aria-selected="true"> <i class="bi bi-list-nested"></i> Parametry</a>
         </li>
         
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#docs"  aria-controls="docs" aria-selected="false"> <i class="bi bi-files"></i>Dokumenty</a>
+          <a class="nav-link" id="profile-tab" data-bs-target="tab" href="#docs"  aria-controls="docs" aria-selected="false"> <i class="bi bi-files"></i>Dokumenty</a>
         </li>
         
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#prices" role="tab" aria-controls="prices" aria-selected="false"> <i class="bi bi-cash-stack"></i> Ceny </a>
+          <a class="nav-link" id="profile-tab" data-bs-target="tab" href="#prices" role="tab" aria-controls="prices" aria-selected="false"> <i class="bi bi-cash-stack"></i> Ceny </a>
         </li>
 
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="suppliers-tab" data-bs-toggle="tab" href="#suppliers" role="tab" aria-controls="suppliers" aria-selected="false"> <i class="bi bi-truck"></i> Dodavatelé</a>
+          <a class="nav-link" id="suppliers-tab" data-bs-target="tab" href="#suppliers" role="tab" aria-controls="suppliers" aria-selected="false"> <i class="bi bi-truck"></i> Dodavatelé</a>
         </li>
 
 
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false"> <i class="bi bi-clock-history"></i> Historie</a>
+          <a class="nav-link" id="contact-tab" data-bs-target="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false"> <i class="bi bi-clock-history"></i> Historie</a>
         </li>
 
 
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-buy-tab" data-bs-toggle="tab" href="#oper_buy" role="tab" aria-controls="oper_buy" aria-selected="false"> <i class="bi bi-box-arrow-in-down-right"></i> Nákup (do skladu)</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-sell-tab" data-bs-toggle="tab" href="#oper_sell" role="tab" aria-controls="oper_sell" aria-selected="false" disabled> <i class="bi bi-box-arrow-up-right"></i> Prodej (ze skladu)</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-transfere-tab" data-bs-toggle="tab" href="#oper_transfere" role="tab" aria-controls="oper_transfere" aria-  selected="false"> <i class="bi bi-arrow-left-right"></i> Přesun mezi sáčky</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-service-tab" data-bs-toggle="tab" href="#oper_service" role="tab" aria-controls="oper_service" aria-selected="false"> <i class="bi bi-box-arrow-down"></i> Servisní odběr</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-move-tab" data-bs-toggle="tab" href="#oper_move" role="tab" aria-controls="oper_move" aria-selected="false"> <i class="bi bi-arrows-move"></i> Změna pozice</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-next-tab" data-bs-toggle="tab" href="#oper_next" role="tab" aria-controls="oper_next" aria-selected="false"> Další</a></li>
+            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-buy-tab" data-bs-target="tab" href="#oper_buy" role="tab" aria-controls="oper_buy" aria-selected="false"> <i class="bi bi-box-arrow-in-down-right"></i> Nákup (do skladu)</a></li>
+            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-sell-tab" data-bs-target="tab" href="#oper_sell" role="tab" aria-controls="oper_sell" aria-selected="false" disabled> <i class="bi bi-box-arrow-up-right"></i> Prodej (ze skladu)</a></li>
+            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-transfere-tab" data-bs-target="tab" href="#oper_transfere" role="tab" aria-controls="oper_transfere" aria-  selected="false"> <i class="bi bi-arrow-left-right"></i> Přesun mezi sáčky</a></li>
+            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-service-tab" data-bs-target="tab" href="#oper_service" role="tab" aria-controls="oper_service" aria-selected="false"> <i class="bi bi-box-arrow-down"></i> Servisní odběr</a></li>
+            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-move-tab" data-bs-target="tab" href="#oper_move" role="tab" aria-controls="oper_move" aria-selected="false"> <i class="bi bi-arrows-move"></i> Změna pozice</a></li>
+            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-next-tab" data-bs-target="tab" href="#oper_next" role="tab" aria-controls="oper_next" aria-selected="false"> Další</a></li>
 
       </ul>
 
