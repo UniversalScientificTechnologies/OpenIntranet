@@ -2,6 +2,8 @@
 {% block title %} | Produkce, uvod{% end %}
 {% block body %}
 
+{% import datetime %}
+
 <nav style="margin: 0.5rem;" style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' widtd='8' height='8'%3E%3Cpatd d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="./../../..">Home</a></li>
@@ -16,12 +18,12 @@
 			<div class="card-header">
 				Seznam výrobních podkladů
 
-			<span class="float-right" style="display: block;">
-	          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('refresh')" title="Obnovit seznam"><i class="bi bi-arrow-counterclockwise"></i></a>
-	          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('open_all')" title="Rozevřít všechny položky"><i class="bi bi-arrows-expand"></i></a>
-	          <a href="#" class="float-right mx-1" onclick="$('#production-list-tree').jstree('close_all')" title="Srolovat celý seznam"><i class="bi bi-arrows-collapse"></i></a>
-	          <a href="#" class="float-right mx-1" onclick="new_production_article()" title="Přidat novou položku"><i class="bi bi-file-plus"></i></a>
-	          <a href="#" class="float-right mx-1" onclick="new_production_folder()" title="Přidat novou složku"><i class="bi bi-folder-plus"></i></a>
+			<span class="float-end" style="display: block;">
+	          <a href="#" class="mx-1" onclick="$('#production-list-tree').jstree('refresh')" title="Obnovit seznam"><i class="bi bi-arrow-counterclockwise"></i></a>
+	          <a href="#" class="mx-1" onclick="$('#production-list-tree').jstree('open_all')" title="Rozevřít všechny položky"><i class="bi bi-arrows-expand"></i></a>
+	          <a href="#" class="mx-1" onclick="$('#production-list-tree').jstree('close_all')" title="Srolovat celý seznam"><i class="bi bi-arrows-collapse"></i></a>
+	          <a href="#" class="mx-1" onclick="new_production_article()" title="Přidat novou položku"><i class="bi bi-file-plus"></i></a>
+	          <a href="#" class="mx-1" onclick="new_production_folder()" title="Přidat novou složku"><i class="bi bi-folder-plus"></i></a>
 	          </span>
 			</div>
 			<div id="production-list-tree" class="mb-0" style="max-height: 80vh; overflow:scroll;">
@@ -34,9 +36,9 @@
 	<div class="card" id="production_info" style="display: none;">
 		<div class="card-header">
 			Přehled výrobních podkladů
-	          	<span class="float-right">
-		          <a href="#" class="float-right mx-1" onclick="$('#production_info').hide();" title="Zavřít skupinu podkladů"><i class="bi bi-x-lg"></i></a>
-		          <a href="#" class="float-right mx-1" onclick="save_current_production()" title="Uložit aktuální změny"><i class="bi bi-sd-card"></i></a>
+	          	<span class="float-end">
+		          <a href="#" class="mx-1" onclick="$('#production_info').hide();" title="Zavřít skupinu podkladů"><i class="bi bi-x-lg"></i></a>
+		          <a href="#" class="mx-1" onclick="save_current_production()" title="Uložit aktuální změny"><i class="bi bi-sd-card"></i></a>
 	      		</span>
 		</div>
 		<div class="card-body" id="production_info_loading">
@@ -223,13 +225,12 @@ function load_production_info(id){
 				for (variant_i in data.variants) {
 					var variant = data.variants[variant_i]
 
-					tab = '<li class="list-group-item"> <div class="small text-muted"> Varianta: ' + variant['_id']['$oid'] + '</div>';
+					tab = '<li class="list-group-item"> <div> <span class="small text-muted"> Varianta: ' + variant['_id']['$oid'] + '</span> <span class="float-end mx-1" title="Vytvořeno"> <i class="bi bi-align-start"></i> ' + new Date(variant['created']['$date']).toLocaleDateString() + ' </span> <span class="float-end mx-1" title="Upraveno"> <i class="bi bi-pencil"></i> ' + '<span class="text-muted">dd-mm-yyyy</span>' + ' </span> </div>';
 					tab += '<div class="d-flex justify-content-between">';
-					tab += '<span> ' + variant['name'] + ' <span class="badge bg-info">' + ' - ' + '</span></span>';
-					tab += '<span>' + 'xxx' +'</span>';
+					tab += '<span><a class="h5" target="_blank_" href="/production/' + variant['_id']['$oid'] + '/edit/"> ' + variant['name'] + '</a> <span class="badge bg-info">' + ' - ' + '</span></span>';
+					tab += '<span>' + '' +'</span>';
 					tab += '<span>';
-					tab += '	<a class="bi bi-hammer" href="/production/' + variant['_id']['$oid'] + '/edit/" title="Otevřít okno výroby"></a>';
-					tab += '	<a class="bi bi-back" href="production/' + variant['_id']['$oid'] + '/duplicate/" title="Vytvořit kopii"></a>';
+					tab += '	<a class="bi bi-back" target="_blank_" href="production/' + variant['_id']['$oid'] + '/duplicate/" title="Vytvořit kopii"></a>';
 					tab += '</span></div> <div class="small text-muted"> ' + variant['description'] + '</div> </li>';
 
 					console.log(tab)
