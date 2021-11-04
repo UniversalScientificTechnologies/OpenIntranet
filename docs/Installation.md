@@ -1,3 +1,9 @@
+---
+layout: default
+title: Installation
+parent: Development
+---
+
 Celý systém je naprogramovaný v Python3 a je postavený na databázovém systému mongodb.
 
 
