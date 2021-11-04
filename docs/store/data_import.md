@@ -1,3 +1,10 @@
+---
+layout: default
+title: External data sources
+parent: Store - Warehouse management system
+nav_order: 4
+---
+
 # Store data import
 
 Mnoho dodavatelů komponent nabízí velmi rozsáhlá API pro získání stavu objednávek, pro tvorbu objednávek nebo jen pro získání dalších informací o produktech. Data import se stará o správu připojení k jednotlivým dodavatelským API
@@ -33,15 +40,19 @@ Na adrese:
 ```
 pak obdržíme tzv. Nonce kód, který je nutné zaregistrovat ve vlastním TME Účtu. 
 Přihlásíme se tedy na stránce tme.eu a přejdeme do `Panel uživatele` -> `Aplikace`
+
 ![obrazek](https://user-images.githubusercontent.com/5196729/140308111-d7f25ac2-5bc0-4457-b90a-a96547fd2137.png)
 
 Klikneme na 'Register new app'
+
 ![obrazek](https://user-images.githubusercontent.com/5196729/140308217-f6d4b572-5871-47b0-829c-31ded206cb33.png)
 
 A do pole vložime získaný 'Nonce' klíč:
+
 ![obrazek](https://user-images.githubusercontent.com/5196729/140308289-a3165a67-f278-4b7f-9a7d-64fd04baa5c6.png)
 
 V dalším kroku získáme kód, token, který znovu vložíme do OpenIntranetu. 
+
 ![obrazek](https://user-images.githubusercontent.com/5196729/140308406-fde556a0-d59e-42c6-bcef-b53baab4d73d.png)
 
 
