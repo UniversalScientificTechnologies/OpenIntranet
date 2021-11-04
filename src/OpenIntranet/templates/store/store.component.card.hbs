@@ -40,16 +40,16 @@ function select_package_formatter(data) {
 
 
 <div class="container-fluid row justify-content-center" style="min-height: 100%;">
-  <div class="col-6 my-2 mr-1 p-0 bg-white rounded box-shadow">
+  <div class="col-6 my-2 mr-1 p-0">
     <div class="d-flex">
       <div class="d-inline-block p-2">
         {%if len(component.get('images', [])) %}
-          <img class="img-thumbnail" style="width: 200pt; height: 200pt;">
+          <img class="img-thumbnail" style="width: 200pt; height: 200pt; max-width: initial;">
         {% else %}
-          <img class="component_image img-thumbnail" src="/static/img/image-alt.svg" style="width: 200pt; height: 200pt;">
+          <img class="component_image img-thumbnail" src="/static/img/image-alt.svg" style="width: 200pt; height: 200pt; max-width: initial;">
         {% end %}
       </div>
-      <div class="d-inline-stretch p-2">
+      <div class="d-inline-stretch m-2  img-thumbnail" style="width: 100%;">
         <div class="row">
           <div class="col"><span class="editable editable-name h1" param_name="component_name">{{component.get('name', 'Beze jména')}}</span> <span class="btn-sm badge bg-secondary"onclick="copyToClipboard('{{component.get('_id', 'null')}}')">Id: {{component.get('_id', 'null')}}</span></div>
         </div>
@@ -102,43 +102,60 @@ function select_package_formatter(data) {
       </div>
 
     </div>
-    <p class="editable editable-description mx-2 py-2" style="max-height: 7em; overflow-y: scroll;">{%raw component.get('description', 'Popis není k dispozici').replace('\n', '<br>') %}</p>
+    <p class="editable editable-description mx-2 py-2 mb-2 img-thumbnail" style="max-height: 7em; overflow-y: scroll;">{%raw component.get('description', 'Popis není k dispozici').replace('\n', '<br>') %}</p>
 
 
-    <div>
-      <ul class="nav nav-tabs pt-0 px-3" id="myTab" role="tablist">
+    <div class="img-thumbnail mx-2 pt-0">
+      <ul class="nav nav-pills pt-2 px-2" id="myTab" role="tablist">
 
         <li class="nav-item" role="presentation">
-          <a class="nav-link active" id="home-tab" data-bs-target="tab" href="#param_tab" role="tab" aria-controls="param_tab" aria-selected="true"> <i class="bi bi-list-nested"></i> Parametry</a>
+          <button class="nav-link active" id="home-tab" data-bs-toggle="pill" data-bs-target="#param_tab" href="#param_tab" role="tab" aria-controls="#param_tab" aria-selected="true"> <i class="bi bi-list-nested"></i> Parametry</button>
         </li>
         
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="profile-tab" data-bs-target="tab" href="#docs"  aria-controls="docs" aria-selected="false"> <i class="bi bi-files"></i>Dokumenty</a>
+          <button class="nav-link" id="profile-tab" data-bs-toggle="pill" data-bs-target="#docs" href="#docs"  aria-controls="#docs" aria-selected="false"> <i class="bi bi-files"></i>Dokumenty</button>
         </li>
         
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="profile-tab" data-bs-target="tab" href="#prices" role="tab" aria-controls="prices" aria-selected="false"> <i class="bi bi-cash-stack"></i> Ceny </a>
+          <button class="nav-link" id="profile-tab" data-bs-toggle="pill" data-bs-target="#prices" href="#prices" role="tab" aria-controls="#prices" aria-selected="false"> <i class="bi bi-cash-stack"></i> Ceny </button>
         </li>
 
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="suppliers-tab" data-bs-target="tab" href="#suppliers" role="tab" aria-controls="suppliers" aria-selected="false"> <i class="bi bi-truck"></i> Dodavatelé</a>
+          <button class="nav-link" id="suppliers-tab" data-bs-toggle="pill" data-bs-target="#suppliers" href="#suppliers" role="tab" aria-controls="suppliers" aria-selected="false"> <i class="bi bi-truck"></i> Dodavatelé</button>
         </li>
 
 
         <li class="nav-item" role="presentation">
-          <a class="nav-link" id="contact-tab" data-bs-target="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false"> <i class="bi bi-clock-history"></i> Historie</a>
+          <button class="nav-link" id="contact-tab" data-bs-toggle="pill" data-bs-target="#contact" href="#contact" role="tab" aria-controls="contact" aria-selected="false"> <i class="bi bi-clock-history"></i> Historie</button>
         </li>
 
+        <li class="naw-item" role="presentation">
+          <button class="nav-link" id="oper-buy-tab" data-bs-toggle="pill" data-bs-target="#oper_buy" href="#oper_buy" role="tab" aria-controls="oper_buy" aria-selected="false"> <i class="bi bi-box-arrow-in-down-right"></i> Nákup (do skladu)</button>
+        </li>
 
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-buy-tab" data-bs-target="tab" href="#oper_buy" role="tab" aria-controls="oper_buy" aria-selected="false"> <i class="bi bi-box-arrow-in-down-right"></i> Nákup (do skladu)</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-sell-tab" data-bs-target="tab" href="#oper_sell" role="tab" aria-controls="oper_sell" aria-selected="false" disabled> <i class="bi bi-box-arrow-up-right"></i> Prodej (ze skladu)</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-transfere-tab" data-bs-target="tab" href="#oper_transfere" role="tab" aria-controls="oper_transfere" aria-  selected="false"> <i class="bi bi-arrow-left-right"></i> Přesun mezi sáčky</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-service-tab" data-bs-target="tab" href="#oper_service" role="tab" aria-controls="oper_service" aria-selected="false"> <i class="bi bi-box-arrow-down"></i> Servisní odběr</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-move-tab" data-bs-target="tab" href="#oper_move" role="tab" aria-controls="oper_move" aria-selected="false"> <i class="bi bi-arrows-move"></i> Změna pozice</a></li>
-            <li class="naw-item" role="presentation"><a class="nav-link" id="oper-next-tab" data-bs-target="tab" href="#oper_next" role="tab" aria-controls="oper_next" aria-selected="false"> Další</a></li>
+        <li class="naw-item" role="presentation">
+          <button class="nav-link" id="oper-sell-tab" data-bs-toggle="pill" data-bs-target="#oper_sell" href="#oper_sell" role="tab" aria-controls="oper_sell" aria-selected="false" disabled> <i class="bi bi-box-arrow-up-right"></i> Prodej (ze skladu)</button>
+        </li>
+
+        <li class="naw-item" role="presentation">
+          <button class="nav-link" id="oper-transfere-tab" data-bs-toggle="pill" data-bs-target="#oper_transfere" href="#oper_transfere" role="tab" aria-controls="oper_transfere" aria-  selected="false"> <i class="bi bi-arrow-left-right"></i> Přesun mezi sáčky</button>
+        </li>
+
+        <li class="naw-item" role="presentation">
+          <button class="nav-link" id="oper-service-tab" data-bs-toggle="pill" data-bs-target="#oper_service" href="#oper_service" role="tab" aria-controls="oper_service" aria-selected="false"> <i class="bi bi-box-arrow-down"></i> Servisní odběr</button>
+        </li>
+
+        <li class="naw-item" role="presentation">
+          <button class="nav-link" id="oper-move-tab" data-bs-toggle="pill" data-bs-target="#oper_move" href="#oper_move" role="tab" aria-controls="oper_move" aria-selected="false"> <i class="bi bi-arrows-move"></i> Změna pozice</button>
+        </li>
+
+        <li class="naw-item" role="presentation">
+          <button class="nav-link" id="oper-next-tab" data-bs-toggle="pill" data-bs-target="#oper_next" href="#oper_next" role="tab" aria-controls="oper_next" aria-selected="false"> Další</button>
+        </li>
 
       </ul>
 
+      <hr>
 
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="param_tab" role="tabpanel" aria-labelledby="home-tab">
@@ -213,8 +230,8 @@ Tohle jsou moje testovací data ... ty tu nebudou:<br><br>
 
   </div>
 
-  <div class="col-4 my-2 ml-1 p-0 bg-white rounded box-shadow">
-    <div id="packet_placeholder"> Načítání ... </div>
+  <div class="col-4 my-2 ml-1 p-0">
+    <div id="packet_placeholder" class="mt-2"> Načítání ... </div>
   </div>
 
 

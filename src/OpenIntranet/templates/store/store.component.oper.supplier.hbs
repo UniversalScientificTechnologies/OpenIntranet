@@ -1,5 +1,5 @@
-<div class="card mx-3">
   {% for i, x in enumerate(component.get('supplier', [])) %}
+<div class="card mx-3 my-1">
     <div class="card-header">{{i}}, <b>{{x['supplier']}}</b>, {{x.get('symbol','null')}} <span></span> <a class="material-icons" href="{{x.get('full_url','')}}" target="_blank">link</a>
       <span class="material-icons">add_shopping_cart</span>
       <span class="material-icons">been</span>
@@ -14,7 +14,8 @@
 
         <div style="display: table-row;">
           <label class="table-cell-label">Symbol:</label>
-          <span>{{x.get('symbol', '---')}}</span>
+          <span>{{x.get('symbol', '---')}}</span> 
+          <a class="bi bi-layer-backward text-muted" role="button" href="data_import/{{x.get('supplier', 'none').lower()}}?symbol={{x.get('symbol', '')}}" target="__blank__" title="Vyhledat v API dodavatele"></a>
         </div>
 
         <div style="display: table-row;">
@@ -24,9 +25,9 @@
 
       </div>
     </div>
+</div>
   {% end %}
 
-</div>
 <div class="card mx-3 text-dark bg-light">
 <div class="card-header">Nový dodavatel, editace dodavatele</div>
 <div class="card-body">
@@ -58,6 +59,7 @@
 
 <script>
 
+suppliers = []
 
 $('#component_supplier').select2({
     width: '100%',

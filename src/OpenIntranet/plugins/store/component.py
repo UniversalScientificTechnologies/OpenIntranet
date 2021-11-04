@@ -21,6 +21,8 @@ import codecs
 import datetime
 from si_prefix import *
 
+from . import data_import
+
 from plugins.helpers.warehouse import *
 
 #from .store import get_plugin_info
@@ -262,12 +264,16 @@ def get_plugin_handlers():
 
         return [
              (r'/{}/component/new/'.format(plugin_name), new_component),
+             (r'/{}/data_import'.format(plugin_name), data_import.tme),
+             (r'/{}/data_import/tme/registr'.format(plugin_name), data_import.tme_get_nonce),
+             (r'/{}/component/(.*)/data_import/tme'.format(plugin_name), data_import.tme),
              (r'/{}/component/(.*)/set_name/'.format(plugin_name), component_set_name),
              (r'/{}/component/(.*)/set_description/'.format(plugin_name), component_set_description),
              (r'/{}/component/(.*)/set_categories/'.format(plugin_name), component_set_categories),
              # (r'/{}/component/(.*)/get_categories/'.format(plugin_name), component_set_description),
              (r'/{}/component/(.*)/set_param/'.format(plugin_name), component_set_param),
              (r'/{}/component/(.*)/set_supplier/'.format(plugin_name), component_set_supplier),
+             (r'/{}/component/(.*)/get_suppliers/'.format(plugin_name), component_get_suppliers),
              (r'/{}/component/(.*)/do_buy/'.format(plugin_name), component_do_buy),
              (r'/{}/component/(.*)/do_move/'.format(plugin_name), component_do_move),
              (r'/{}/component/(.*)/do_relocate/'.format(plugin_name), component_do_relocate),
@@ -355,6 +361,18 @@ class component_set_supplier(BaseHandler):
             self.mdb.stock.update({'_id': cid}, {"$set": {'supplier.{}'.format(id): data}} )
 
         self.write({'status': 'ok'})
+
+class component_get_suppliers(BaseHandler):
+    def get(self, component):
+        cid = bson.ObjectId(component)
+        out = self.mdb.stock.aggregate([
+                {"$match": {"_id": cid}},
+                {"$project" : {'_id' : 0, 'supplier': 1}},
+                #{"$unwind": '$supplier'},   
+            ])
+        out = list(out)[0]
+
+        self.write(out)
 
 class component_set_categories(BaseHandler):
     def post(self, component):
