@@ -14,6 +14,7 @@ from tornado import options
 from tornado import web
 
 from plugins import BaseHandler
+import plugins as plugins_init
 
 tornado.options.define("port", default=10020, help="port", type=int)
 tornado.options.define("config", default="/data/ust/intranet.conf", help="Intranet config file")
@@ -161,6 +162,8 @@ class WebApp(tornado.web.Application):
         handlers = []
         ignored_files = []
 
+        mdb = plugins_init.database_init()
+
         print(tornado.options.options.plugins)
         for plugin_file in tornado.options.options.plugins:
             try:
@@ -169,6 +172,10 @@ class WebApp(tornado.web.Application):
                 else:
                     module = importlib.import_module('plugins')
 
+                if hasattr(module, 'plugin_init'):
+                    print("Automaticka inicializace")
+                    module.plugin_init(mdb)
+                plugin_handlers = module.get_plugin_handlers()
                 plugin_handlers = module.get_plugin_handlers()
                 plugin_info = module.get_plugin_info()
                 plugin_name = plugin_info.get("name", module.__name__)
