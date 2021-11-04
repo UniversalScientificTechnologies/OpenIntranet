@@ -55,9 +55,12 @@ V dalším kroku získáme kód, token, který znovu vložíme do OpenIntranetu.
 
 ![obrazek](https://user-images.githubusercontent.com/5196729/140308406-fde556a0-d59e-42c6-bcef-b53baab4d73d.png)
 
+Získaný kód znovu vložime do intranetu formou GET požadavku. V prohlížeči tedy otevřeme tuto adresu s naším pinem. 
+
+```
+  https://<url_open_intranet>/store/data_import/tme/registr?user_pin=<user pin>
+```
 
 
-
-
-
-
+Celý tento postup vychází ze přístupové politiky TME. Na následujícím diagramu převzatého z jejich [dokumentace](https://developers.tme.eu/documents/tme-api-en.pdf) jsou vidět jednotlivé kroky: 
+![obrazek](https://user-images.githubusercontent.com/5196729/140321188-9e7a1338-fd0e-4a62-b260-a789589bb9f3.png)
