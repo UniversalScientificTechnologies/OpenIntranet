@@ -1,7 +1,7 @@
 ---
 layout: default
 title: OpenIntranet
-nav_order: 1
+nav_order: 0
 --- 
 
 ## Welcome to [OpenIntranet](https://github.com/UniversalScientificTechnologies/OpenIntranet) documentation
