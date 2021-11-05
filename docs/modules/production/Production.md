@@ -1,3 +1,13 @@
+---
+layout: default
+title: Production
+nav_order: 2
+parent: Moduly
+has_children: true
+permalink: modules/production
+---
+
+
 # Popis
 
 Modul production je navržen a vyvinut pro výrobu elektronických komponent. Užvatel si ze svého oblíbeného CAM programu vygeneruje BOM a ten nahraje do intranetu do sekce production. Následně provede spárování komponent v BOMu se součástkami ve skladu. Sekce production uživatele upozorní na skladové zásoby potřebných součástek. 

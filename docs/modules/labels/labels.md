@@ -1,3 +1,13 @@
+---
+layout: default
+title: Štítky
+nav_order: 3
+parent: Moduly
+has_children: false
+permalink: modules/labels
+---
+
+
 Pro tvorbu štítků existuje samostatný plugin, který shlukuje jednotlivé štítky do skupin. Jednotlivé skupiny slouží k tisku a k tvorbě tiskových sestav na archy samolepek. Systém zná několik typů štítků, které se liší dle obsahu a užití. 
 
 

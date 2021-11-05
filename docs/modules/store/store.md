@@ -2,7 +2,7 @@
 layout: default
 title: Store - Warehouse management system
 nav_order: 0
-parent: OpenIntranet - Modules overview
+parent: Moduly
 has_children: true
 permalink: modules/store
 ---
