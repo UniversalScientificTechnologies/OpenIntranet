@@ -3,6 +3,8 @@ layout: default
 title: External data sources
 parent: Store - Warehouse management system
 nav_order: 4
+permalink: modules/store/external_data_sources
+
 ---
 
 # Store data import
