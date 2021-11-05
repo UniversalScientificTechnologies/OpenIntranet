@@ -2,7 +2,7 @@
 layout: default
 title: Production
 nav_order: 2
-parent: OpenIntranet - Modules overview
+parent: Moduly
 has_children: true
 permalink: modules/production
 ---
