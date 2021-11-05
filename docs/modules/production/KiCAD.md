@@ -3,6 +3,7 @@ layout: default
 title: Production - Kicad
 nav_order: 0
 parent: Production
+grand_parent: Moduly
 has_children: true
 permalink: modules/production/kicad
 ---
