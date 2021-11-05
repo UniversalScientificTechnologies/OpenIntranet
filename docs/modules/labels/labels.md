@@ -4,7 +4,7 @@ title: Štítky
 nav_order: 3
 parent: OpenIntranet - Modules overview
 has_children: true
-permalink: modules/store
+permalink: modules/labels
 ---
 
 
