@@ -32,12 +32,12 @@ Momentálně je intranet v provozním nasazení, ale stále je mnoho co zlepšov
 
 ## Současná implementace
 
-![UST OpenIntranet](doc/img/main_view.png)
+![UST OpenIntranet](docs/img/main_view.png)
 
-![OpenIntranet system overview](doc/img/system_overview.png)
+![OpenIntranet system overview](docs/img/system_overview.png)
 
 
-Podrobnější popis jednotlivých komponent je na wiki stránkách [Návody a popis](https://github.com/UniversalScientificTechnologies/OpenIntranet/wiki)
+Podrobnější popis jednotlivých komponent je na wiki stránkách v sekci [Moduly](https://universalscientifictechnologies.github.io/OpenIntranet/modules)
 
 ## Seznam plánovaných modulů
 
@@ -47,20 +47,20 @@ Následující moduly jsou v různé fázi rozpracovanosti, některé jsou již 
 
 Základní modul sloužící k orientaci a vyhledávání ve skladu a k běžným operacím se skladovými položkami.
 
-![OpenIntranet store view](doc/img/store_view.png)
+![OpenIntranet store view](docs/img/store_view.png)
 
 ### Inventura
 
 Modul usnadňující pravidelnou a systematickou inventarizaci položek, zejména za účelem odhalení chybějících položek.
 
-![OpenIntranet stock taking](doc/img/stock_taking_view.png)
+![OpenIntranet stock taking](docs/img/stock_taking_view.png)
 
 
 ### Adresář
 
 Adresář uživatelů, zákazníků, dodavatelů o podobně, usnadňuje orientaci a minimalizuje chyby vznikající roztříštěním informací v různých poznámkách uvnitř organizace.
 
-![OpenIntranet contact and users view](doc/img/users_list.png)
+![OpenIntranet contact and users view](docs/img/users_list.png)
 
 
 ### Nákupy
@@ -75,7 +75,7 @@ Umožňuje prodej položek a zařízení třetím osobám.
 
 V podstatě typ pohledu na sklad z hlediska sestavených celků vytvořených z menších skladových položek.
 
-![OpenIntranet produced devices view](doc/img/producted_devices_view.png)
+![OpenIntranet produced devices view](docs/img/producted_devices_view.png)
 
 
 ### Projekty
@@ -96,4 +96,4 @@ Zjednodušuje správu plateb za pohledávky třetích stran.
 
 
 ## Installation
-Installation is described in the [wiki/Installation](https://github.com/UniversalScientificTechnologies/OpenIntranet/wiki/Installation) page.
+Installation is described in the docs [page](https://universalscientifictechnologies.github.io/OpenIntranet/getting_started/installation.html).
