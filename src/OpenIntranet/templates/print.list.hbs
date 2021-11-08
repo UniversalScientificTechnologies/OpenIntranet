@@ -17,7 +17,7 @@
         {% if label['type'] == 'packet' %}
         <div class="list-group-item list-group-item-action flex-column align-items-start" draggable="true" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)"  style='cursor: move;' label_id="{{label['_id']}}" >
         <div class="d-flex w-100 justify-content-between">
-          <div><h5> <i class="bi bi-box-seam openintranet_hover openintranet_hover_packet"></i> <a class="" href="/store/component/{{label['item'][0]['_id']}}/">{{label['item'][0]['name']}}</a> <small class="text-muted">{{label['id']}}</small></h5>
+          <div><h5> <i class="bi bi-box-seam openintranet_hover openintranet_hover_packet"></i> <a class="" href="/store/component/{{label['item'][0]['_id']}}/">{{label['item'][0]['name']}}</a> <small class="text-muted">{{label['id']}}</small></h5> {{label}}
 
           </div>
           <small class="text-muted"><div>Autor {{label['author']}}; {{label['_id'].generation_time}}</div><div>Typ: {{label['type']}}</div></small>
