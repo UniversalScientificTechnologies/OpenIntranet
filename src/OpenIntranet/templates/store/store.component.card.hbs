@@ -165,8 +165,7 @@ function select_package_formatter(data) {
 
         </div>
         <div class="tab-pane fade" id="docs" role="tabpanel" aria-labelledby="profile-tab">
-            Tady bude seznam dokumentů, příloh, obrázků... Bude to rozdělené dle kategorií
-            {#% module Template("store/store.api.component.view.documents.hbs", parameters=parameters) %#}
+            {% module Template("store/store.component.view.documents.hbs", documents=documents) %}
             <div id="docs_list"></div>
         </div>
 
@@ -489,20 +488,24 @@ $( document ).ready(function() {
 
 
 $(document).on("click", ".operation_packet_transfere_in",function() {
+  console.log("Tlacitko", this);
       $('#myTab a[href="#oper_transfere"]').tab('show');
       $("[name='destination']").val($(this).attr('pid')).change();
 });
 
 $(document).on("click", ".operation_packet_transfere_out",function() {
+  console.log("Tlacitko", this);
       $('#myTab a[href="#oper_transfere"]').tab('show');
       $("[name='source']").val($(this).attr('pid')).change();
 });
 $(document).on("click", ".operation_packet_service",function() {
+  console.log("Tlacitko", this);
       $('#myTab a[href="#oper_service"]').tab('show');
       $("[name='packet_to_service']").val($(this).attr('pid')).change();
       console.log(this);
 });
 $(document).on("click", ".operation_packet_print",function() {
+  console.log("Tlacitko", this);
       console.log(this);
 });
 

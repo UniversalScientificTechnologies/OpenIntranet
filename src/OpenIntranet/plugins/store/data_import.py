@@ -68,6 +68,7 @@ class tme(BaseHandler):
 			session = {
 				'source': 'tme',
 				'component': str(component_id),
+				'symbol': self.get_argument('symbol', ''),
 			}
 			r.hmset(sessid, session)
 			self.redirect('/store/data_import?sesid='+ sessid)
@@ -80,18 +81,17 @@ class tme(BaseHandler):
 			data_import_info = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']
 
 			params = {
-				'SymbolList[0]': 'RPI-PICO',
+				'SymbolList[0]': session['symbol'],
 				'Country' : 'CZ',
 				'Language': 'cs',
-				'Currency': 'CZK',
-				#'Token': data_import_info['tme_token'],
-				#'Token': data_import_info['tme_user_token'],
-				#'Nonce': data_import_info['tme_user_nonce']
+				'Currency': 'CZK'
 			}
 			print(params)
 
-			response = api_call('Products/GetProductsFiles', params, data_import_info['tme_user_token'], data_import_info['tme_app_secret'], True);
-			self.write(response)
+			product_files = api_call('Products/GetProductsFiles', params, data_import_info['tme_user_token'], data_import_info['tme_app_secret'], True);
+			parameters = api_call('Products/GetParameters', params, data_import_info['tme_user_token'], data_import_info['tme_app_secret'], True);
+
+			self.write({'files': product_files['Data'], 'parameters': parameters['Data']})
 
 	def tme_get_docs(self):
 

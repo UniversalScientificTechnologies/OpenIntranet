@@ -272,11 +272,31 @@ class api_get_packets_by_position(BaseHandler):
                 'foreignField': "pid",
                 'as': 'history'
                 }
-            }
+            },
+            # {'$lookup': {
+            #    "from": "stock",
+            #    "let": { "supplier_id": "$supplier", "packet": "$ordered" },
+            #    "pipeline": [
+            #       { "$match":
+            #          { "$expr":
+            #             { "$and":
+            #                [
+            #                  { "$eq": [ "$stock_item",  "$$order_item" ] },
+            #                  { "$gte": [ "$instock", "$$order_qty" ] }
+            #                ]
+            #             }
+            #          }
+            #       },
+            #       { "$project": { stock_item: 0, _id: 0 } }
+            #    ],
+            #    "as": "stockdata"
+            #  }
+            # }
         ])
 
         data = list(data)
-
+        print(">>>>>>")
+        print(data)
         self.write(bson.json_util.dumps(data))
 
 
@@ -565,6 +585,7 @@ class api(BaseHandler):
         elif data == 'get_suppliers':
             cid = self.get_argument('id', None)
             sup = self.get_argument('supplier', None)
+            
             if not cid:
                 q = self.get_argument('q', '')
                 dbcursor = self.mdb.stock.distinct('supplier.supplier',{'supplier.supplier': {'$regex': q, '$options': 'ix'}})
@@ -752,6 +773,18 @@ class api(BaseHandler):
                       }
                     },
                     {"$set": {"position.path": { "$concatArrays": ["$position.path.name", ["$position.name"]]}} },
+                    {"$lookup": {
+                        "from": "stock",
+                        "let": { "number": { "$convert": {'input': "$supplier", 'to': "int", 'onError': 9999}} },
+                        "pipeline": [
+                            {"$match": {"_id": bson.ObjectId(self.get_argument('key'))}},
+                            {"$project": { "supplier": { "$arrayElemAt": [ "$supplier", "$$number" ] }, '_id':0}  },
+                            { "$match": { "supplier" : { "$exists": "true", "$not": { "$type": "array" }, "$type": "object" } } },
+                            { "$replaceRoot": { "newRoot": "$supplier" } }
+                        ],
+                        "as": "supplier"
+                        }
+                    },
                     {"$lookup":
                          {
                            "from": 'warehouse',
@@ -820,6 +853,7 @@ class api(BaseHandler):
 
                 ], useCursor = True)
             dout = list(dbcursor)
+            print(dout)
 
             if output_type == "html_tab":
                 self.set_header('Content-Type', 'text/html; charset=UTF-8')
