@@ -50,8 +50,8 @@ class print_label(BaseHandler):
             warehouse_name = self.get_warehouse().get('name', "Neni nastaven")
 
             for i, label in enumerate(data):
-                print(".....")
-                print(label)
+                #print(".....")
+                #print(label)
                 pdf.set_text_color(0)
 
                 ir = i + skip   # cislo bunky
@@ -59,7 +59,7 @@ class print_label(BaseHandler):
                 row  = ip//3    # cislo radku
                 cell  = ip%3    # cislo sloupce
                 actual_page = ir//(3*7) # cislo stranky
-                print(i, ir, ip, row, cell)
+                #print(i, ir, ip, row, cell)
                 if page != actual_page:
                     print("NOVA STRANKA", actual_page)
                     pdf.add_page()
@@ -88,13 +88,16 @@ class print_label(BaseHandler):
 
 
                     # nazev soucastky
+                    
+                    pdf.set_draw_color(200)
+                    pdf.set_fill_color(245)
 
                     pdf.set_text_color(0)
                     pdf.set_font('pt_sans-bold', '', 12)
                     pdf.set_xy(x0+5, y0+4.5)
                     pdf.cell(label_width-10, 4.5, label['component']['name'][:25], align = 'L', border=1)
 
-                    print(label.keys())
+                    ## print(label.keys())
                     id = str(label['_id'])
 
                     barcode = "[)>\u001E06"     # format 06 header
@@ -110,43 +113,70 @@ class print_label(BaseHandler):
                     pdf.image('static/tmp/barcode/%s.png'%(id), w = 20, h=20)
 
                     # Popis stitku
+                    pdf.set_text_color(100)
                     pdf.set_font('pt_sans', '', 8)
                     pdf.set_xy(x0+4, y0+17)
                     pdf.multi_cell(label_width-28, 2.8, label['component'].get('description', '')[:80], align='L')
 
                     # pozice ve skaldu
-                    print("PACKET>", label['packet'])
+                    pdf.set_text_color(0)
+                    pdf.set_xy(x0+label_width-19, y0+10)
+                    pdf.set_font('pt_sans', '', 10)
+                    pdf.cell(14, 5, label['packet']['name'], align="R", fill=True)
 
-                    pdf.set_xy(x0+4, y0+8.8)
-                    pdf.cell(label_width-8, 5, "{} ks".format(label['packet']['packet_count']), align="R")
 
-                    pdf.set_text_color(100)
-                    pdf.set_xy(x0+4, y0+8.8)
+                    pdf.set_text_color(80)
+                    pdf.set_xy(x0+5, y0+10)
                     if "warehouse" in label:
+
+
+                        #pos = label['warehouse']['code'].upper() +  "/"
                         pos = "/"
                         for p in reversed(label['path']):
                             pos += p['name'] + "/"
 
-                        pdf.set_font('pt_sans-bold', '', 10)
-                        pdf.write(5, label['warehouse']['code'].upper())
+                        #pdf.set_font('pt_sans', '', 6)
+                        #pdf.write(5, label['warehouse']['code'].upper())
+
+                        #pdf.set_font('pt_sans-bold', '', 8)
+                        #pdf.write(5, pos)
+                        #pdf.set_font('pt_sans-bold', '', 10)
+                        #pdf.write(5, label['position']['name'])
+                        pos += label['position']['name']
+                        pdf.multi_cell(label_width-29, 3, pos, align='L')
+
+
                         pdf.set_font('pt_sans', '', 8)
-                        pdf.write(5, pos)
-                        pdf.set_font('pt_sans-bold', '', 10)
-                        pdf.write(5, label['position']['name'])
+                        pdf.set_text_color(100)
+                        pdf.set_xy(x0+32, y0+32)
+                        pdf.cell(14, 3.5, label['warehouse']['code'].upper(), align="R")
+
                     else:
+                        pdf.set_text_color(120)
                         pdf.set_font('pt_sans', '', 10)
                         pdf.write(5, "Mimo skladu")
 
+                    cat_text = ""
                     if "category" in label:
                         pos = []
+                        cat_text = " | cat: "
                         for c in label['category']:
                             pos += [c['name']]
 
-                        pos = ','.join(pos)
+                        cat_text += ','.join(pos)
 
-                        pdf.set_xy(x0+4, y0+12)
-                        pdf.set_font('pt_sans', '', 10)
-                        pdf.write(5, pos)
+                        #pdf.set_xy(x0+4, y0+12)
+                        #pdf.set_font('pt_sans', '', 10)
+                        #pdf.write(5, pos)
+
+                    pdf.set_font('pt_sans', '', 9)
+                    pdf.set_text_color(60)
+                    pdf.set_xy(x0+4, y0+34.5)
+                    pdf.cell(0, 0, "{} ks".format(label['packet']['packet_count']), align="L")
+
+                    # pdf.set_font('pt_sans', '', 7)
+                    # pdf.set_text_color(120)
+                    # pdf.cell(0, 0, "{}".format(cat_text), align="L")
 
                 if label['type'] == 'position':
                     #packet = label['packet']
@@ -224,6 +254,7 @@ class print_label(BaseHandler):
                 else:
                     pass
 
+                pdf.set_text_color(150)
                 pdf.set_font('pt_sans', '', 7)
                 pdf.set_xy(x0, y0+37)
                 pdf.cell(label_width, 0, "UST.cz|{}|{}".format(datetime.datetime.now().strftime("%d. %m. %Y, %H:%M"), id), align="C")

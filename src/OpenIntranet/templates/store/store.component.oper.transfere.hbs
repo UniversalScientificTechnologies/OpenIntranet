@@ -9,7 +9,7 @@
     <select class="form-control table_style col-4" name='source'>
       <option value="none" selected>Vyberte sáček</option>
       {% for i, sup in enumerate(packets) %}
-        <option value="{{sup['_id']}}">{{i}}, {{sup['_id']}}, {{sup.get('position', 'null')}}</option>
+        <option value="{{sup['_id']}}">{{sup.get('name', '')}} ({{sup['_id']}})</option>
       {% end %}
     </select>
 
@@ -21,9 +21,9 @@
   <div class="form-group form-row">
     <label class="col-sm-2 col-form-label">Cílový sáček</label>
     <select class="form-control table_style col-4" name='destination'>
-      <option value="none" selected>Nový sáček</option>
+      {#<option value="none" selected>Nový sáček</option>#}
       {% for i, sup in enumerate(packets) %}
-        <option value="{{sup['_id']}}">{{i}}, {{sup['_id']}}, {{sup.get('position', 'null')}}</option>
+        <option value="{{sup['_id']}}">{{sup.get('name', '')}} ({{sup['_id']}})</option>
       {% end %}
     </select>
   </div>

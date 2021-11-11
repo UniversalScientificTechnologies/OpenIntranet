@@ -34,19 +34,25 @@
   {%set row = i %}
 
  <div class="card-body" >
-    <div class="hist_line">
-        <span class="hist_element text-muted " style="width: 100%;" data-bs-toggle="popover" title="{{row}}" >{{row.get('_id').generation_time}} <a href="/store/packet/{{row.get('_id')}}/" class="text-muted small" target="_blank" rel="noopener noreferrer">({{row.get('_id')}}</a><span class="material-icons barcode-value" data="{{row['_id']}}">code</span>)
+    <div class="hist_line d-flex justify-content-between">
+        <h4><span class="badge bg-light text-dark"><i class="bi bi-app"></i> {{row.get('name', 'Name is not set.')}} </span></h4>
+        <span class="hist_element text-muted m-1" data-bs-toggle="popover" title="{{row}}" ><a href="/store/packet/{{row.get('_id')}}/" class="text-muted small" target="_blank" rel="noopener noreferrer">({{row.get('_id')}} <i class="bi bi-share barcode-value" data="{{row['_id']}}"></i>)</a></span>
+    </div>
+    <div class="hist_line m-1"> 
+    {{row.get('description', ' ')}}
 
     </div>
     <div class="hist_line">
         <span class="editable operation_packet_set_position" pid="{{row['_id']}}">
           {% if 'warehouse' in row %}
-          <span class="barcode-value" data="{{row['warehouse']['_id']}}"></span> <span class="hist_element" style="width: 100%;"><span class="text-muted">{{row['warehouse']['name'] }}/</span>{%raw "<span class='text-muted'>/</span>".join(row['position']['path'])%} <small class="text-muted">({{row['warehouse']['_id']}})</small></span>
+          <span class="barcode-value" data="{{row['warehouse']['_id']}}"></span> <span class="hist_element" style="width: 100%;"><span class="text-muted">{{row['warehouse']['name'] }}/</span>{%raw "<span class='text-muted'>/</span>".join(row['position']['path'])%}</span>
           {% else %}
           <span class="hist_element text-muted" style="width: 100%;"> Bez umístění </span>
           {% end %}
         </span>
-        <span class="text-muted">Dodavatel:</span> <span>{{row['supplier']}}</span>
+        {%if len(row['supplier'])%}
+        <span class="text-muted">Dodavatel:</span> <span>{{row['supplier'][0]['supplier']}} ({{row['supplier'][0]['symbol']}}) <a href="{{row['supplier'][0]['url']}}"> <i class="bi bi-link-45deg"></i> </a></span> 
+        {%end%}
         <!-- <span class="hist_element" style="width: 15%;">{{row.get('bilance', '--')}} ks</span><span class="hist_element" style="width: 15%;">{{row.get('price', '--')}} Czk</span> -->
     </div>
     <div class="" data-bs-toggle="popover" title="Actual total values of packages, LIFO prices">
@@ -54,7 +60,7 @@
          <span class="badge big bg-secondary" data-bs-toggle="popover" title="Cena za kus"><span class="material-icons">toll</span> {{"{:.2f}".format(row['price']/row['count'] if row['count'] else 0)}} Czk/ks</span>
          <span class="badge big bg-success" data-bs-toggle="popover" title="Cena sáčku"><span class="material-icons">toll</span> {{"{:.2f}".format(row['price'])}} Czk</span>
     </div>
-    <div class="hist_line font-weight-light">{{row.get('description', 'None')}}</div>
+
     <div class="d-inline-block">
 
       <div class="d-inline-block">
@@ -77,11 +83,11 @@
     </div>
     <div class="">
 
-        <button class="btn btn-primary btn-sm p-1 operation_packet_transfere_out" pid="{{row['_id']}}" data-bs-toggle="popover" title="Přesun do jiného sáčku" ><span class="material-icons">unarchive</span></button>
-        <button class="btn btn-primary btn-sm p-1 operation_packet_transfere_in" pid="{{row['_id']}}" data-bs-toggle="popover" title="Přesun do tohoto sáčku" ><span class="material-icons">archive</span></button>
-        <button class="btn btn-primary btn-sm p-1 operation_packet_service" pid="{{row['_id']}}" data-bs-toggle="popover" title="Servisní odběr" ><span class="material-icons"> settings_ethernet </span></button>
-        <button class="btn btn-primary btn-sm p-1 operation_packet_print" pid="{{row['_id']}}" data-bs-toggle="popover" title="Tisknout štítek"><span class="material-icons">print</span></button>
-        <button class="btn btn-primary btn-sm p-1 operation_packet_set_position" pid="{{row['_id']}}" data-bs-toggle="popover" title="Změna pozice sáčku"><span class="material-icons">loop</span></button>
+        <button class="btn btn-primary btn-sm p-1 operation_packet_transfere_out" pid="{{row['_id']}}" data-bs-toggle="popover" title="Přesun do jiného sáčku" ><i class="bi bi-box-arrow-down"></i></button>
+        <button class="btn btn-primary btn-sm p-1 operation_packet_transfere_in" pid="{{row['_id']}}" data-bs-toggle="popover" title="Přesun do tohoto sáčku" ><i class="bi bi-box-arrow-in-up"></i></button>
+        <button class="btn btn-primary btn-sm p-1 operation_packet_service" pid="{{row['_id']}}" data-bs-toggle="popover" title="Servisní odběr" ><span class="bi bi-check2-square"></span></button>
+        <button class="btn btn-primary btn-sm p-1 operation_packet_print" pid="{{row['_id']}}" data-bs-toggle="popover" title="Tisknout štítek"><i class="bi bi-printer"></i></button>
+        <button class="btn btn-primary btn-sm p-1 operation_packet_set_position" pid="{{row['_id']}}" data-bs-toggle="popover" title="Změna pozice sáčku"><i class="bi bi-dpad"></i></button>
     </div>
 {#{{row}}#}
 </div>

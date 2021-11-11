@@ -253,9 +253,12 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
 
     #print(".............................................")
 
+    docs_query = [{ '$match': { "_id": id}}, 
+                    { "$project": {"documents": 1} }
+                 ]
+
+    output['documents'] = list(db.stock.aggregate(docs_query))
     return output
-
-
 
 
 def get_plugin_handlers():
@@ -291,7 +294,7 @@ class component_home_page(BaseHandler):
 
         component = get_component(self.mdb, cid, bson.ObjectId(self.get_cookie('warehouse')))
 
-        self.render('store/store.component.card.hbs', id=component['basic'][0]['_id'], component = component['basic'][0], current_warehouse = component['current_warehouse'][0], other_warehouse = component['other_warehouse'][0], prices = component['prices'][0], packets = component['packets'], parameters = component['parameters'], dumps=dumps, warehouse = self.get_warehouse())
+        self.render('store/store.component.card.hbs', id=component['basic'][0]['_id'], component = component['basic'][0], current_warehouse = component['current_warehouse'][0], other_warehouse = component['other_warehouse'][0], prices = component['prices'][0], packets = component['packets'], parameters = component['parameters'], documents = component['documents'], dumps=dumps, warehouse = self.get_warehouse())
 
 
 class new_component(BaseHandler):
@@ -387,6 +390,11 @@ class component_set_categories(BaseHandler):
         #self.write({'status': 'ok'})
 
 
+##
+#
+#  Nákup polozky do sacku
+#
+##
 
 class component_do_buy(BaseHandler):
     def post(self, component):
@@ -405,7 +413,7 @@ class component_do_buy(BaseHandler):
 
         new_packet = False
         if packet == 'new':
-            new_packet = True
+            new_packet = len(self.mdb.stock.find_one({'_id': cid}).get('packets', [])) +1
             packet_id = ObjectId()
         else:
             packet_id = ObjectId(packet)
@@ -427,6 +435,7 @@ class component_do_buy(BaseHandler):
                         '_id': packet_id,
                         'type': 'zip_bag',
                         'supplier': supplier,
+                        'name': 'S{:03}'.format(new_packet),
                         # 'count': float(bilance),
                         #'reserved': 0,
                         'position': position,

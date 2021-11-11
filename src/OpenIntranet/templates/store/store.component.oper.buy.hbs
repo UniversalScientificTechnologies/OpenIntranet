@@ -37,7 +37,7 @@
 		<select class="form-control table_style col-sm-10" id="compo_packet" name="packet">
         <option value="new">Create new packet</option>
 	      {% for i, sup in enumerate(packets) %}
-	        <option value="{{sup['_id']}}">{{i}}, {{sup['_id']}} {#{sup.get('position', 'null')}#}</option>
+	        <option value="{{sup['_id']}}">{{sup.get('name', '')}} ({{sup['_id']}}) {#{sup.get('position', 'null')}#}</option>
 	      {% end %}
 		</select>
 	</div>

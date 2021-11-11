@@ -9,7 +9,7 @@
     <select class="id_input form-control table_style col-10 " name='packet_to_service'>
       <option value="none" selected default disabled>Vyberte sáček</option>
       {% for i, sup in enumerate(packets) %}
-        <option value="{{sup['_id']}}">{{i}}, {{sup['_id']}}, {{sup.get('position', 'null')}}</option>
+        <option value="{{sup['_id']}}">{{sup.get('name', '')}}, ({{sup['_id']}})</option>
       {% end %}
     </select>
 
@@ -17,7 +17,8 @@
 
   <div class="form-group form-row">
     <label class="col-sm-2 col-form-label" input_mode='numeric' pattern="[-+=]?\d*" title="Do pole lze zapsat zapsat relativní počty pomocí +, -. Nebo zadat aktuální absolutní počet kusů pomocí znaku '='." >Počet</label>
-    <input class="count form_control col" name="count" type="text">
+    <input class="count form_control col" name="count" type="text" value="-10">
+    <div class="form-text">Znaménko '-' znamená odebrání ze skladu. Do pole lze zapsat zapsat relativní počty pomocí +, -. Nebo zadat aktuální absolutní počet kusů pomocí znaku '='. </div>
   </div>
 
   <div class="form-group form-row">
