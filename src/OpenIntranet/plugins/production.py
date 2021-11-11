@@ -871,8 +871,23 @@ class ust_bom_upload(BaseHandler):
 
     def make_comp_dict(self, element):
         print(element)
+
+        tstamp = None
+        try:
+            tstamp = element.findall('tstamps')[0].text
+        except:
+            pass
+
+        try:
+            tstamp = element.findall('tstamp')[0].text
+        except:
+            pass
+
+        if not tstamp:
+            tstamp = str(bson.ObjectId())
+
         component = {
-                'Tstamp': element.findall('tstamp')[0].text,
+                'Tstamp': tstamp,
                 "Datasheet": "",
                 "Footprint": element.findall('footprint')[0].text,
                 "Ref": element.get('ref'),
