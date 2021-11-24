@@ -89,13 +89,31 @@ class print_label(BaseHandler):
 
                     # nazev soucastky
                     
-                    pdf.set_draw_color(200)
+                    pdf.set_draw_color(10)
                     pdf.set_fill_color(245)
-
                     pdf.set_text_color(0)
+
                     pdf.set_font('pt_sans-bold', '', 12)
                     pdf.set_xy(x0+5, y0+4.5)
-                    pdf.cell(label_width-10, 4.5, label['component']['name'][:25], align = 'L', border=1)
+                    
+
+                    label_name = label['component']['name']
+                    if len(label_name) > 40:
+                        label_name = label_name[40:]+".."
+                    name_length = pdf.get_string_width(label_name)
+
+                    if name_length > 58:
+                        for size in range(0, 70):
+                            pdf.set_font('pt_sans-bold', '', 12-size/10)
+                            name_length = pdf.get_string_width(label_name)
+                            if name_length < 58:
+                                print("Zmenseny nazev, velikost", 12-size/10)
+                                break
+                    print("DELKA:", pdf.get_string_width(label_name), label_name)
+                    pdf.cell(label_width-10, 4.5, label_name, align = 'L', border=1)
+
+
+                    pdf.set_font('pt_sans', '', 8)
 
                     ## print(label.keys())
                     id = str(label['_id'])
@@ -113,7 +131,7 @@ class print_label(BaseHandler):
                     pdf.image('static/tmp/barcode/%s.png'%(id), w = 20, h=20)
 
                     # Popis stitku
-                    pdf.set_text_color(100)
+                    pdf.set_text_color(400)
                     pdf.set_font('pt_sans', '', 8)
                     pdf.set_xy(x0+4, y0+17)
                     pdf.multi_cell(label_width-28, 2.8, label['component'].get('description', '')[:80], align='L')
@@ -121,7 +139,7 @@ class print_label(BaseHandler):
                     # pozice ve skaldu
                     pdf.set_text_color(0)
                     pdf.set_xy(x0+label_width-19, y0+10)
-                    pdf.set_font('pt_sans', '', 10)
+                    pdf.set_font('pt_sans', '', 9)
                     pdf.cell(14, 5, label['packet']['name'], align="R", fill=True)
 
 
@@ -147,7 +165,7 @@ class print_label(BaseHandler):
 
 
                         pdf.set_font('pt_sans', '', 8)
-                        pdf.set_text_color(100)
+                        pdf.set_text_color(90)
                         pdf.set_xy(x0+32, y0+32)
                         pdf.cell(14, 3.5, label['warehouse']['code'].upper(), align="R")
 
