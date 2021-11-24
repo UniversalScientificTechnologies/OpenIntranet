@@ -25,10 +25,10 @@
 
 {% for type in dout[0]%}
 {%if len(dout[0][type])%}
-  <div class="card-header" data-bs-toggle="collapse" data-bs-target="#{{type}}" aria-expanded="true" aria-controls="{{type}}">
+  <div class="card-header" data-bs-toggle="collapse" data-bs-target="#{{type}}" aria-controls="{{type}}">
   {%if len(dout[0][type])%}<b>{%end%}{{packet_status_dict.get(type, type) }}{%if len(dout[0][type])%}</b>{%end%} ({{len(dout[0][type])}})
   </div>
-  <ul class="list-group list-group-flush collapse" id="{{type}}">
+  <ul class="list-group list-group-flush collapse  multi-collapse {%if type=="current_warehouse" %}show{%end%}" id="{{type}}">
   {% for i in dout[0][type]%}<li class="list-group-item p-0">
 
   {%set row = i %}
