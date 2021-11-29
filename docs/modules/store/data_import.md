@@ -17,6 +17,11 @@ Mnoho dodavatelů komponent nabízí velmi rozsáhlá API pro získání stavu o
 
 TME je významný dodavatel elektronických součástek. 
 
+#### Zjištění stavu data importeru
+Pokud nevíte, jestli máte TME data importer zaregistrovaný, můžete to jednoduše zjistit požadavkem z webového prohlížeči. Informaci o stavu nastavení TME API zjistíte na adrese:
+```
+  https://<url_open_intranet>/store/data_import/tme
+```
 
 #### Konfigurace 
 Pro rozfungování získávání údajů je nutné zaregistrovat aplikaci v jejich vývojářském rozhraní. Na základě této registrace se získají dva kódy. Tzv. `Token` a `Application secret` kód. 
