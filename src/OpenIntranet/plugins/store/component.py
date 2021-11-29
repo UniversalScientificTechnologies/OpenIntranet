@@ -268,6 +268,7 @@ def get_plugin_handlers():
         return [
              (r'/{}/component/new/'.format(plugin_name), new_component),
              (r'/{}/data_import'.format(plugin_name), data_import.tme),
+             (r'/{}/data_import/tme'.format(plugin_name), data_import.tme_get_status),
              (r'/{}/data_import/tme/registr'.format(plugin_name), data_import.tme_get_nonce),
              (r'/{}/component/(.*)/data_import/tme'.format(plugin_name), data_import.tme),
              (r'/{}/component/(.*)/set_name/'.format(plugin_name), component_set_name),

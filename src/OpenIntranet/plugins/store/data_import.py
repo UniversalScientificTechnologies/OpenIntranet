@@ -122,7 +122,7 @@ class tme_get_nonce(BaseHandler):
 
 		if tme_token and tme_app_secret:
 			self.mdb.intranet_plugins.update_one({'_id': 'store'}, {"$set": {'data.data_import.tme_token': tme_token, 'data.data_import.tme_app_secret': tme_app_secret}})
-			self.write("TME token a TME Secret_key byly uloženy. Nyní je můžete použít. Více informací se dočtete v oficiální příručce")
+			self.write("TME token a TME Secret_key byly uloženy. Nyní je bude Intranet užívat. Nonce kód získáte na <a href='/store/data_import/tme/registr'>této adrese</a>. Více informací se dočtete v oficiální příručce")
 			self.finish()
 			return 1
 
@@ -163,3 +163,19 @@ class tme_get_nonce(BaseHandler):
 
 		self.write(response)
 
+
+class tme_get_status(BaseHandler):
+
+	def get(self):
+
+		try:
+			tme_db_status = self.mdb.intranet_plugins.find_one({"_id": "store"})
+
+			tme_db_status = tme_db_status['data'].get("data_import", None)
+			if not tme_db_status:
+				self.write("TME importer není nastaven. ")
+			else:
+				self.write("TME importer je nastaven! :) ")
+
+		except:
+			self.write("TME importer naní správně nastaven. Zkuste ho nastavit znovu. ")
