@@ -96,4 +96,4 @@ Zjednodušuje správu plateb za pohledávky třetích stran.
 
 
 ## Installation
-Installation is described in the docs [page](https://universalscientifictechnologies.github.io/OpenIntranet/getting_started/installation.html).
+Installation is described in the docs [page](https://universalscientifictechnologies.github.io/OpenIntranet/getting_started/installation/).
