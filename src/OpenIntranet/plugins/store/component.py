@@ -273,6 +273,7 @@ def get_plugin_handlers():
              (r'/{}/component/(.*)/data_import/tme'.format(plugin_name), data_import.tme),
              (r'/{}/component/(.*)/set_name/'.format(plugin_name), component_set_name),
              (r'/{}/component/(.*)/set_description/'.format(plugin_name), component_set_description),
+             (r'/{}/component/(.*)/set_image/'.format(plugin_name), component_set_image),
              (r'/{}/component/(.*)/set_categories/'.format(plugin_name), component_set_categories),
              # (r'/{}/component/(.*)/get_categories/'.format(plugin_name), component_set_description),
              (r'/{}/component/(.*)/set_param/'.format(plugin_name), component_set_param),
@@ -319,7 +320,7 @@ class component_set_name(BaseHandler):
         cid = bson.ObjectId(component)
         new_name = self.get_argument('new_name')
 
-        self.mdb.stock.update({'_id': cid}, {"$set": {'name': new_name}})
+        self.mdb.stock.update_one({'_id': cid}, {"$set": {'name': new_name}})
         self.write({'status': 'ok'})
 
 
@@ -327,9 +328,30 @@ class component_set_description(BaseHandler):
     def post(self, component):
         cid = bson.ObjectId(component)
         new_description = self.get_argument('new_description')
+        overwrite = self.get_argument('overwrite', 'overwrite')
 
-        self.mdb.stock.update({'_id': cid}, {"$set": {'description': new_description}})
+        if overwrite == 'append':
+            self.mdb.stock.update_one({'_id': cid}, [{"$set": {'description': { "$concat": [ {"$ifNull": ["$description", ""]}, "\r\n\r\n", new_description] }}}])
+        elif overwrite == 'prepend':
+            self.mdb.stock.update_one({'_id': cid}, [{"$set": {'description': { "$concat": [ new_description, "\r\n\r\n",  {"$ifNull": ["$description", ""]}] }}}])
+        else:
+            self.mdb.stock.update_one({'_id': cid}, {"$set": {'description': new_description}})
+
+
         self.write({'status': 'ok'})
+
+class component_set_image(BaseHandler):
+    def post(self, component):
+        cid = bson.ObjectId(component)
+        url = self.get_argument('url', None)
+        title_img = int(self.get_argument('title', 0))
+        print("Aktualizace obrazku:", cid, url, title_img)
+
+        if title_img and url: 
+            self.mdb.stock.update_one({'_id': cid}, [{"$set": {'img_title': {"url": url} }} ])
+
+        self.write({'status': 'ok'})
+
 
 class component_set_param(BaseHandler):
     def post(self, component):
@@ -342,7 +364,7 @@ class component_set_param(BaseHandler):
 
         #TODO: kontrola typu a správného zápisu hodnoty
         print({'_id': cid}, {"$set": {'parameters.$.{}'.format(parameter): {'value': value}}})
-        self.mdb.stock.update({'_id': cid}, {"$set": {'parameters.{}'.format(parameter): {'value': value}}} )
+        self.mdb.stock.update_one({'_id': cid}, {"$set": {'parameters.{}'.format(parameter): {'value': value}}} )
         self.write({'status': 'ok'})
 
 class component_set_supplier(BaseHandler):
@@ -360,9 +382,9 @@ class component_set_supplier(BaseHandler):
         }
 
         if id == -1: # Novy dodavatel
-            self.mdb.stock.update({'_id': cid}, {"$push": {'supplier': data}} )
+            self.mdb.stock.update_one({'_id': cid}, {"$push": {'supplier': data}} )
         else:
-            self.mdb.stock.update({'_id': cid}, {"$set": {'supplier.{}'.format(id): data}} )
+            self.mdb.stock.update_one({'_id': cid}, {"$set": {'supplier.{}'.format(id): data}} )
 
         self.write({'status': 'ok'})
 
@@ -386,7 +408,7 @@ class component_set_categories(BaseHandler):
         for i, c in enumerate(categories):
             categories[i] = ObjectId(c)
 
-        out = self.mdb.stock.update({'_id': cid}, {"$set": {'category': categories}} )
+        out = self.mdb.stock.update_one({'_id': cid}, {"$set": {'category': categories}} )
         self.write({'status': 'ok', 'data': str(out)})
         #self.write({'status': 'ok'})
 
@@ -444,7 +466,7 @@ class component_do_buy(BaseHandler):
                     }
                   }
                 }
-            out = self.mdb.stock.update(query_data, packet_data)
+            out = self.mdb.stock.update_one(query_data, packet_data)
             print("Pridavam sacek", out)
 
         out = self.mdb.stock_operation.insert({
@@ -530,7 +552,7 @@ class component_do_move(BaseHandler):
             if dst == 'none':
                 dst = bson.ObjectId()
                 print("Vytvorim novy sacek {}".format(dst))
-                self.mdb.stock.update({
+                self.mdb.stock.update_one({
                     "_id": cid
                 }, {
                     "$push": {
@@ -585,7 +607,7 @@ class component_do_relocate(BaseHandler):
         print(packet)
         print(pos)
 
-        self.mdb.stock.update({
+        self.mdb.stock.update_one({
                 "_id": cid,
                 'packets._id': packet
             }, {
@@ -647,7 +669,7 @@ class component_do_service(BaseHandler):
         # print(packet)
         # print(pos)
         #
-        # self.mdb.stock.update({
+        # self.mdb.stock.update_one({
         #         "_id": cid,
         #         'packets._id': packet
         #     }, {

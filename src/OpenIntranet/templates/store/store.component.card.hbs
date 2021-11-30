@@ -43,8 +43,8 @@ function select_package_formatter(data) {
   <div class="col-6 my-2 mr-1 p-0">
     <div class="d-flex">
       <div class="d-inline-block p-2">
-        {%if len(component.get('images', [])) %}
-          <img class="img-thumbnail" style="width: 200pt; height: 200pt; max-width: initial;">
+        {%if len(component.get('img_title', [])) %}
+          <img class="img-thumbnail" style="width: 200pt; max-width: initial;" src="{{component['img_title']['url']}}">
         {% else %}
           <img class="component_image img-thumbnail" src="/static/img/image-alt.svg" style="width: 200pt; height: 200pt; max-width: initial;">
         {% end %}
