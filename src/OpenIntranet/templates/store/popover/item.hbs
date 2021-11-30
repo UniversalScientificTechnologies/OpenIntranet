@@ -1,0 +1,19 @@
+<div>
+	<div class="d-inline-block ">
+        {%if 'img_title' in item %}
+          <img class="img-thumbnail" style="width: 70pt; max-width: initial;" src="{{item['img_title']['url']}}">
+        {% else %}
+          <img class="component_image img-thumbnail" src="/static/img/image-alt.svg" style="width: 70pt; height: 70pt; max-width: initial;">
+        {% end %}
+	</div>
+    <div class="d-inline-block">
+    	<div><i class="bi bi-cpu"></i> Součástka: <a href="/store/component/{{item['_id']}}/" target="__blank__"><span class="font-weight-bold">{{item['name']}}</span></a> </div>
+    	<div>Kategorie: jeste nefunguje</div>
+
+    </div>
+
+</div>
+
+<div>
+	{{item.get('description', "Popis není k dispozici")[:300]}}
+</div>
