@@ -1,0 +1,70 @@
+
+<div>
+	<h4>Popis:</h4>
+	<div  class="img-thumbnail">
+	<span id="data_import_description">{{products.get('Description', 'Není k dispozici')}}</span>
+	<br>
+		<a href="#." class="bi bi-arrow-up-right-square" onclick="update_description('prepend')" title="Přidat na začatek existujícího popisu"></a>
+		<a href="#." class="bi bi-arrow-right-square" onclick="update_description()" title="Kompletně přepsat existující popis"></a>
+		<a href="#." class="bi bi-arrow-down-right-square" onclick="update_description('append')" title="Přidat na konec existujícího popisu"></a>
+	</div>
+
+</div>
+
+<div>
+	<h4>Obrazky:</h4>
+	{% for image in files['Files']['HighResolutionPhotoList'] + files['Files']['PhotoList']  %}
+	<div class="w-50 img-thumbnail">
+		<img src="{{image}}" class="w-100">
+		<a href="#." onclick="update_image(1, '{{image}}')" class="bi bi-image-alt" title="Nastavit jako titulní fotku"></a>
+		<a href="#." onclick="update_image(0, '{{image}}')" class="bi bi-images" title="Přidat do seznamu fotek" disabled></a>
+	</div>
+	{% end %}
+</div>
+<div>
+	<h4>dokumenty:</h4>
+	{% for doc in files['Files']['DocumentList'] %}
+		<div class="img-thumbnail"><a href="{{doc['DocumentUrl']}}"> {{doc['DocumentType']}} </a></div>
+	{% end %}
+</div>
+
+<script type="text/javascript">
+	
+function update_description(overwrite='overwrite'){
+    $.ajax({
+        url: 'set_description/',
+        type: 'post',
+        data: {'overwrite': overwrite, 'new_description': $("#data_import_description").text()},
+        success:function(){
+          alert("Popis byl aktualizovan")
+        }
+    });
+}
+
+function update_image(title=0, url=''){
+    $.ajax({
+        url: 'set_image/',
+        type: 'post',
+        data: {'url': url, 'title': title},
+        success:function(){
+          alert("Obrazek byl nastaven")
+        }
+    });
+}
+
+</script>
+
+
+<hr>
+
+parametry:
+{{parameters}}<br><br>
+
+
+produkt:
+{{products}}<br><br>
+
+
+soubory:
+{{files}}<br><br>
+

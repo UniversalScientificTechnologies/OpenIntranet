@@ -429,6 +429,8 @@ function update_view(){
         tmpl.querySelector('.product_list-description').innerText = element['description'];
         tmpl.querySelector('.product_list_copyid').setAttribute('copy', element['_id'].$oid);
 
+        try{ tmpl.querySelector('.component_image').setAttribute('src', element['img_title']['url']) } catch(e){};
+
         // zaskrtavatko vybaraných polozek
         if(selected.indexOf(element['_id'].$oid) >= 0){
             tmpl.querySelector('.product_list-select').checked = true;

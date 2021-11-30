@@ -15,7 +15,8 @@
         <div style="display: table-row;">
           <label class="table-cell-label">Symbol:</label>
           <span>{{x.get('symbol', '---')}}</span> 
-          <a class="bi bi-layer-backward text-muted" role="button" href="data_import/{{x.get('supplier', 'none').lower()}}?symbol={{x.get('symbol', '')}}" target="__blank__" title="Vyhledat v API dodavatele"></a>
+          <a class="bi bi-layer-backward text-muted" role="button" href="#data_import" onclick="data_import(supplier='{{x.get('supplier', 'none').lower()}}', symbol='{{x.get('symbol', '')}}')" title="Vyhledat v API dodavatele"></a>
+          <!-- href="data_import/{{x.get('supplier', 'none').lower()}}?symbol={{x.get('symbol', '')}}" -->
         </div>
 
         <div style="display: table-row;">
@@ -55,6 +56,14 @@
   </div>
 </div>
 </form></div></div>
+
+
+<div class="card mx-3 text-dark bg-light">
+<div class="card-header">Import dat</div>
+<div class="card-body" id="supplier_import_data_tab">
+
+
+</div></div>
 
 
 <script>
@@ -98,5 +107,25 @@ $('#form_component_suppiler').submit(function(e){
         }
     });
 });
+
+
+function data_import(supplier, symbol){
+
+
+    $.ajax({
+        url: 'data_import/'+supplier,
+        type: 'GET',
+        data: {'symbol': symbol },
+        success:function(d){
+          $("#supplier_import_data_tab").empty();
+          $("#supplier_import_data_tab").html(d.toString());
+          console.log(d);
+          //alert(d);
+        }
+    });
+
+
+  //href="data_import/{{x.get('supplier', 'none').lower()}}?symbol={{x.get('symbol', '')}}"
+}
 
 </script>
