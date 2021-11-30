@@ -14,18 +14,20 @@
 <div>
 	<h4>Obrazky:</h4>
 	{% for image in files['Files']['HighResolutionPhotoList'] + files['Files']['PhotoList']  %}
-	<div class="w-50 img-thumbnail">
+	<div class="img-thumbnail d-inline-block" style="width: 49%;">
 		<img src="{{image}}" class="w-100">
-		<a href="#." onclick="update_image(1, '{{image}}')" class="bi bi-image-alt" title="Nastavit jako titulní fotku"></a>
+		<a href="#." onclick="update_image(1, '{{image}}')" class="bi bi-image" title="Nastavit jako titulní fotku"></a>
 		<a href="#." onclick="update_image(0, '{{image}}')" class="bi bi-images" title="Přidat do seznamu fotek" disabled></a>
 	</div>
 	{% end %}
 </div>
 <div>
 	<h4>dokumenty:</h4>
+	<div class="img-thumbnail"><ol>
 	{% for doc in files['Files']['DocumentList'] %}
-		<div class="img-thumbnail"><a href="{{doc['DocumentUrl']}}"> {{doc['DocumentType']}} </a></div>
+		<li><a href="{{doc['DocumentUrl']}}"> {{doc['DocumentType']}} </a></li>
 	{% end %}
+	</ol></div>
 </div>
 
 <script type="text/javascript">
@@ -55,6 +57,7 @@ function update_image(title=0, url=''){
 </script>
 
 
+{#
 <hr>
 
 parametry:
@@ -67,4 +70,4 @@ produkt:
 
 soubory:
 {{files}}<br><br>
-
+#}
