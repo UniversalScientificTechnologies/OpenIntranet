@@ -314,8 +314,10 @@ update_bom();
 <style type="text/css">
 	
 	.popover-class{
+	}
 
-		background: red;
+	.popover-body{
+		padding: 7pt 7pt;
 	}
 
 	:root {
@@ -356,13 +358,15 @@ $(document).on("mouseenter", ".hover-packet", function(e) {
    		//async: false,
         success: function( data, textStatus, jQxhr ){
 			
-			popover.config.content = data;
+			popover._config.content = data;
+			popover.setContent();
 			popover.show();
     		
     	},
         error: function( jqXhr, textStatus, errorThrown ){
 
-			popover.config.content = "Nelze nacist";
+			popover._config.content = "Nelze nacist";
+			popover.setContent();
 			popover.show();
 
             console.log( errorThrown );
@@ -375,7 +379,55 @@ $(document).on("mouseenter", ".hover-packet", function(e) {
 
 });
 
-$(document).on("mouseleave", ".hover-packet", function(e) {
+$(document).on("mouseenter", ".hover-item", function(e) {
+	console.log(e.target);
+	
+	try {
+		popover.dispose();
+	}catch(e){};
+
+	popover = new bootstrap.Popover(e.target, {
+		placement: 'auto',
+		sanitize: false,
+		html: true,
+		content: "Loading ...",
+		customClass: "popover-class",
+		container: 'body'
+	});
+	popover.show();
+
+	$.ajax({
+        type: "GET",
+        url: "/store/popover/item/"+e.target.getAttribute("item_id")+"/",
+        data: {
+        	name: $('#production_name').val(),
+        },
+   		//async: false,
+        success: function( data, textStatus, jQxhr ){
+			
+			popover._config.content = data;
+			popover.setContent();
+			popover.show();
+    		
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+
+			popover._config.content = "Nelze nacist";
+			popover.setContent();
+			popover.show();
+
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+
+});
+
+$(document).on("mouseleave", "popover-body", function(e) {
+	console.log("Odjet pryc...")
 	//popover.dispose();
 	//popover = null;
 	//alert("mouseleave")

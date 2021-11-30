@@ -38,7 +38,12 @@ function update_description(overwrite='overwrite'){
         type: 'post',
         data: {'overwrite': overwrite, 'new_description': $("#data_import_description").text()},
         success:function(){
-          alert("Popis byl aktualizovan")
+			Lobibox.notify("success", {
+				size: 'mini',
+				icon: false,
+				sound: false,
+				msg: 'Popis úspěšně aktualizován. Pro zobrazení zmeny zaktualizujte stránku. '
+			});   
         }
     });
 }
@@ -49,7 +54,12 @@ function update_image(title=0, url=''){
         type: 'post',
         data: {'url': url, 'title': title},
         success:function(){
-          alert("Obrazek byl nastaven")
+			Lobibox.notify("success", {
+				size: 'mini',
+				icon: false,
+				sound: false,
+				msg: 'Obrázek úspěšně aktualizován. Pro zobrazení zmeny zaktualizujte stránku. '
+			});   
         }
     });
 }
@@ -60,7 +70,12 @@ function update_document(url='', type="Datasheet"){
         type: 'post',
         data: {'url': url, 'doc_type': type, 'doc_form': 'link'},
         success:function(){
-          alert("Obrazek byl nastaven")
+			Lobibox.notify("success", {
+				size: 'mini',
+				icon: false,
+				sound: false,
+				msg: 'Dokument úspěšně aktualizován. Pro zobrazení zmeny zaktualizujte stránku. '
+			});   
         }
     });
 }
