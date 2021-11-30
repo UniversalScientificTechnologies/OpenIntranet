@@ -20,6 +20,12 @@ Nejmenší skladová entita je sáček obsahující určitý počet identických
  * Přehled všech skladových zásob
  * Rozdělování na sáčky
 
+
+## Seznam skladových položek
+V seznamu skladových položek můžete nalézt přehled všech skladových položek. Můžete v nich vyhledávat nebo si je prohlížet dle skladových kategorií. 
+![store_view](https://user-images.githubusercontent.com/5196729/144079223-7115499f-46e5-4d75-87d5-1a0b965e921c.png)
+
+
 ## Editace názvu součástky 
 
 Název položky se edituje dvojklikem na samotný název. Pak se otevře takové okno (tzv. modal).
