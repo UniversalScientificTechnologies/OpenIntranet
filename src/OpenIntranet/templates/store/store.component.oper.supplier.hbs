@@ -1,8 +1,12 @@
+
+  <i class="bi bi-plus-square-dotted btn btn-success p-1 mx-3 mb-1" onclick="prepare_supplier_form(-1);"></i>
+
   {% for i, x in enumerate(component.get('supplier', [])) %}
 <div class="card mx-3 my-1">
-    <div class="card-header">{{i}}, <b>{{x['supplier']}}</b>, {{x.get('symbol','null')}} <span></span> <a class="material-icons" href="{{x.get('full_url','')}}" target="_blank">link</a>
-      <span class="material-icons">add_shopping_cart</span>
-      <span class="material-icons">been</span>
+    <div class="card-header">{{i}}, <b>{{x['supplier']}}</b>, {{x.get('symbol','null')}} <span></span> 
+      <a class="bi bi-link" href="{{x.get('full_url','')}}" target="_blank"></a>
+      <i class="bi bi-cart-plus"></i>
+      <a class="bi bi-pencil" href="##" onclick="prepare_supplier_form({{i}})"></a>
     </div>
     <div class="card-body">
 <!--       <span class="small text-muted">{{x}}</span>
@@ -29,8 +33,9 @@
 </div>
   {% end %}
 
-<div class="card mx-3 text-dark bg-light">
-<div class="card-header">Nový dodavatel, editace dodavatele</div>
+
+<div class="card mx-3 text-dark bg-light supplier_edit_card" style="display: None;">
+<div class="card-header">Editace dodavatele</div>
 <div class="card-body">
 <form id="form_component_suppiler">
   <div style="display: table;">
@@ -58,7 +63,7 @@
 </form></div></div>
 
 
-<div class="card mx-3 text-dark bg-light">
+<div class="card mx-3 text-dark bg-light data_import_card" style="display: None;">
 <div class="card-header">Import dat</div>
 <div class="card-body" id="supplier_import_data_tab">
 
@@ -102,11 +107,41 @@ $('#form_component_suppiler').submit(function(e){
         type: 'POST',
         data: data,
         success:function(d){
-          alert(d);
           location.reload();
         }
     });
 });
+
+// Vyplnit tabulku dodavatele s existujícím záznamem. 
+function prepare_supplier_form(supplier){
+
+  if(supplier >= 0){
+
+      $.ajax({
+          url: 'get_suppliers/',
+          type: 'GET',
+          success:function(d){
+            var supplier_d = d['supplier'][supplier];
+            console.log(d, supplier_d);
+
+            $("#form_component_suppiler input[name=id]").val(supplier);
+            $("#form_component_suppiler input[name=symbol]").val(supplier_d['symbol']);
+            $("#form_component_suppiler input[name=url]").val(supplier_d['url']);
+
+            var $Option = $("<option selected='selected'></option>").val(supplier_d['supplier']).text(supplier_d['supplier'])
+            $("#form_component_suppiler #component_supplier").append($Option).trigger('change');
+            
+
+          }
+      });
+  } else {
+    $("#form_component_suppiler input[name=id]").val(supplier);
+    $("#form_component_suppiler input[name=symbol]").val("");
+    $("#form_component_suppiler input[name=url]").val("");
+  }
+
+  $(".supplier_edit_card").show();
+}
 
 
 function data_import(supplier, symbol){
@@ -117,6 +152,7 @@ function data_import(supplier, symbol){
         type: 'GET',
         data: {'symbol': symbol },
         success:function(d){
+          $(".data_import_card").show();
           $("#supplier_import_data_tab").empty();
           $("#supplier_import_data_tab").html(d.toString());
           console.log(d);
