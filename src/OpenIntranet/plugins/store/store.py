@@ -875,6 +875,7 @@ class api(BaseHandler):
 
                 dout = list(dbcursor)
                 self.render('store/store.api.component_docs_view.hbs', dout = dout, parent = self)
+                return
 
 
 
