@@ -25,7 +25,7 @@
 	<h4>dokumenty:</h4>
 	<div class="img-thumbnail"><ol>
 	{% for doc in files['Files']['DocumentList'] %}
-		<li><a href="{{doc['DocumentUrl']}}"> {{doc['DocumentType']}} </a></li>
+		<li><a href="{{doc['DocumentUrl']}}"> {{doc['DocumentType']}} </a> <a href="#." onclick="update_document(url='{{doc['DocumentUrl']}}', type='{{doc['DocumentType']}}')" class="bi bi-file-earmark-plus"></a></li>
 	{% end %}
 	</ol></div>
 </div>
@@ -48,6 +48,17 @@ function update_image(title=0, url=''){
         url: 'set_image/',
         type: 'post',
         data: {'url': url, 'title': title},
+        success:function(){
+          alert("Obrazek byl nastaven")
+        }
+    });
+}
+
+function update_document(url='', type="Datasheet"){
+    $.ajax({
+        url: 'set_document/',
+        type: 'post',
+        data: {'url': url, 'doc_type': type, 'doc_form': 'link'},
         success:function(){
           alert("Obrazek byl nastaven")
         }
