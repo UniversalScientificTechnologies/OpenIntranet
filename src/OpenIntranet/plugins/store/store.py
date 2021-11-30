@@ -419,7 +419,7 @@ class api_move_category(BaseHandler):
 
         data = {'$set': {'parent': parent} }
         if parent != cid:
-            self.mdb.category.update({'_id': cid}, data, upsert=False)
+            self.mdb.category.update_one({'_id': cid}, data, upsert=False)
         else:
             print("CHYBA")
         self.write("OK")
@@ -439,7 +439,7 @@ class api_move_position(BaseHandler):
 
         data = {'$set': {'parent': parent} }
         if parent != cid:
-            self.mdb.store_positions.update({'_id': cid}, data, upsert=False)
+            self.mdb.store_positions.update_one({'_id': cid}, data, upsert=False)
         else:
             print("CHYBA")
         self.write("OK")
@@ -467,7 +467,7 @@ class api_update_position(BaseHandler):
             if parent:
                 data['parent'] = parent
 
-            self.mdb.store_positions.update({'_id': cid}, {"$set": data}, upsert=True)
+            self.mdb.store_positions.update_one({'_id': cid}, {"$set": data}, upsert=True)
         self.write("OK")
 
 class api_update_category(BaseHandler):
@@ -491,7 +491,7 @@ class api_update_category(BaseHandler):
             if parent:
                 data['parent'] = parent
 
-            self.mdb.category.update({'_id': cid}, {"$set": data}, upsert=True)
+            self.mdb.category.update_one({'_id': cid}, {"$set": data}, upsert=True)
         self.write("{'state': 'OK'}")
 
 class api_parameters_list(BaseHandler):
@@ -602,7 +602,7 @@ class api(BaseHandler):
         elif data == 'add_supplier':
             id = self.get_argument('id', None)
 
-            out = self.mdb.update({'_id': id},{
+            out = self.mdb.update_one({'_id': id},{
                 '$push':{'supplier':{
                         'supplier': self.get_argument('supplier'),
                         'id': self.get_argument('symbol'),
@@ -624,7 +624,7 @@ class api(BaseHandler):
 
                 if component:
                     print("Pozadavek na upravu", component, "Ze skladu:", stock, "Na pocet", count)
-                    self.mdb.stock.update(
+                    self.mdb.stock.update_one(
                         { "_id": component },
                         {"$set": {"stock."+stock+".count": count}  },
                         upsert = False
@@ -679,7 +679,7 @@ class api(BaseHandler):
 
             print("Update product with parameters:", ObjectId(id))
             #print(json.dumps(new_json, indent=4))
-            dout = self.mdb.stock.update(
+            dout = self.mdb.stock.update_one(
                     {
                         "_id": ObjectId(id)
                     },{
@@ -696,7 +696,7 @@ class api(BaseHandler):
             state = self.get_argument('state', 'true')  # True nebo False, nastavit nebo odstranit tag
             state = True if state == 'true' else False
             self.LogActivity()
-            self.mdb.stock.update({
+            self.mdb.stock.update_one({
                     "_id": component
                 },{
                     ('$set' if state else '$unset'):{
@@ -742,7 +742,7 @@ class api(BaseHandler):
                     {"$unwind": '$history'},
                     {"$sort" : {"history._id": -1}},
                     {"$limit": 500}
-                ], useCursor = True)
+                ])
             dout = list(dbcursor)
 
             print("Output type", output_type)
@@ -851,7 +851,7 @@ class api(BaseHandler):
                        }
                     }
 
-                ], useCursor = True)
+                ])
             dout = list(dbcursor)
             print(dout)
 
@@ -871,7 +871,7 @@ class api(BaseHandler):
                 dbcursor = self.mdb.stock.aggregate([
                     {"$match": {"_id": bson.ObjectId(self.get_argument('key'))}},
 
-                ], useCursor = True)
+                ])
 
                 dout = list(dbcursor)
                 self.render('store/store.api.component_docs_view.hbs', dout = dout, parent = self)
@@ -880,7 +880,7 @@ class api(BaseHandler):
 
         elif data == 'update_category':
             self.LogActivity(module = 'store', operation = 'update_category', data={'category': self.get_argument('name')})
-            self.mdb.category.update({"name": self.get_argument('name')},
+            self.mdb.category.update_one({"name": self.get_argument('name')},
             {
                 "name_cs": self.get_argument('name_cs'),
                 "description": self.get_argument('description'),
@@ -933,7 +933,7 @@ class api(BaseHandler):
                     '$skip' : int(50)*int(page)
                 },{
                     '$limit' : int(50)
-                }], useCursor=True)
+                }])
             dout = list(dbcursor)
 
         print("operace:", data)
@@ -984,7 +984,7 @@ class operation(BaseHandler):
                 description += "oprava z %d na %d ks".format(counts, bilance)
 
             print("service_push >>", id, stock, description, float(bilance))
-            out = self.mdb.stock.update(
+            out = self.mdb.stock.update_one(
                     {'_id': id},
                     {'$push': {'history':
                         {'_id': bson.ObjectId(), 'stock': stock, 'operation': 'service', 'bilance': float(bilance),  'description':description, 'user':self.logged}
@@ -1070,7 +1070,7 @@ class operation(BaseHandler):
                         }
                       }
                     }
-                out = self.mdb.stock.update(query_data, packet_data)
+                out = self.mdb.stock.update_one(query_data, packet_data)
                 print("Pridavam sacek", out)
 
             # Pridavam do existujiciho packetu
@@ -1082,7 +1082,7 @@ class operation(BaseHandler):
                 invoice = bson.ObjectId(invoice)
                 id = bson.ObjectId()
 
-                out = self.mdb.stock.update(query_data,
+                out = self.mdb.stock.update_one(query_data,
                     {
                     '$push':
                         {
@@ -1109,7 +1109,7 @@ class operation(BaseHandler):
 
             # Pokud vytvarime pozadavek na koupi polozky
             else:
-                out = self.mdb.stock.update(
+                out = self.mdb.stock.update_one(
                     {'_id': bson.ObjectId(comp)},
                     {'$push': {'history':
                         {'_id': id, 'operation':'buy_request', 'bilance': float(bilance), 'description':description, 'user':self.logged, 'status': 0}
@@ -1145,13 +1145,13 @@ class operation(BaseHandler):
             idb = bson.ObjectId()
 
             print("move_push >>", comp, source, target, count, description)
-            out = self.mdb.stock.update(
+            out = self.mdb.stock.update_one(
                 {'_id': bson.ObjectId(comp)},
                 {'$push': {'history':
                     {'_id': ida, 'stock': bson.ObjectId(source), 'operation':'move_out', 'bilance': -float(count), 'price': 0, 'description':description, 'user':self.logged},
                 }}
             )
-            out = self.mdb.stock.update(
+            out = self.mdb.stock.update_one(
                 {'_id': bson.ObjectId(comp)},
                 {'$push': {'history':
                     {'_id': idb, 'stock': bson.ObjectId(target), 'operation':'move_in', 'bilance': float(count), 'price': 0, 'description':description, 'user':self.logged},
@@ -1205,11 +1205,11 @@ class operation(BaseHandler):
 
             if order < 0:
                 # nova polozka
-                out = self.mdb.stock.update({'_id': id}, {
+                out = self.mdb.stock.update_one({'_id': id}, {
                     "$push": {"supplier": {'supplier':supplier, 'symbol':symbol, 'barcode':code, 'url':url}}
                 })
             else:
-                out = self.mdb.stock.update({'_id': id}, {
+                out = self.mdb.stock.update_one({'_id': id}, {
                     "$set": {"supplier.{}".format(order): {'supplier':supplier, 'symbol':symbol, 'barcode':code, 'url':url}}
                 })
             self.write(out)

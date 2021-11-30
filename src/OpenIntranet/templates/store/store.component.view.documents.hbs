@@ -1,3 +1,8 @@
 
+<ol>
+{% for doc in documents[0].get('documents', []) %}
+	
+<li> <a href="{{doc['url']}}" target="__blank__">{{doc['type']}}</a> ({{doc['form']}}) </li>
 
-{{documents}}
+{% end %}
+</ol>

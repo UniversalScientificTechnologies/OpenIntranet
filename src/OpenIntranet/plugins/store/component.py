@@ -279,6 +279,7 @@ def get_plugin_handlers():
              (r'/{}/component/(.*)/set_param/'.format(plugin_name), component_set_param),
              (r'/{}/component/(.*)/set_supplier/'.format(plugin_name), component_set_supplier),
              (r'/{}/component/(.*)/get_suppliers/'.format(plugin_name), component_get_suppliers),
+             (r'/{}/component/(.*)/set_document/'.format(plugin_name), component_set_docs),
              (r'/{}/component/(.*)/do_buy/'.format(plugin_name), component_do_buy),
              (r'/{}/component/(.*)/do_move/'.format(plugin_name), component_do_move),
              (r'/{}/component/(.*)/do_relocate/'.format(plugin_name), component_do_relocate),
@@ -399,6 +400,31 @@ class component_get_suppliers(BaseHandler):
         out = list(out)[0]
 
         self.write(out)
+
+
+class component_set_docs(BaseHandler):
+    def post(self, component):
+        cid = bson.ObjectId(component)
+        id = int(self.get_argument('id', -1))
+        doc_type = self.get_argument('doc_type', "Document")
+        doc_form = self.get_argument('doc_form')
+        url = self.get_argument('url', None)
+
+        if doc_form == 'link' and url:
+
+            data = {
+                'type': doc_type,
+                'form': 'link',
+                'url': url
+            }
+
+            if id == -1:
+                self.mdb.stock.update_one({'_id': cid}, {"$push": {'documents': data}} )
+            else:
+                self.mdb.stock.update_one({'_id': cid}, {"$set": {'documents.{}'.format(id): data}} )
+
+        self.write({'status': 'ok'})
+
 
 class component_set_categories(BaseHandler):
     def post(self, component):
