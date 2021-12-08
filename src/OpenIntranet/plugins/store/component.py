@@ -310,7 +310,7 @@ class new_component(BaseHandler):
         component['tags'] = []
         component['packets'] = []
         
-        self.mdb.stock.insert(component)
+        self.mdb.stock.insert_one(component)
         #self.write({'status': 'ok', 'new_component': str(component['_id'])})
 
         self.redirect('/store/component/{}/'.format(cid))
@@ -495,7 +495,7 @@ class component_do_buy(BaseHandler):
             out = self.mdb.stock.update_one(query_data, packet_data)
             print("Pridavam sacek", out)
 
-        out = self.mdb.stock_operation.insert({
+        out = self.mdb.stock_operation.insert_one({
             'pid': packet_id,
             'count': float(bilance),
             'reserved': 0,
@@ -592,7 +592,7 @@ class component_do_move(BaseHandler):
                     }
                 })
 
-            self.mdb.stock_operation.insert({
+            self.mdb.stock_operation.insert_one({
                     "pid": dst,
                     "count" : count,
                     "unit_price" : operation_price,
@@ -603,7 +603,7 @@ class component_do_move(BaseHandler):
                     "supplier" : "0",
                     "description" : "Presun do jineho sacku"
                 })
-            self.mdb.stock_operation.insert({
+            self.mdb.stock_operation.insert_one({
                     "pid": src,
                     "count" : -count,
                     "unit_price" : -operation_price,
@@ -659,7 +659,7 @@ class component_do_service(BaseHandler):
             relative_count = float(count)
 
         description = self.get_argument('description', "")
-        out = self.mdb.stock_operation.insert({
+        out = self.mdb.stock_operation.insert_one({
             'pid': pid,
             'count': float(relative_count),
             'reserved': 0,
@@ -722,5 +722,5 @@ class component_do_duplicate(BaseHandler):
         component['overview'] = {}
         component['stock'] = {}
 
-        self.mdb.stock.insert(component)
+        self.mdb.stock.insert_one(component)
         self.write({'status': 'ok', 'new_component': str(component['_id'])})

@@ -319,8 +319,8 @@ class production_tree_move_elemen(BaseHandler):
         if validated:
             print("Presun production z/do..", source, destination)
 
-            self.mdb.production_tree.update( {"_id": source}, {"$set": {"parent": destination}} )
-            self.mdb.production_groups.update( {"_id": source}, {"$set": {"parent": destination}} )
+            self.mdb.production_tree.update_one( {"_id": source}, {"$set": {"parent": destination}} )
+            self.mdb.production_groups.update_one( {"_id": source}, {"$set": {"parent": destination}} )
 
             self.write("ok")
 
@@ -330,8 +330,8 @@ class production_tree_rename_elemen(BaseHandler):
         source = bson.ObjectId(self.get_argument('id'))
         new_name = self.get_argument('new_name')
 
-        self.mdb.production_tree.update( {"_id": source}, {"$set": {"text": new_name}} )
-        self.mdb.production_groups.update( {"_id": source}, {"$set": {"name": new_name}} )
+        self.mdb.production_tree.update_one( {"_id": source}, {"$set": {"text": new_name}} )
+        self.mdb.production_groups.update_one( {"_id": source}, {"$set": {"name": new_name}} )
 
         self.write("ok")
 
@@ -389,7 +389,7 @@ class update_production_group(BaseHandler):
         name = self.get_argument('name')
         description = self.get_argument('description')
 
-        self.mdb.production_groups.update({'_id': group_id}, 
+        self.mdb.production_groups.update_one({'_id': group_id}, 
             { "$set": {"name": name, "description": description}}
         )
 
@@ -480,7 +480,7 @@ class edit(BaseHandler):
         print("Vyhledavam polozku", name)
         if name == 'new':
             parent = bson.ObjectId(self.get_argument('group'))
-            product = self.mdb.production.insert({
+            product = self.mdb.production.insert_one({
                     'name': 'Without name',
                     'created': datetime.datetime.now(),
                     'state': 0,
@@ -603,7 +603,7 @@ class edit(BaseHandler):
                 if parameter == 'UST_ID':
                     value = bson.ObjectId(value)
                     print("JE TO UST ID... budu potrebovat ID")
-                self.mdb.production.update(
+                self.mdb.production.update_one(
                     {
                        '_id': bson.ObjectId(name.strip()),
                        "components.Ref": c.strip()
@@ -651,7 +651,7 @@ class edit(BaseHandler):
                 print(bson.ObjectId(name))
 
                 if exist.count() > 0:
-                    update = self.mdb.production.update(
+                    update = self.mdb.production.update_one(
                             {
                                 '_id': bson.ObjectId(name),
                                 "components.Ref": c
@@ -669,7 +669,7 @@ class edit(BaseHandler):
                             }, upsert = True)
                 else:
                     print("NOVA POLOZKA")
-                    update = self.mdb.production.update(
+                    update = self.mdb.production.update_one(
                             {
                                 '_id': bson.ObjectId(name)
                             },{
@@ -740,7 +740,7 @@ class edit(BaseHandler):
             p_description = self.get_argument('description')
             print(p_name, p_description)
 
-            self.mdb.production.update(
+            self.mdb.production.update_one(
                 {'_id': bson.ObjectId(name)},
                 {'$set':{
                     'name': p_name,
@@ -772,7 +772,7 @@ class edit(BaseHandler):
             print(bson.ObjectId(name))
 
             if exist.count() > 0:
-                update = self.mdb.production.update(
+                update = self.mdb.production.update_one(
                         {
                             '_id': bson.ObjectId(name),
                             "placement.Tstep": tstep
@@ -790,7 +790,7 @@ class edit(BaseHandler):
                         }, upsert = True)
             else:
                 print("NOVA POLOZKA")
-                update = self.mdb.production.update(
+                update = self.mdb.production.update_one(
                         {
                             '_id': bson.ObjectId(name)
                         },{
@@ -904,7 +904,7 @@ class ust_bom_upload(BaseHandler):
         except Exception as e:
             pass
 
-        component.update( update )
+        component.update_one( update )
 
         return component
 
@@ -926,7 +926,7 @@ class ust_bom_upload(BaseHandler):
         components = root.findall('components')[0]
 
         # Nastav, ze je polozka zastarala (obsolete)
-        self.mdb.production.update(
+        self.mdb.production.update_one(
                 {"_id": bson.ObjectId(name)},
                 {"$set": {"components.$[].status": ComponentStatus.Obsolete.value}}, multi=True
             )
@@ -944,7 +944,7 @@ class ust_bom_upload(BaseHandler):
 
                 if exist.count() > 0:
                     print("Update polozky")
-                    update = self.mdb.production.update(
+                    update = self.mdb.production.update_one(
                             {
                                 '_id': bson.ObjectId(name),
                                 "components.Tstamp": component['Tstamp']
@@ -954,7 +954,7 @@ class ust_bom_upload(BaseHandler):
                 else:
                     print("NOVA POLOZKA")
                     component['status'] = ComponentStatus.Actual.value
-                    update = self.mdb.production.update(
+                    update = self.mdb.production.update_one(
                             {
                                 '_id': bson.ObjectId(name)
                             },{
@@ -965,7 +965,7 @@ class ust_bom_upload(BaseHandler):
                 print("Problem s nactenim polozky:", e)
 
         if remove_obsolete:
-            self.mdb.production.update(
+            self.mdb.production.update_one(
               { "_id": bson.ObjectId(name) },
               {
                 "$pull": { "components": { "status": ComponentStatus.Obsolete.value }},

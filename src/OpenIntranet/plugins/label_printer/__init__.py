@@ -35,7 +35,7 @@ class add_packet_to_group(BaseHandler):
         author = None
         date = datetime.datetime.utcnow()
 
-        self.mdb.label_list.insert({
+        self.mdb.label_list.insert_one({
             'type': 'packet',
             'id': bson.ObjectId(pid),
             'count': count,
@@ -52,7 +52,7 @@ class create_group(BaseHandler):
         name = self.get_argument('name')
         date = datetime.datetime.utcnow()
 
-        self.mdb.label_group.insert({
+        self.mdb.label_group.insert_one({
             'name': name,
             'author': self.actual_user['_id'],
             'show': 1,
@@ -159,7 +159,7 @@ class set_label_group(BaseHandler):
         else:
             group = bson.ObjectId(group)
 
-        self.mdb.label_list.update({'_id': label}, {"$set":{"group":group}})
+        self.mdb.label_list.update_one({'_id': label}, {"$set":{"group":group}})
 
         self.write("ok")
 
@@ -194,7 +194,7 @@ class print_position_labels(BaseHandler):
         print(pos_data)
 
         # Vytvoreni skupiny
-        self.mdb.label_groups.insert({
+        self.mdb.label_groups.insert_one({
             '_id': group_id,
             'name': 'Print group: ' + pos_data['name']
         })
@@ -202,7 +202,7 @@ class print_position_labels(BaseHandler):
         for pos in posid:
             if type in ['all', 'position']:
                 # Vlozit vsechny sacky do tiskoveho seznamu
-                self.mdb.label_list.insert({
+                self.mdb.label_list.insert_one({
                         'type': 'position',
                         'id': pos,
                         'count': 1,
@@ -220,7 +220,7 @@ class print_position_labels(BaseHandler):
                 ]))
 
                 for packet in packets:
-                    self.mdb.label_list.insert({
+                    self.mdb.label_list.insert_one({
                         'type': 'packet',
                         'id': packet['packets']['_id'],
                         'count': 1,

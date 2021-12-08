@@ -81,16 +81,16 @@ class api_addToCart(BaseHandler):
                 print("Do kosiku pridavam polozku '{}' v počtu '{}' metodou {}".format(component, count, method))
 
                 if exist:
-                    self.mdb.carts.update({'_id': bson.ObjectId(cart['_id']),
+                    self.mdb.carts.update_one({'_id': bson.ObjectId(cart['_id']),
                                            'cart.id': component},
                                             { '$set': { 'cart.$.count': count } })
                 else:
                     row = {'id': component, 'count': count}
-                    self.mdb.carts.update({'_id': bson.ObjectId(cart['_id'])},
+                    self.mdb.carts.update_one({'_id': bson.ObjectId(cart['_id'])},
                             { '$push': {'cart' :row} })
 
             if ctype == 'sell':
-                    self.mdb.carts.update({'_id': bson.ObjectId(cart['_id']), 'cart.id': component},
+                    self.mdb.carts.update_one({'_id': bson.ObjectId(cart['_id']), 'cart.id': component},
                                           { '$set': {
                                                 'cart.$.price': component_param.get('price_sell', component_param.get('price', 0)),
                                                 'cart.$.offset': 0,
@@ -116,7 +116,7 @@ class api_new_cart(BaseHandler):
             'public': self.get_argument('public', True),
             'created': datetime.datetime.now()
         }
-        self.mdb.carts.insert(cart)
+        self.mdb.carts.insert_one(cart)
 
 
 class api(object):

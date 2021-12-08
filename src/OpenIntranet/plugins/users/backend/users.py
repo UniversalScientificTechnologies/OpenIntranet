@@ -305,7 +305,7 @@ class UserPageHandler(BaseHandler):
                 new["invalidation_date"] = str_ops.date_to_str(contract["invalidation_date"])
 
             if new["is_valid"]:
-                result.insert(0, new)
+                result.insert_one(0, new)
             else:
                 result.append(new)
 
@@ -352,12 +352,12 @@ class UserPageHandler(BaseHandler):
 
             if document["type"] == "study_certificate":
                 if document["is_valid"]:
-                    study_certificates.insert(0, document)
+                    study_certificates.insert_one(0, document)
                 else:
                     study_certificates.append(document)
             elif document["type"] == "tax_declaration":
                 if document["is_valid"]:
-                    tax_declarations.insert(0, document)
+                    tax_declarations.insert_one(0, document)
                 else:
                     tax_declarations.append(document)
 

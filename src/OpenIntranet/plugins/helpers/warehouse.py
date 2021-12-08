@@ -50,7 +50,7 @@ def get_article_price(article):
 def update_article_price(db, article_id):
 	article = db.find_one({"_id": article_id})
 	price = get_article_price(article)
-	db.update({"_id": article_id}, {"$set":{"warehouse_unit_price": price}})
+	db.update_one({"_id": article_id}, {"$set":{"warehouse_unit_price": price}})
 	return price
 
 

@@ -686,7 +686,7 @@ class api(BaseHandler):
                         '$set': new_json
                     },upsert=True)
             #else:
-            #    dout = self.mdb.stock.insert(new_json)
+            #    dout = self.mdb.stock.insert_one(new_json)
 
 
         elif data == 'update_tag':
