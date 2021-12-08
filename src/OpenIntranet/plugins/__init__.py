@@ -72,13 +72,13 @@ def save_file(db, original_filename):
 
     record = db.owncloud.find_one({'original_filename': file, 'path': path})
     if record:
-        db.owncloud.update({'_id': record['_id']}, {
+        db.owncloud.update_one({'_id': record['_id']}, {
             '$inc': {'revision': 1},
             '$set': {'update': datetime.datetime.now()}
         })
         return os.path.join(path, str(record['_id']) + "_" + file)
     else:
-        out = db.owncloud.insert({
+        out = db.owncloud.insert_one({
             'path': path,
             'original_filename': file,
             'revision': 1,
@@ -161,7 +161,7 @@ class Intranet(tornado.web.RequestHandler):
 
             if not 'remote_token' in self.actual_user:
                 rt = haslib.md5(str(uuid.uuid4())).hexdigest()
-                # self.mdb.users.update({ "_id": self.actual_user["_id"] }, { "set": { "remote_token": rt } })
+                # self.mdb.users.update_one({ "_id": self.actual_user["_id"] }, { "set": { "remote_token": rt } })
                 # self.actual_user['remote_token'] = rt
                 print(rt)
 
@@ -426,7 +426,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 print("[NEZNAMA OPERACE]", operation['operation'])
                 print(operation)
 
-        self.mdb.stock.update({"_id": id}, {"$set": {"overview": overview}})
+        self.mdb.stock.update_one({"_id": id}, {"$set": {"overview": overview}})
         print(bson.json_util.dumps(overview, indent=2))
         print(colored("![component_update_counts]", "yellow", attrs=["bold"]))
 
@@ -497,11 +497,11 @@ class BaseHandler(tornado.web.RequestHandler):
         # pokud tato skladova pozice uz u polozky existuje.
         if exist and target_primary:
             print("Nastavim pozici na primarni")
-            self.mdb.stock.update(
+            self.mdb.stock.update_one(
                 {'_id': id},
                 {"$set": {"position.$[].primary": False}}
             )
-            self.mdb.stock.update(
+            self.mdb.stock.update_one(
                 {'_id': id, 'position.posid': target_position},
                 {"$set": {"position.$.primary": target_primary}}
             )
@@ -510,18 +510,18 @@ class BaseHandler(tornado.web.RequestHandler):
             print("Nastavim novou pozici")
             if primary and target_primary:
                 print("Earsing primary positions", primary, target_primary)
-                self.mdb.stock.update(
+                self.mdb.stock.update_one(
                     {'_id': id, 'position.posid': primary},
                     {"$set": {"position.$.primary": False}}
                 )
-            self.mdb.stock.update(
+            self.mdb.stock.update_one(
                 {'_id': id},
                 {"$addToSet": {"position": {"posid": target_position, "primary": target_primary}}}
             )
             return True
 
     def component_remove_position(self, id, stock):
-        self.mdb.stock.update(
+        self.mdb.stock.update_one(
             {'_id': bson.ObjectId(id)},
             {"$pull": {"position": {"posid": bson.ObjectId(stock)}}}
         )
@@ -582,7 +582,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 elif x['supplier'].lower() == 'killich':
                     x['full_url'] = "https://eshop.killich.cz/?search=+{}".format(x['symbol'])
 
-                self.mdb.stock.update({"_id": id}, {"$set": {"supplier.{}".format(i): x}})
+                self.mdb.stock.update_one({"_id": id}, {"$set": {"supplier.{}".format(i): x}})
 
         except Exception as e:
             print(e)
@@ -670,7 +670,7 @@ class BaseHandler(tornado.web.RequestHandler):
         print(">> activity from {} in {} module".format(user, module))
         print(">> operation: {}".format(operation))
 
-        self.mdb.operation_log.insert({'user': user, 'module': module, 'operation': operation, 'data': data})
+        self.mdb.operation_log.insert_one({'user': user, 'module': module, 'operation': operation, 'data': data})
 
 
 #
@@ -935,7 +935,7 @@ class RegistrationHandler(BaseHandler):
 
         new_password_hash = password_hash(user_name, password)
 
-        self.mdb.users.insert({
+        self.mdb.users.insert_one({
             'user': user_name,
             'pass': new_password_hash,
             'email': email,

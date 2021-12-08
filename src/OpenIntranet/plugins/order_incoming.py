@@ -118,7 +118,7 @@ class invoice(BaseHandler):
 
 class save_invoice(BaseHandler):
     def post(self):
-        self.mdb.invoice.update({'_id': bson.ObjectId(self.get_argument('id'))},{
+        self.mdb.invoice.update_one({'_id': bson.ObjectId(self.get_argument('id'))},{
             '$set':{
                 'invoice': self.get_argument('invoice_number'),
                 'due_date': self.get_argument('duedate'),
@@ -153,11 +153,11 @@ class prepare_invoice_row(BaseHandler):
             }
 
             if int(element_id) == -1:
-                self.mdb.invoice.update(
+                self.mdb.invoice.update_one(
                     { "_id": bson.ObjectId(invoice)},
                     { "$push": { 'items': push_json }}, upsert=True)
             else:
-                self.mdb.invoice.update(
+                self.mdb.invoice.update_one(
                     { "_id": bson.ObjectId(invoice)},
                     { "$set": { 'items.{}'.format(element_id): push_json }}, upsert=True)
         else:
@@ -175,23 +175,23 @@ class invoice_next_state(BaseHandler):
 
         if state == 4 and self.is_authorized(['invoice-access', 'invoice-sudo', 'invoice_import', 'invoice-validator'], sudo=False):
             print("4 -- 3")
-            self.mdb.invoice.update({'_id': cid}, {'$inc': {'state': -1}})
+            self.mdb.invoice.update_one({'_id': cid}, {'$inc': {'state': -1}})
             self.write('OK')
         # validace
         elif state == 3 and self.is_authorized(['invoice-sudo', 'invoice-validator'], sudo=False):
             print("3 --- 2")
-            self.mdb.invoice.update({'_id': cid}, {'$inc': {'state': -1}})
+            self.mdb.invoice.update_one({'_id': cid}, {'$inc': {'state': -1}})
             self.write('OK')
 
         #naskladneni
         elif state == 2 and self.is_authorized(['invoice-sudo', 'invoice-reciever'], sudo=False):
             print("2 --- 1")
-            self.mdb.invoice.update({'_id': cid}, {'$inc': {'state': -1}})
+            self.mdb.invoice.update_one({'_id': cid}, {'$inc': {'state': -1}})
             self.write('OK')
         # validace
         elif state == 1 and self.is_authorized(['invoice-sudo', 'invoice-validator'], sudo=False):
             print("1 --- 0")
-            self.mdb.invoice.update({'_id': cid}, {'$inc': {'state': -1}})
+            self.mdb.invoice.update_one({'_id': cid}, {'$inc': {'state': -1}})
             self.write('OK')
         else:
             print("AUTHORIZED PROBLEM ....", self.role)

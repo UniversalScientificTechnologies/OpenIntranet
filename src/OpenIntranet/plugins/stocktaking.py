@@ -357,7 +357,7 @@ class stocktaking_eventlock(BaseHandler):
     def post(self):
 
         self.authorized(['inventory-sudo'], True)
-        self.mdb.intranet.update({'_id': 'stock_taking'}, {'$set':{'current': None}})
+        self.mdb.intranet.update_one({'_id': 'stock_taking'}, {'$set':{'current': None}})
         self.write("OK")
 
 class stocktaking_eventsave(BaseHandler):
@@ -378,12 +378,12 @@ class stocktaking_eventsave(BaseHandler):
         if id == 'new':
             data['history'] = []
             data['documents'] = []
-            id = str(self.mdb.stock_taking.insert(data))
+            id = str(self.mdb.stock_taking.insert_one(data))
         else: #TODO: dodelat overeni, ze se jedna o legitimni ObjectID
-            self.mdb.stock_taking.update({'_id': bson.ObjectId(id)}, {'$set':data}, False, True)
+            self.mdb.stock_taking.update_one({'_id': bson.ObjectId(id)}, {'$set':data}, False, True)
 
         # ulozit aktualni inventuru
-        if data['status']: self.mdb.intranet.update({'_id': 'stock_taking'}, {'$set':{'current': bson.ObjectId(id)}})
+        if data['status']: self.mdb.intranet.update_one({'_id': 'stock_taking'}, {'$set':{'current': bson.ObjectId(id)}})
         self.write(id)
 
 
@@ -392,7 +392,7 @@ class edit(BaseHandler):
     def get(self, name):
         print("Vyhledavam polozku", name)
         if name == 'new':
-            product = self.mdb.production.insert({
+            product = self.mdb.production.insert_one({
                     'name': 'Without name',
                     'created': datetime.datetime.now(),
                     'state': 0,

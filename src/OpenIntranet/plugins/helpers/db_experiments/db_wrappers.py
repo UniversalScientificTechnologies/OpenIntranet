@@ -131,7 +131,7 @@ class MdocWrapper:
         self._database.add_operation(self.COLLECTION, operation)
 
     def _process_updates(self, updates):
-        self._updates.update(updates)
+        self._updates.update_one(updates)
 
     def reload_from_database(self):
         raise NotImplementedError()
