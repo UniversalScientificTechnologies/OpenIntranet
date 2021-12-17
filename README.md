@@ -45,7 +45,11 @@ Následující moduly jsou v různé fázi rozpracovanosti, některé jsou již 
 
 ### Správce skladu
 
-Základní modul sloužící k orientaci a vyhledávání ve skladu a k běžným operacím se skladovými položkami.
+Základní modul sloužící k orientaci a vyhledávání ve skladu a k běžným operacím se skladovými položkami. Umožňuje vyhledávání položek a zobrazení fotografií produktů. 
+Zatím podporuje API následujících eshopů se součástkami. 
+
+  * [TME](https://www.tme.eu/cz/)
+  * [Mouser](https://eu.mouser.com/)
 
 ![OpenIntranet store view](docs/img/store_view.png)
 
