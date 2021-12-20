@@ -75,6 +75,7 @@ class print_label(BaseHandler):
                 y0 = a4_h/2 + (-3.5+row) * label_height + 2
                 
                 id = str(label['id'])
+                printed_id = id
 
 
 
@@ -131,15 +132,17 @@ class print_label(BaseHandler):
                     pdf.image('static/tmp/barcode/%s.png'%(id), w = 20, h=20)
 
                     # Popis stitku
-                    pdf.set_text_color(400)
+                    pdf.set_text_color(20)
                     pdf.set_font('pt_sans', '', 8)
-                    pdf.set_xy(x0+4, y0+17)
-                    pdf.multi_cell(label_width-28, 2.8, label['component'].get('description', '')[:80], align='L')
 
-                    # pozice ve skaldu
+                    description = label['component'].get('description', '')[:120].strip()
+                    pdf.set_xy(x0+4, y0+15)
+                    pdf.multi_cell(label_width-28, 2.8, description, align='L', border=0)
+
+                    # pozice ve skaldu, oznaceni stitku uzivatelskym kodem
                     pdf.set_text_color(0)
                     pdf.set_xy(x0+label_width-19, y0+10)
-                    pdf.set_font('pt_sans', '', 9)
+                    pdf.set_font('pt_sans-bold', '', 9)
                     pdf.cell(14, 5, label['packet']['name'], align="R", fill=True)
 
 
@@ -147,25 +150,17 @@ class print_label(BaseHandler):
                     pdf.set_xy(x0+5, y0+10)
                     if "warehouse" in label:
 
-
-                        #pos = label['warehouse']['code'].upper() +  "/"
                         pos = "/"
                         for p in reversed(label['path']):
                             pos += p['name'] + "/"
 
-                        #pdf.set_font('pt_sans', '', 6)
-                        #pdf.write(5, label['warehouse']['code'].upper())
-
-                        #pdf.set_font('pt_sans-bold', '', 8)
-                        #pdf.write(5, pos)
-                        #pdf.set_font('pt_sans-bold', '', 10)
-                        #pdf.write(5, label['position']['name'])
                         pos += label['position']['name']
+                        pdf.set_font('pt_sans-bold', '', 9)
                         pdf.multi_cell(label_width-29, 3, pos, align='L')
 
 
                         pdf.set_font('pt_sans', '', 8)
-                        pdf.set_text_color(90)
+                        pdf.set_text_color(80)
                         pdf.set_xy(x0+32, y0+32)
                         pdf.cell(14, 3.5, label['warehouse']['code'].upper(), align="R")
 
@@ -183,18 +178,26 @@ class print_label(BaseHandler):
 
                         cat_text += ','.join(pos)
 
-                        #pdf.set_xy(x0+4, y0+12)
-                        #pdf.set_font('pt_sans', '', 10)
-                        #pdf.write(5, pos)
-
                     pdf.set_font('pt_sans', '', 9)
                     pdf.set_text_color(60)
                     pdf.set_xy(x0+4, y0+34.5)
-                    pdf.cell(0, 0, "{} ks".format(label['packet']['packet_count']), align="L")
+                    pdf.cell(0, 0, "{} ks".format(packet['packet_count']), align="L")
+                    printed_id = packet['_id']
 
-                    # pdf.set_font('pt_sans', '', 7)
-                    # pdf.set_text_color(120)
-                    # pdf.cell(0, 0, "{}".format(cat_text), align="L")
+
+                    # Zkus najit dodavatele sacku. Pokud to nejde, nevadi.. proste tam nic nebude 
+                    try:
+                        supplier_order = int(packet['supplier'])
+                        supplier_info = packet['component'][0]['supplier'][supplier_order]
+                        supplier_text = supplier_info.get('supplier', "NA") + " | " + supplier_info.get('symbol', "NA")
+                        
+                        pdf.set_font('pt_sans', '', 8)
+                        pdf.set_text_color(100)
+                        pdf.set_xy(x0+4, y0+29)
+                        pdf.cell(label_width-28, 4.5, supplier_text, align = 'L', border=0)
+                    except:
+                        pass
+
 
                 if label['type'] == 'position':
                     #packet = label['packet']
@@ -272,10 +275,10 @@ class print_label(BaseHandler):
                 else:
                     pass
 
-                pdf.set_text_color(150)
+                pdf.set_text_color(100)
                 pdf.set_font('pt_sans', '', 7)
                 pdf.set_xy(x0, y0+37)
-                pdf.cell(label_width, 0, "UST.cz|{}|{}".format(datetime.datetime.now().strftime("%d. %m. %Y, %H:%M"), id), align="C")
+                pdf.cell(label_width, 0, "UST.cz|{}|{}".format(datetime.datetime.now().strftime("%d.%m. %Y,%H:%M"), printed_id), align="C")
 
 
             task = "tisk"
