@@ -135,7 +135,7 @@ class print_label(BaseHandler):
                     pdf.set_text_color(20)
                     pdf.set_font('pt_sans', '', 8)
 
-                    description = label['component'].get('description', '')[:120].strip()
+                    description = label['component'].get('description', '')[:110].strip()
                     pdf.set_xy(x0+4, y0+15)
                     pdf.multi_cell(label_width-28, 2.8, description, align='L', border=0)
 
