@@ -626,10 +626,16 @@ function startUpload() {
 	};
 
     xhr.onload = function() {
-		$('.bom_import_step').hide();
-		$('#bom_import_step_success').show();
-		console.log("Úspěch - nahráno");
-		setTimeout(function(){window.location.reload(1);}, 2000);
+
+    	if (this.status == 200) {
+			$('.bom_import_step').hide();
+			$('#bom_import_step_success').show();
+			console.log("Úspěch - nahráno");
+			setTimeout(function(){window.location.reload(1);}, 2000);
+		} else {
+			$('.bom_import_step').hide();
+			$('#bom_import_step_failed').show();		
+		}
     };
 
     xhr.onerror = function() {
