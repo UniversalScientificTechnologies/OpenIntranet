@@ -904,7 +904,7 @@ class ust_bom_upload(BaseHandler):
         except Exception as e:
             pass
 
-        component.update_one( update )
+        component.update( update )
 
         return component
 
@@ -928,8 +928,7 @@ class ust_bom_upload(BaseHandler):
         # Nastav, ze je polozka zastarala (obsolete)
         self.mdb.production.update_one(
                 {"_id": bson.ObjectId(name)},
-                {"$set": {"components.$[].status": ComponentStatus.Obsolete.value}}, multi=True
-            )
+                {"$set": {"components.$[].status": ComponentStatus.Obsolete.value}})
 
         for component_xml in components.iter('comp'):
             try:
@@ -937,12 +936,12 @@ class ust_bom_upload(BaseHandler):
                 component = self.make_comp_dict(component_xml)
                 print("Component>> ", component)
 
-                exist = self.mdb.production.find({'_id': bson.ObjectId(name), 'components.Tstamp': component['Tstamp']})
+                exist = list(self.mdb.production.find({'_id': bson.ObjectId(name), 'components.Tstamp': component['Tstamp']}))
                 v_update = {}
                 v_push = {}
 
 
-                if exist.count() > 0:
+                if len(exist) > 0:
                     print("Update polozky")
                     update = self.mdb.production.update_one(
                             {
