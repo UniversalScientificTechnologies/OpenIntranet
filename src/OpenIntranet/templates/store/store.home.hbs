@@ -94,6 +94,27 @@
     </div>
 
   </div>
+
+
+  <div class="card-body">
+
+    <div class="card-title">
+      <h5>Skladové pozice</h5>
+      <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="search_by_position">
+          <label class="form-check-label" for="search_by_category">Vyhledávat dle pozice</label>
+      </div>
+      <a href="#" class="badge bg-primary" onclick="$('#position-tree').jstree('open_all')">Rozbalit vše</a>
+      <a href="#" class="badge bg-primary" onclick="$('#position-tree').jstree('close_all')">Sbalit vše</a>
+      <a href="#" class="badge bg-primary" onclick="$('#position-tree').jstree('select_all')">Vybrat vše</a>
+      <a href="#" class="badge bg-primary" onclick="$('#position-tree').jstree('deselect_all')">Odznačit vše</a>
+    </div>
+
+    <div id="position-tree">
+
+    </div>
+
+  </div>
 </div>
 
 
@@ -250,6 +271,31 @@ function load_category_tree(){
 }
 load_category_tree();
 
+
+
+
+function load_position_tree(){
+    $('#position-tree').jstree({
+        'core' : {
+           'data' : {
+              'type': "POST",
+              'url' : "/store/api/get_positions/list/?jstree=True"
+            }
+        },
+        "plugins" : [
+            "checkbox",
+            "massload",
+            "sort",
+            "state",
+            "types",
+        ],
+        'checkbox':{
+            'whole_node': false,
+        }
+    });
+}
+load_position_tree();
+
 </script>
 
 <script type="text/javascript">
@@ -359,19 +405,12 @@ function select_categories(what){
 }
 
 function active_categories(name = false){
-	// if (name != false){
-	// }else{
-	// 	var list = []
-	// 	var selected=$(".filter_cat:checked")
-	// 	for (var i = selected.length - 1; i >= 0; i--) {
-	// 		list.push(selected[i].name)
-	// 	}
-	// 	//console.log('selected', list)
- //    console.log("AKtivni kategorie", list);
-	// 	return(list)
-	// }
   var list_of_categories = $('#category-tree').jstree('get_selected');
   return list_of_categories;
+}
+
+function active_positions(name = false){
+  return $('#position-tree').jstree('get_selected');
 }
 
 function update_list(){
@@ -384,8 +423,10 @@ function update_list(){
 	  url: "/store/api/products/",
 	  //contentType : 'application/json',
 	  data: {
-	  		'categories': active_categories(),
-            'search_by_category': Number($("#search_by_category").prop('checked')),
+        'categories': active_categories(),
+        'search_by_category': Number($("#search_by_category").prop('checked')),
+        'positions': active_positions(),
+        'search_by_position': Number($("#search_by_position").prop('checked')),
 	  		'search': $("#filter-search").val(),
 	  		'polarity': $('#category_polarity').is( ":checked" ),
 	  		'tag_polarity': $('#tag_polarity').is( ":checked" ),
