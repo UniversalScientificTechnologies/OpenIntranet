@@ -51,6 +51,14 @@ def api_call(action, params, token, app_secret, show_header=False):
     return json.loads(html);
 
 
+def mouser_api_call(action, mouser_key, body):
+	api_url = "https://api.mouser.com/api/v1/" + action + "?apiKey=" + mouser_key
+	response = request.Request(url=api_url, data=bytes(json.dumps(body), encoding='utf8'), headers={'Content-Type': 'application/json'}, method='POST'	)
+	response = json.loads(request.urlopen(response).read())['SearchResults']['Parts'][0]
+	return response
+
+
+
 class tme(BaseHandler):
 	#role_module = ['store-sudo', 'store-access', 'store-manager', 'store_read']
 
@@ -185,3 +193,116 @@ class tme_get_status(BaseHandler):
 
 		except:
 			self.write("TME importer naní správně nastaven. Zkuste ho nastavit znovu. ")
+
+
+
+class mouser_data_importer(BaseHandler):
+	def get(self, component_id = None):
+
+		if self.get_argument('symbol', None):	
+			key = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']['mouser_api_key']			
+			r = redis.Redis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+
+			if component_id:
+				component_id = bson.ObjectId(component_id)
+
+			sesid = self.get_argument('sesid', None)
+
+			if not sesid and component_id:
+				sessid = str(bson.ObjectId())
+				session = {
+					'source': 'mouser',
+					'component': str(component_id),
+					'symbol': self.get_argument('symbol', ''),
+				}
+				r.hmset(sessid, session)
+				self.redirect('/store/data_import?sesid='+ sessid)
+
+			else:
+				session = r.hgetall(sesid)
+				print("Moje session")
+				print(session)
+
+				data_import_info = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']
+
+				body = {
+				  "SearchByPartRequest": {
+				    "mouserPartNumber": session['symbol']
+				  }
+				}
+
+				product = mouser_api_call('search/partnumber', key, body)
+
+				# self.write({'files': product_files['Data'], 'parameters': parameters['Data'], 'products': products})
+				self.render('store/store.api.importer.mouser.data.hbs',product=product)
+
+		else:
+			if self.get_argument('mouser_api_key', None):
+				key = self.get_argument('mouser_api_key')
+				self.mdb.intranet_plugins.update_one({'_id': 'store'}, {"$set": {'data.data_import.mouser_api_key': key}})
+				self.write("New mouser api key was set")
+
+			else:
+				# check if mouser is registred
+				data_import = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']
+				if 'mouser_api_key' in data_import:
+					self.write("Mouser api key is set")
+				else:
+					self.write("Mouser api key is not entered")
+
+
+
+
+
+class return_data(BaseHandler):
+	#role_module = ['store-sudo', 'store-access', 'store-manager', 'store_read']
+
+	def get(self):
+		r = redis.Redis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+
+
+		sesid = self.get_argument('sesid', None)
+
+		if sesid:
+			session = r.hgetall(sesid)
+			print("Moje session")
+			print(session)
+
+			if session.get('source', '') == 'tme':
+
+				data_import_info = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']
+
+				params = {
+					'SymbolList[0]': session['symbol'],
+					'Country' : 'CZ',
+					'Language': 'cs',
+					'Currency': 'CZK'
+				}
+				print(params)
+
+				product_files = api_call('Products/GetProductsFiles', params, data_import_info['tme_user_token'], data_import_info['tme_app_secret'], True);
+				parameters = api_call('Products/GetParameters', params, data_import_info['tme_user_token'], data_import_info['tme_app_secret'], True);
+				products = api_call('Products/GetProducts', params, data_import_info['tme_user_token'], data_import_info['tme_app_secret'], True);
+
+				product_files = product_files['Data']['ProductList'][0]
+				parameters = parameters['Data']['ProductList'][0]
+				products = products['Data']['ProductList'][0]
+
+				# self.write({'files': product_files['Data'], 'parameters': parameters['Data'], 'products': products})
+				self.render('store/store.api.importer.tme.data.hbs', parameters = parameters, products = products, files = product_files)
+
+		if session.get('source', '') == 'mouser':
+
+			key = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']['mouser_api_key']			
+			data_import_info = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']
+
+			body = {
+			  "SearchByPartRequest": {
+			    "mouserPartNumber": session['symbol']
+			  }
+			}
+
+			product = mouser_api_call('search/partnumber', key, body)
+
+			# self.write({'files': product_files['Data'], 'parameters': parameters['Data'], 'products': products})
+			self.render('store/store.api.importer.mouser.data.hbs',product=product)
