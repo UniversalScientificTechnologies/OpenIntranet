@@ -13,7 +13,7 @@ permalink: modules/store/external_data_sources
 Mnoho dodavatelů komponent nabízí velmi rozsáhlá API pro získání stavu objednávek, pro tvorbu objednávek nebo jen pro získání dalších informací o produktech. Data import se stará o správu připojení k jednotlivým dodavatelským API
 
 
-### TME.eu
+## TME.eu
 
 TME je významný dodavatel elektronických součástek. 
 
@@ -72,3 +72,28 @@ Získaný kód znovu vložime do intranetu formou GET požadavku. V prohlížeč
 
 Celý tento postup vychází ze přístupové politiky TME. Na následujícím diagramu převzatého z jejich [dokumentace](https://developers.tme.eu/documents/tme-api-en.pdf) jsou vidět jednotlivé kroky: 
 ![obrazek](https://user-images.githubusercontent.com/5196729/140321188-9e7a1338-fd0e-4a62-b260-a789589bb9f3.png)
+
+
+## [Mouser](www.mouser.com)
+
+Mouser je další oblíbený globální distributor, který nabízí API pro přístup k jimi nabízeným součástkám. 
+
+
+#### Zjištění stavu importeru
+Stav mouser API data importeru lze stručně zjistit na adrese:
+
+```
+  https://<url_open_intranet>/store/data_import/mouser
+```
+
+
+#### Nastavení importeru
+
+Nejdříve musíte na jejich stránkách se zaregistrovat a [zažádat si](https://cz.mouser.com/MyMouser/MouserSearchApplication.aspx) o API kód. API kód následě přijde emailem. 
+
+Do intranetu pak API kód nastavíte GET požádavkem, kam vložíte svou adresu intranetu a místo `<mouser_api_key>` napíšete váš klíč¸který jste obdrželi emailem. 
+
+```
+  https://<url_open_intranet>/store/data_import/mouser?mouser_api_key=<mouser_api_key>
+```
+
