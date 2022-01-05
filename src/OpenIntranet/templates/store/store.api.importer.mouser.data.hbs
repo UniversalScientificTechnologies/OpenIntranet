@@ -1,0 +1,94 @@
+
+
+
+<div>
+	<h4>Popis:</h4>
+	<div  class="img-thumbnail">
+	<span id="data_import_description">{{product.get('Description', 'Není k dispozici')}}</span>
+	<br>
+		<a href="#." class="bi bi-arrow-up-right-square" onclick="update_description('prepend')" title="Přidat na začatek existujícího popisu"></a>
+		<a href="#." class="bi bi-arrow-right-square" onclick="update_description()" title="Kompletně přepsat existující popis"></a>
+		<a href="#." class="bi bi-arrow-down-right-square" onclick="update_description('append')" title="Přidat na konec existujícího popisu"></a>
+	</div>
+
+</div>
+
+
+
+<div>
+	<h4>Obrazky:</h4>
+	{% for image in [product.get('ImagePath', None)] %}
+	<div class="img-thumbnail d-inline-block" style="width: 49%;">
+		<img src="{{image}}" class="w-100">
+		<a href="#." onclick="update_image(1, '{{image}}')" class="bi bi-image" title="Nastavit jako titulní fotku"></a>
+		<a href="#." onclick="update_image(0, '{{image}}')" class="bi bi-images" title="Přidat do seznamu fotek" disabled></a>
+	</div>
+	{% end %}
+</div>
+
+
+<div>
+	<h4>dokumenty:</h4>
+	<div class="img-thumbnail"><ol>
+	{% for doc in [product.get('DataSheetUrl', None)] %}
+		<li><a href="{{doc}}"> DTS </a> <a href="#." onclick="update_document(url='{{doc}}', type='DTS')" class="bi bi-file-earmark-plus"></a></li>
+	{% end %}
+	</ol></div>
+</div>
+
+
+
+<script type="text/javascript">
+	
+function update_description(overwrite='overwrite'){
+    $.ajax({
+        url: 'set_description/',
+        type: 'post',
+        data: {'overwrite': overwrite, 'new_description': $("#data_import_description").text()},
+        success:function(){
+			Lobibox.notify("success", {
+				size: 'mini',
+				icon: false,
+				sound: false,
+				msg: 'Popis úspěšně aktualizován. Pro zobrazení zmeny zaktualizujte stránku. '
+			});   
+        }
+    });
+}
+
+function update_image(title=0, url=''){
+    $.ajax({
+        url: 'set_image/',
+        type: 'post',
+        data: {'url': url, 'title': title},
+        success:function(){
+			Lobibox.notify("success", {
+				size: 'mini',
+				icon: false,
+				sound: false,
+				msg: 'Obrázek úspěšně aktualizován. Pro zobrazení zmeny zaktualizujte stránku. '
+			});   
+        }
+    });
+}
+
+function update_document(url='', type="Datasheet"){
+    $.ajax({
+        url: 'set_document/',
+        type: 'post',
+        data: {'url': url, 'doc_type': type, 'doc_form': 'link'},
+        success:function(){
+			Lobibox.notify("success", {
+				size: 'mini',
+				icon: false,
+				sound: false,
+				msg: 'Dokument úspěšně aktualizován. Pro zobrazení zmeny zaktualizujte stránku. '
+			});   
+        }
+    });
+}
+
+</script>
+
+
+{#{{product}}#}

@@ -267,10 +267,12 @@ def get_plugin_handlers():
 
         return [
              (r'/{}/component/new/'.format(plugin_name), new_component),
-             (r'/{}/data_import'.format(plugin_name), data_import.tme),
+             (r'/{}/data_import'.format(plugin_name), data_import.return_data),
              (r'/{}/data_import/tme'.format(plugin_name), data_import.tme_get_status),
              (r'/{}/data_import/tme/registr'.format(plugin_name), data_import.tme_get_nonce),
+             (r'/{}/data_import/mouser'.format(plugin_name), data_import.mouser_data_importer),
              (r'/{}/component/(.*)/data_import/tme'.format(plugin_name), data_import.tme),
+             (r'/{}/component/(.*)/data_import/mouser'.format(plugin_name), data_import.mouser_data_importer),
              (r'/{}/component/(.*)/set_name/'.format(plugin_name), component_set_name),
              (r'/{}/component/(.*)/set_description/'.format(plugin_name), component_set_description),
              (r'/{}/component/(.*)/set_image/'.format(plugin_name), component_set_image),

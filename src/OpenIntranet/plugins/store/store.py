@@ -135,8 +135,17 @@ class api_products_json(BaseHandler):
         for i, cat in enumerate(selected):
             print(cat.decode('UTF-8'))
             selected[i] = bson.ObjectId(cat.decode('UTF-8'))
+
+        search_by_position = bool(int(self.get_argument('search_by_position', 0)))
+        selected_positions = (self.request.arguments.get('positions[]', []))
+        for i, pos in enumerate(selected_positions):
+            #print(pos.decode('UTF-8'))
+            selected_positions[i] = bson.ObjectId(pos.decode('UTF-8'))
+
         print("Vyhledavat dle kategorii..", search_by_category)
         print("SEZNAM kategorie", selected)
+        print("Vyhledavat dle pozic..", search_by_category)
+        print("SEZNAM pozic", selected_positions)
         in_stock = self.get_argument('in_stock', 'All')
         page = self.get_argument('page', 0)
         page_len = self.get_argument('page_len', 100)
@@ -179,6 +188,12 @@ class api_products_json(BaseHandler):
                 agq += [{
                     "$match": {'category': {polarity: selected}}
                 }]
+
+            if search_by_position:
+                agq += [{
+                    "$match": {'packets.position': {polarity: selected_positions}}
+                }]
+
             agq += [{
                     '$addFields': {'count': { '$sum': '$history.bilance'}}
                 }]
