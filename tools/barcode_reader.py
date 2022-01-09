@@ -11,16 +11,18 @@ import tornado.web
 import socket
 
 print("Start")
-print(evdev.list_devices())
+#print(evdev.list_devices())
 
 dev = None
 devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
 for device in devices:
-    print(device.info, device.name, '#', device.phys)
-    print(device.leds(verbose=True))
+    print(device.name)
+    #print(device.info, device.name, '#', device.phys)
+    #print(device.leds(verbose=True))
     if '1400g' in device.name:
         dev = InputDevice(device)
         print("selected>>>>>")
+        break
 
 if not dev:
     print("Device must by set manually...")
@@ -50,7 +52,9 @@ sh = {
     '8':'*',
     '9':'(',
     'MINUS':'_',
-    'EQUAL':'+'
+    'EQUAL':'+',
+    'DOT':'>',
+    'COMMA':'<'
 }
 
 
@@ -61,7 +65,9 @@ sl = {
     'SLASH':'/',
     'DOT':  '.',
     'COMMA':',',
-    'EQUAL':'='
+    'EQUAL':'=',
+    'LEFTBRACE':'[',
+    'RIGHTBRACE':']'
 }
 
 def build_string(pole):
@@ -86,20 +92,20 @@ def read_barcode():
             cate = categorize(event)
             if cate.keycode == 'KEY_LEFTSHIFT':
                 shift = cate.keystate
-                print("shift", cate.keystate)
+                #print("shift", cate.keystate)
             elif cate.keycode == 'KEY_ENTER' and cate.keystate == 0:
-                print("Ener begin")
+                #print("Ener begin")
                 keys = []
             elif cate.keycode == 'KEY_ENTER' and cate.keystate == 1:
-                print("Ener end")
+                #print("Ener end")
                 print(keys)
                 code = build_string(keys)
-                print(">>>", connections, con, get_con())
+                #print(">>>", connections, con, get_con())
                 for x in get_con():
                     print(x)
                     x.write_message(code)
             elif event.value:
-                print(shift, cate.keycode, cate.keystate)
+                #print(shift, cate.keycode, cate.keystate)
                 keys += [(shift, cate.keycode)]
 #read_barcode()
 
@@ -109,39 +115,63 @@ def read_barcode():
     keys = []
     shift = 0
 
+def send_data(connections, code):
+    for x in connections:
+        print("Posilam na", x)
+        try:
+            oic = False
+            label_type = None
+            decoded = {}
+            if '[)>[RS]06[GS]' in code:
+                code = code[13:-9]
+                oic = True
+                for part in code.split('[GS]'):
+                    crop = 0
+                    for ch in part:
+                        crop += 1
+                        if not ch.isnumeric():
+                            break
+                    decoded[part[:crop]] = part[crop:]
+
+            if oic:
+                if 'S' in decoded:
+                    label_type = "packet"
+                elif '1L' in decoded:
+                    label_type = "position"
+
+            data = {'data': decoded, 'code': code, 'raw': code, 'codetype': None,
+                'date': None, 'source': 'barcode_reader', 'OpenIntranetCode': oic,
+                'type': label_type}
+            print(data)
+            x.write_message(json.dumps(data))
+        except Exception as e:
+            print(e)
+            print("Odeslani dat se nepovedlo..., Odstranuji..")
+            connections.remove(x)
+
 def blocking_func():
     global connections
     global keys
     global shift
+    #shift = 0
     try:
         for event in dev.read():
             if event.type == ecodes.EV_KEY:
                 cate = categorize(event)
-                if cate.keycode == 'KEY_LEFTSHIFT':
+                if cate.keycode == 'KEY_LEFTSHIFT' or cate.keycode == 'KEY_RIGHTSHIFT':
                     shift = cate.keystate
-                    print("shift", cate.keystate)
-                elif cate.keycode == 'KEY_ENTER' and cate.keystate == 0:
-                    print("Ener begin")
-                    keys = []
-                elif cate.keycode == 'KEY_ENTER' and cate.keystate == 1:
-                    print("Ener end")
-                    code = build_string(keys)
-                    #print("Mozna pripojeni", connections)
-                    for x in connections:
-                        print("Posilam na", x)
-                        try:
-                            data = {'code': code, 'codetype': None, 'date': None, 'source': 'barcode_reader'}
-                            print(data)
-                            x.write_message(json.dumps(data))
-                        except Exception as e:
-                            print(e)
-                            print("Odeslani dat se nepovedlo..., Odstranuji..")
-                            connections.remove(x)
-
                 elif event.value:
-                    print(shift, cate.keycode, cate.keystate)
                     keys += [(shift, cate.keycode)]
+
+                if '[EOT]' in build_string(keys):
+                    code = build_string(keys) # odebrat [EOT]
+                    print("Nacteno: ", code)
+                    send_data(connections, code)
+
+                    keys = []
+
     except Exception as e:
+        #print(e)
         #print(connections)
         pass
 
