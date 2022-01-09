@@ -61,30 +61,29 @@
 </style>
 
 <script type = "text/javascript">
-   function WebSocketBarcode() {
-      if ("WebSocket" in window) {
-         var ws = new WebSocket("ws://localhost:8765/ws");
-         ws.onopen = function() {
-            console.log("opened...")
-         };
 
-         ws.onmessage = function (evt) {
-           console.log(evt);
-            var received_msg = evt.data;
-            var obj = JSON.parse(evt.data);
-            $('#sku_search').val(obj.code);
-            $('#sku_search').trigger('change');
-         };
+    function load_product(data) {
+      console.log(".....", data);
+      if(data['type'] == 'packet'){
+          $('#sku_search').val(data.data['S']);
+          $('#sku_search').trigger('change');
+      } else if (data['type'] == 'position'){
+        $("#position_select").val(data.data["1L"]).trigger('change');
 
-         ws.onclose = function() {
-            alert("Barcode reader is disconected....");
-         };
       } else {
-         alert("WebSocket NOT supported by your Browser!");
+          Lobibox.notify('error', {
+              title: 'Načtení štítku neproběhlo dobře',
+              delay: 3000
+          });
       }
-   }
 
-   WebSocketBarcode();
+    }
+
+    let barr = new barcode_reader();
+    //barr.addCallback('OpenArticleEdit', BC_store_OpenArticleEdit, codetype = 'ObjectId');
+    barr.addCallback('stocktaking', load_product);
+
+
 </script>
 
 
@@ -105,23 +104,25 @@
                 <div class="card-body row">
 
                     <div class="form-group col-lg-12 col-md-12"><div class="row">
-                        <label class="col-form-label">pid <span class="small fw-light text-muted">(packet id)</span></label>
-                        <div class="input-group col-sm-9">
+
+                        <label class="col-form-label col-3">pid <span class="small fw-light text-muted">(sacek)</span></label>
+                        <div class="col-9"><div class="input-group">
                           <input class="form-control" type="text" id="sku_search" onchange="reload_sku()">
                           <div class="input-group-append">
                             <button class="btn btn-outline-secondary material-icons" type="button" onclick="reload_sku()">refresh</button>
                           </div>
-                        </div>
+                        </div></div>
                     </div></div>
 
                     <div class="form-group col-lg-12 col-md-12 form-group-sm"><div class="row">
-                        <label class="col-form-label">cid <span class="small fw-light text-muted">(component id)</span></label>
-                        <div class="input-group col-sm-9">
+                        <label class="col-form-label col-3">cid <span class="small fw-light text-muted">(polozka)</span></label>
+                        <div class="col-9"><div class="input-group col-sm-9">
                           <input class="form-control" type="text" id="id_val" disabled>
                           <div class="input-group-append">
                             <a class="btn btn-outline-secondary material-icons" type="button" href="#" id="id_stock_link" target="__blank__">open_in_new</a>
                           </div>
                         </div>
+                      </div>
                     </div></div>
 
                     <div class="form-group col-lg-12 col-md-12"><div class="row">
@@ -130,9 +131,13 @@
                     </div></div>
                     <div>
 
+
                     </div>
-                    <div id="next_operation" class=" display-5 text-muted col-md-12">
-                        Načtěte další kód...
+                    <div  class=" display-5 text-muted col-md-12">
+                        <span class="badge bg-light text-dark" style="font-size:0.4em; border: 1px gray solid;"><i class="bi bi-app"></i> <span id="packet_name"></span> </span>
+                        <span id="next_operation">
+                          Načtěte další kód...
+                        </span>
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <div class="col text-center align-middle display-4 shadow alert alert-success">
@@ -260,7 +265,56 @@
 </div>
 
 
+<div class="modal modal-bad-position" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Položka se má nacházet v jiné pozici</h5>
+      </div>
+      <div class="modal-body">
+        <p>Položka se má nacházet v jiné pozici. Pokud chcete položku přesunout do aktuální pozice, stiskněte 'Změnit pozici položky'. Pokud chcete pokud položka patří do jiné pozice, zavřete tuto hlášku, načtěte štítek správné pozice (nebo ho vyberte ze seznamu) a proveďte jeho inventuru znovu.</p>
+        <p>Při změně pozice se připraví nový štítek.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clear_form(); ModalBadPosition.hide();">Zrušit</button>
+        <button type="button" class="btn btn-primary" onclick="relocate_packet(); ModalBadPosition.hide();">Změnit pozici položky</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript">
+    var ModalBadPosition = new bootstrap.Modal($(".modal-bad-position"), {});
+</script>
+
+
+<script type="text/javascript">
+
+
+    function relocate_packet(){
+        $.ajax({
+          url: '/store/component/'+$('#id_val').val()+'/do_relocate/',
+          type: 'POST',
+          data: {
+            packet_to_move: $('#sku_search').val(),
+            position: $('#position_select').val(),
+          },
+          success:function(d){
+            reload_sku();
+            update_list();
+            update_list_of_position();
+          }
+        });
+
+        $.ajax('/labels/add_packet_to_group', {
+        type: 'POST',
+        data: { 'packet': $('#sku_search').val() },
+        success: function (data, status, xhr) {
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+        },
+      
+      });
+    }
 
     $("#sku_search").on("change", reload_sku());
     function reload_sku(){
@@ -288,7 +342,7 @@
                 $("#all_search").val(data.item.name);
                 $("#val_old").empty();
 
-               // console.log("Artikl:", data);
+                console.log("Artikl:", data);
 
         // Zjisti, jestli uz to bylo inventurovane
                 for (rec_i in data.item.history){
@@ -313,6 +367,18 @@
                       title: 'Tato položka již byla inventurovaná..',
                       msg: 'U položky <b>'+$('#sku_search').val()+'</b> inventura již problěhla.',
                       delay: 3000
+                  });
+                }
+
+                if(data.item.packet.position.$oid == $('#position_select').val()){
+
+                } else {
+                  ModalBadPosition.show();
+
+                  Lobibox.notify('warning', {
+                      title: 'Tato položka patří do jiné pozice',
+                      //msg: 'U položky <b>'+$('#sku_search').val()+'</b> inventura již problěhla.',
+                      delay: 5000
                   });
                 }
 
@@ -352,6 +418,13 @@
                   $("#val_old").text(data.packet_count.packet_count);
                 }catch(e){
                   $("#val_old").text(0);
+                }
+
+
+                try{
+                  $("#packet_name").text(data.item.packet.name);
+                }catch(e){
+                  $("#packet_name").text("xxx");
                 }
 
 

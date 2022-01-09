@@ -11,7 +11,8 @@ class barcode_reader{
            this.ws = new WebSocket(this.address);
            this.ws.onopen = function() {
               console.log("opened...")
-              $('.barcode-icon').text('phonelink_ring');
+              $("[type = barcodereader-icon]").removeAttr('class');
+              $("[type = barcodereader-icon]").attr('class', 'bi bi-upc-scan');
            };
 
            var self = this;
@@ -22,8 +23,9 @@ class barcode_reader{
 
            this.ws.onclose = function() {
               console.log("Barcode reader is disconected....");
-              //$('.barcode-icon').text('phonelink_erase');
-              $('.barcode-icon').text('block');
+              //$('.barcode-icon').text('phonelink_erase');              
+              $("[type = barcodereader-icon]").removeAttr('class');
+              $("[type = barcodereader-icon]").attr('class', 'bi bi-x-lg');
            };
 
         } else {
@@ -37,13 +39,11 @@ class barcode_reader{
 
     doCallback(data){
         console.log("CALLBACK", data);
-        console.log("...", data['codetype']);
         for(var callback in this.callback){
             var callback_info = this.callback[callback];
             console.log(callback_info);
-            if(data['codetype'] == 'ObjectId'){
-                callback_info.callback(data);
-            }
+            callback_info.callback(data);
+            
         }
     }
 
