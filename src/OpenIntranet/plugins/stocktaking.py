@@ -236,8 +236,16 @@ class load_item(BaseHandler):
         # self.component_update_counts(packet_id)
 
         out['item'] = self.mdb.stock.find_one({'packets._id': packet_id})
+        
+
+        # vybrat spravny packet, aby k tomu byl snazsi pristup...
+        out['item']['packet'] = None
+        for packet in out['item']['packets']:
+            if packet['_id'] == packet_id:
+                out['item']['packet'] = packet
+                break
+
         # out['article_unit_price'] = get_article_price(out['item'])
-        # out['position'] = self.component_get_positions(id = packet_id)
         out['packet_count'] = get_packet_count(self.mdb, packet_id)
         out['article_unit_price'] = 0
         out['position'] = self.component_get_positions(id = packet_id)

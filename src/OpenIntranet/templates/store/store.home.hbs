@@ -366,15 +366,12 @@ $(document).ready(function() {
     barr.addCallback('OpenArticleEdit', BC_store_OpenArticleEdit, codetype = 'ObjectId');
     barr.addCallback('load_product', BC_store_LoadProduct);
 
-
-
     $('#selected-category').select2({width: '100%'});
     update_list();
     var hash = location.hash.substr(1);
     if(hash.length>2){
 	    load_product(hash, open = true);
 	}
-
 });
 
 function page(value, relative=false){
