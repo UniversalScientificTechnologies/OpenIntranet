@@ -345,15 +345,17 @@
                 console.log("Artikl:", data);
 
         // Zjisti, jestli uz to bylo inventurovane
-                for (rec_i in data.item.history){
-                  var history = data.item.history[rec_i];
-                  if (history.type == 'inventory' && history.inventory_id != undefined){
-                    console.log(history.inventory_id);
-                    if(history.inventory_id.$oid == data.inventory._id.$oid){
-                      first_time = false;
-                    }
-                  }
-                }
+                // for (rec_i in data.item.history){
+                //   var history = data.item.history[rec_i];
+                //   if (history.type == 'inventory' && history.inventory_id != undefined){
+                //     console.log(history.inventory_id);
+                //     if(history.inventory_id.$oid == data.inventory._id.$oid){
+                //       first_time = false;
+                //     }
+                //   }
+                // }
+
+                first_time = !data['is_stocktaked'];
 
                 if (first_time == true){
                   Lobibox.notify('success', {
