@@ -142,7 +142,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="col text-center align-middle display-4 shadow alert alert-success">
                           <div class="old_val_text"> <span id="val_old">000.00</span> ks</div>
-                          <div class="old_val_spinner spinner-grow text-success" role="status" style="display: none;"><span class="sr-only">Loading...</span></div>
+                          <div class="old_val_spinner spinner-grow text-success" role="status" style="display: none;"><span>Loading...</span></div>
                         </div>
                     </div>
 
@@ -345,15 +345,17 @@
                 console.log("Artikl:", data);
 
         // Zjisti, jestli uz to bylo inventurovane
-                for (rec_i in data.item.history){
-                  var history = data.item.history[rec_i];
-                  if (history.type == 'inventory' && history.inventory_id != undefined){
-                    console.log(history.inventory_id);
-                    if(history.inventory_id.$oid == data.inventory._id.$oid){
-                      first_time = false;
-                    }
-                  }
-                }
+                // for (rec_i in data.item.history){
+                //   var history = data.item.history[rec_i];
+                //   if (history.type == 'inventory' && history.inventory_id != undefined){
+                //     console.log(history.inventory_id);
+                //     if(history.inventory_id.$oid == data.inventory._id.$oid){
+                //       first_time = false;
+                //     }
+                //   }
+                // }
+
+                first_time = !data['is_stocktaked'];
 
                 if (first_time == true){
                   Lobibox.notify('success', {
@@ -705,6 +707,7 @@ function add_history(name, count, status = null){
 
                   for (rec_i in x.history){
                     var rec = x.history[rec_i];
+                    console.log(rec);
                     if (rec.type == 'inventory'){
                       //console.log("inventura", rec.inventory_id);
                       //console.log(x);
