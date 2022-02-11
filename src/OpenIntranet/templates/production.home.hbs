@@ -60,9 +60,9 @@
 
 			</form>
 
-			<div><label>Varianty: </label> <span class="float-right"><a class="bi bi-plus-lg" id="href_create_new_production_workflow" title="Vytvořit prázné workflow"></a></span> </div>
+			<div><label>Série: </label> <span class="float-right"><a class="bi bi-plus-lg" id="href_create_new_production_workflow" title="Vytvořit prázné workflow"></a></span> </div>
 			<div class="card mt-0 mb-0">
-				<ul class="list-group list-group-flush" id="variants_list">
+				<ul class="list-group list-group-flush" id="series_list">
 					
 				</ul>
 			</div>
@@ -217,25 +217,25 @@ function load_production_info(id){
 
 			$("#href_create_new_production_workflow").attr('href', '/production/new/edit/?group='+data['_id']['$oid'])
 
-			$("#variants_list").empty();
+			$("#series_list").empty();
 			
-			if(!data.variants.length){
-				$("#variants_list").append("<p class='text-muted m-2'> Skupina neobsahuje žádné výrobní podklady.</p>");
+			if(!data.series.length){
+				$("#series_list").append("<p class='text-muted m-2'> Skupina neobsahuje žádné výrobní podklady.</p>");
 			}else{
-				for (variant_i in data.variants) {
-					var variant = data.variants[variant_i]
+				for (serie_i in data.series) {
+					var serie = data.series[serie_i]
 
-					tab = '<li class="list-group-item"> <div> <span class="small text-muted"> Varianta: ' + variant['_id']['$oid'] + '</span> <span class="float-end mx-1" title="Vytvořeno"> <i class="bi bi-align-start"></i> ' + new Date(variant['created']['$date']).toLocaleDateString() + ' </span> <span class="float-end mx-1" title="Upraveno"> <i class="bi bi-pencil"></i> ' + '<span class="text-muted">dd-mm-yyyy</span>' + ' </span> </div>';
+					tab = '<li class="list-group-item"> <div> <span class="small text-muted"> Série: ' + serie['_id']['$oid'] + '</span> <span class="float-end mx-1" title="Vytvořeno"> <i class="bi bi-align-start"></i> ' + new Date(serie['created']['$date']).toLocaleDateString() + ' </span> <span class="float-end mx-1" title="Upraveno"> <i class="bi bi-pencil"></i> ' + '<span class="text-muted">dd-mm-yyyy</span>' + ' </span> </div>';
 					tab += '<div class="d-flex justify-content-between">';
-					tab += '<span><a class="h5" target="_blank_" href="/production/' + variant['_id']['$oid'] + '/edit/"> ' + variant['name'] + '</a> <span class="badge bg-info">' + ' - ' + '</span></span>';
+					tab += '<span><a class="h5" target="_blank_" href="/production/' + serie['_id']['$oid'] + '/edit/"> ' + serie['name'] + '</a> <span class="badge bg-info">' + ' - ' + '</span></span>';
 					tab += '<span>' + '' +'</span>';
 					tab += '<span>';
-					tab += '	<a class="bi bi-back" target="_blank_" href="production/' + variant['_id']['$oid'] + '/duplicate/" title="Vytvořit kopii"></a>';
-					tab += '</span></div> <div class="small text-muted"> ' + variant['description'] + '</div> </li>';
+					tab += '	<a class="bi bi-back" target="_blank_" href="production/' + serie['_id']['$oid'] + '/duplicate/" title="Vytvořit kopii"></a>';
+					tab += '</span></div> <div class="small text-muted"> ' + serie['description'] + '</div> </li>';
 
 					console.log(tab)
 
-					$("#variants_list").append(tab);
+					$("#series_list").append(tab);
 				}
 			}
 

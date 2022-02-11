@@ -144,15 +144,20 @@ F{% extends "base.hbs" %}
 
 
 		<div class="col-4">
-			<div class="card">
-				<div class="card-body">
 
 
-					Cenotvorba - cena matiriálu, cena práce, počet komponent, ....
-
-
-				</div>
-			</div>
+ <ul class="list-group">
+  <li class="list-group-item d-flex justify-content-between">Počet komponent: <span><span id="pricing_count">--</span> ks</span>
+  <li class="list-group-item d-flex justify-content-between">Počet komponent s USTID / počet typů USTID: <span><span id="pricing_count_ust">--</span> ks / <span id="pricing_count_ust_unique">--</span> ks</span>
+</li>
+  <li class="list-group-item d-flex justify-content-between">Nákupní cena materiálu: <span><span id="pricing_price_components">--</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Cena spotřebního materiálu: <span id="pricing_count_price_consumables"><span>0</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between fw-bold">Skladová cena komponenty: <span><span id="pricing_price_stock">0</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between text-muted">Cena práce: <span><span>00</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between text-muted">Marže: <span><span>00</span> czx</span></li>
+  <li class="list-group-item d-flex justify-content-between text-muted fw-bold">Katalogová prodejní cena: <span><span>00</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Poslední aktualizace ceny proveden: <span>--</span> <button class="btn btn-sm btn-success" onclick="update_pricelist()">Update & save</button></li>
+</ul> 
 		</div>
 
 
@@ -652,11 +657,9 @@ function startUpload() {
 
 
 function load_components() {
-	//var components = [];
 
 	$.ajax({
         type: "POST",
-        //contentType: "application/json; charset=utf-8",
         url: ".",
         data: {
         	operation: 'get_production'
@@ -678,80 +681,6 @@ function load_components() {
             });
         }
     });
-    console.log(components);
-
-	// var selected = [];
-	// $('#parts_table_body').empty();
-	// for (i in components){
-	// 	if (selected.indexOf(i) == -1){
-	// 		var com = components[i];
-	// 		selected.push(i);
-	// 		var c_ref = [com['Ref']];
-	// 		var c_package = com['Package']  || null;
-	// 		var c_note = com['Note'] || null;
-	// 		var c_value = com['Value']  || null;
-	// 		var c_ustid = com['UST_ID'] || null;
-
-	// 		// Tato cast provede 'grouping' polozek se stejnymi parametry
-	// 		for (j in components){
-	// 			if (selected.indexOf(j) == -1){
-	// 				var com2 = components[j];
-	// 				if (c_package == com2['Package'] && c_value == com2['Value'] && c_ustid == (com2['UST_ID'] || null) && c_note == (com2['Note'] || null)) {
-	// 					c_ref.push(com2['Ref']);
-	// 					selected.push(j);
-	// 				}
-	// 			}
-	// 		}
-
-
-	// 		var row = document.createElement("tr");
-	// 		var x = row.insertCell(-1);
-	// 		x.innerHTML = "<span class='position' clk_data='"+c_ref+"'>"+i+"</span>";
-
-
-	// 		x = row.insertCell(-1);
-	// 		for (j in c_ref){
-	// 			if (j > 0){x.innerHTML += ', '}
-	// 			x.innerHTML += "<span class='position' clk_data='" +c_ref[j]+ "'>"+c_ref[j]+"</span>";
-	// 		}
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = c_value;
-
-
-	// 		//x = row.insertCell(-1);
-	// 		//x.innerHTML = str(len(c_ref));
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['MFNP'] || null;
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['Distributor'] || null;
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['Link'] || null;
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = c_package;
-	// 		x = row.insertCell(-1);
-	// 		if (c_ustid){
-	// 			x.innerHTML = '<a href = "/store/component/'+c_ustid+'/" target="_blank">'+c_ustid+'</a>';
-	// 		}
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['price_predicted'] || null;
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['price_store'] || null;
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['price_final'] || null;
-
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = c_note || null;
-
-	// 		$('#parts_table_body').append(row);
-	// 	}
-	// }
-
-    console.log("OBECNA DATA:", production);
 
 	$('#production_name').val(production['name']);
 	$('#production_autor').val(production['author']);
@@ -759,28 +688,25 @@ function load_components() {
 	$('#production_type').val(production['type']);
 	$('#production_description').val(production['description']);
 
-    // var draw = SVG('placement_img').size('300px', '300px');
-    // for (i in placement){
-    // 	var c = placement[i];
-    // 	console.log(c);
-    // 	draw.rect(10, 20).move(c.PosX*10, c.PosY*10).rotate(c.Rot).attr({ fill: '#f06', clk_data: c.Ref }).addClass('position');
-    // }
+	if(production.pricing){
+		draw_pricing(production.pricing);
+	}
 
-	// $('.position').click(function(){
- //        edit_component(this.getAttribute('clk_data').split(','));
- //    });
-// 	$('.position').hover(function(){
-// 		var clk = this.getAttribute('clk_data');
-// 		console.log(clk);
-//         $('.position').css('background-color', 'initial');
-//         $('.position').attr('fill', '#f06');
-//         $('[clk_data="'+clk+'"]').css('background-color', 'red');
-//         $('[clk_data="'+clk+'"]').attr('fill', '#00f');
-//     });
  }
 
-
 load_components();
+
+function draw_pricing(prices){
+	$("#pricing_count").text(prices.count);
+	$("#pricing_count_ust").text(prices.count_ust);
+	$("#pricing_count_ust_unique").text(prices.count_ust_unique);
+	$("#pricing_price_components").text(Math.round(prices.price_components));
+	$("#pricing_price_consumables").text(Math.round(prices.price_consumables));
+	$("#pricing_price_stock").text(Math.round(prices.price_stock));
+
+
+}
+
 
 
 // aktualizuje parametry, ktere jsou pouzite v tabulce s nastavenim
@@ -792,6 +718,29 @@ function update_parameters(){
         	operation: 'update_parameters',
         	name: $('#production_name').val(),
         	description: $('#production_description').val(),
+        },
+   		async: false,
+        success: function( data, textStatus, jQxhr ){
+    		load_components()
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+function update_pricelist(){
+	$.ajax({
+        type: "POST",
+        url: ".",
+        data: {
+        	operation: 'update_pricelist',
+        	name: $('#production_name').val(),
+        	//description: $('#production_description').val(),
         },
    		async: false,
         success: function( data, textStatus, jQxhr ){

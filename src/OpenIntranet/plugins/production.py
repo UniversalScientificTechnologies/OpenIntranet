@@ -7,6 +7,7 @@ import tornado.websocket
 import tornado.httputil
 from . import Intranet
 from . import BaseHandler, BaseHandlerJson
+from .store.item_helper import get_items_last_buy_price
 #from pyoctopart.octopart import Octopart
 import json
 import urllib
@@ -376,7 +377,7 @@ class get_production_group(BaseHandler):
                "from": "production",
                "localField": "_id",
                "foreignField": "production_group",
-               "as": "variants"
+               "as": "series"
              }}
         ])
 
@@ -389,14 +390,8 @@ class update_production_group(BaseHandler):
         name = self.get_argument('name')
         description = self.get_argument('description')
 
-        self.mdb.production_groups.update_one({'_id': group_id}, 
-            { "$set": {"name": name, "description": description}}
-        )
-
         self.write("")
             
-
-
 
 '''
     Tabulka s BOMem pro zobrazeni v production
@@ -749,6 +744,50 @@ class edit(BaseHandler):
             dout = [{'state': 'ok'}]
             output = bson.json_util.dumps(dout)
             self.write(output)
+
+        ##
+        ### Update pricelist
+        ##
+        ## aktualizuje cenu teto polozky podle aktualnich nakupnich cen
+        ##
+
+        elif op == 'update_pricelist':
+            print("Update pricelist")
+
+            # get last buy price of component
+            components = {
+                "count": 0,
+                "count_unique": 0,
+                "count_ust": 0,
+                "count_ust_unique": 0,
+                "price_components": 0,
+                "price_consumables": self.get_argument('price_consumables', 0),
+                "price_work": self.get_argument('price_work', 0),
+                "update": 0,
+                "price_stock": 0
+            }
+
+            components_list = []
+            comps = list(self.mdb.production.find({'_id': bson.ObjectId(name)}, {'components':1}))[0]
+            for item in comps['components']:
+                components["count"] += 1
+                uid = item.get("UST_ID", None)
+                if uid and bson.ObjectId.is_valid(uid):
+                    components["count_ust"] += 1
+                    components_list.append(uid)
+
+                    components["price_components"] += get_items_last_buy_price(self.mdb, uid)
+
+            components["count_ust_unique"] = len(set(components_list))
+            components["price_stock"] = components['price_components'] + components['price_consumables']
+            self.mdb.production.update_one(
+                {'_id': bson.ObjectId(name)},
+                {'$set':{
+                    'pricing': components
+                }})
+
+            self.write(components)
+
 
         ##
         #### Update placement
