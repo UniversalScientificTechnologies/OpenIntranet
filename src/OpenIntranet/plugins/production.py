@@ -761,10 +761,10 @@ class edit(BaseHandler):
                 "count_ust": 0,
                 "count_ust_unique": 0,
                 "price_components": 0,
-                "price_consumables": self.get_argument('price_consumables', 0),
-                "price_work": self.get_argument('price_work', 0),
+                "price_consumables": float(self.get_argument('price_consumables', 0)),
+                "price_work": float(self.get_argument('price_work', 0)),
                 "update": 0,
-                "price_stock": 0
+                "price_sell": float(self.get_argument('price_sell', 0))
             }
 
             components_list = []
@@ -779,7 +779,7 @@ class edit(BaseHandler):
                     components["price_components"] += get_items_last_buy_price(self.mdb, uid)
 
             components["count_ust_unique"] = len(set(components_list))
-            components["price_stock"] = components['price_components'] + components['price_consumables']
+            components["price_stock"] = components['price_components'] + components['price_consumables'] + components['price_work']
             self.mdb.production.update_one(
                 {'_id': bson.ObjectId(name)},
                 {'$set':{

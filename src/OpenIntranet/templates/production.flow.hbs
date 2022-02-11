@@ -94,7 +94,7 @@ F{% extends "base.hbs" %}
 
 
 	<div class="row d-flex align-items-stretch">
-		<div class="col-4">
+		<div class="col-lg-4 col-sm-6 col-xs-12">
 			<div class="card">
 				<div class="card-body" style="display: table;">
 					<div class="table-row">
@@ -130,7 +130,7 @@ F{% extends "base.hbs" %}
 		</div>
 
 
-		<div class="col-4 card" style="padding: 0pt;">
+		<div class="col-lg-4 col-sm-6 col-xs-12 card" style="padding: 0pt;">
 		  <ul class="list-group list-group-flush">
 		    <a class="list-group-item" href="#" onclick="openUploadModal()"><i class="bi bi-cloud-upload"></i> Nahrát data (BOM)</a>
 		    <a class="list-group-item" href="./../print/" target="_blank"><i class="bi bi-printer"></i> Tisknout osazovák</a>
@@ -143,7 +143,7 @@ F{% extends "base.hbs" %}
 
 
 
-		<div class="col-4">
+		<div class="col-lg-4 col-sm-6 col-xs-12">
 
 
  <ul class="list-group">
@@ -151,11 +151,11 @@ F{% extends "base.hbs" %}
   <li class="list-group-item d-flex justify-content-between">Počet komponent s USTID / počet typů USTID: <span><span id="pricing_count_ust">--</span> ks / <span id="pricing_count_ust_unique">--</span> ks</span>
 </li>
   <li class="list-group-item d-flex justify-content-between">Nákupní cena materiálu: <span><span id="pricing_price_components">--</span> czk</span></li>
-  <li class="list-group-item d-flex justify-content-between">Cena spotřebního materiálu: <span id="pricing_count_price_consumables"><span>0</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Cena spotřebního materiálu: <span ><input id="pricing_price_consumables" type="number" value="0" min="0" step="1" style="border: none; border-bottom:  solid lightgray 1px;width: 4em;text-align: right; padding: 0pt; margin: 0pt;"> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Cena práce: <span><input id="pricing_price_work" type="number" value="0" min="0" step="1" style="border: none; border-bottom:  solid lightgray 1px;width: 4em;text-align: right; padding: 0pt; margin: 0pt;"> czk</span></li>
   <li class="list-group-item d-flex justify-content-between fw-bold">Skladová cena komponenty: <span><span id="pricing_price_stock">0</span> czk</span></li>
-  <li class="list-group-item d-flex justify-content-between text-muted">Cena práce: <span><span>00</span> czk</span></li>
-  <li class="list-group-item d-flex justify-content-between text-muted">Marže: <span><span>00</span> czx</span></li>
-  <li class="list-group-item d-flex justify-content-between text-muted fw-bold">Katalogová prodejní cena: <span><span>00</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Marže: <span><span>--</span> %</span></li>
+  <li class="list-group-item d-flex justify-content-between fw-bold">Katalogová prodejní cena: <span><input id="pricing_price_sell" type="number" value="0" min="0" step="1" style="border: none; border-bottom:  solid lightgray 1px;width: 6em;text-align: right; padding: 0pt; margin: 0pt;">czk</span></li>
   <li class="list-group-item d-flex justify-content-between">Poslední aktualizace ceny proveden: <span>--</span> <button class="btn btn-sm btn-success" onclick="update_pricelist()">Update & save</button></li>
 </ul> 
 		</div>
@@ -701,9 +701,11 @@ function draw_pricing(prices){
 	$("#pricing_count_ust").text(prices.count_ust);
 	$("#pricing_count_ust_unique").text(prices.count_ust_unique);
 	$("#pricing_price_components").text(Math.round(prices.price_components));
-	$("#pricing_price_consumables").text(Math.round(prices.price_consumables));
 	$("#pricing_price_stock").text(Math.round(prices.price_stock));
 
+	$("#pricing_price_sell").val(Math.round(prices.price_sell));
+	$("#pricing_price_consumables").val(prices.price_consumables);
+	$("#pricing_price_work").val(prices.price_work);
 
 }
 
@@ -740,7 +742,9 @@ function update_pricelist(){
         data: {
         	operation: 'update_pricelist',
         	name: $('#production_name').val(),
-        	//description: $('#production_description').val(),
+        	price_consumables: $("#pricing_price_consumables").val(),
+        	price_work: $("#pricing_price_work").val(),
+        	price_stock: $("#pricing_price_stock").val()
         },
    		async: false,
         success: function( data, textStatus, jQxhr ){
