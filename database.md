@@ -72,10 +72,10 @@ db.createView("packets_count_complete", "stock", [
     {"$unwind": "$packets"},
     {"$lookup": { "from": 'store_positions', "localField":'packets.position', "foreignField": '_id', "as": 'packets.position'}},
     {"$lookup": { "from": 'stock_operation', "localField":'packets._id', "foreignField": 'pid', "as": 'packets.operations'}},
-    {"$lookup": { "from": 'stock_operation', "localField":'packets.cid', "foreignField": 'cid', "as": 'component.operations_cid'}},
-    {"$project": {"packets":1, "component":1} },
+    {"$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'cid', "as": 'operations_cid'}},
+    {"$project": {"packets":1, "operations_cid":1} },
     {"$addFields": {
-            "component_reserv":  {"$sum": "$component.operations_cid.reserv"},
+            "component_reserv":  {"$sum": "$operations_cid.reserved"},
             "packet_count":  {"$sum": "$packets.operations.count"},
             "packet_reserv":  {"$sum": "$packets.operations.reserv"},
             "packet_ordered":  {"$sum": "$packets.operations.ordered"},
@@ -118,8 +118,8 @@ db.createView("packets_count_complete", "stock", [
   }, 
    {"$addFields": {
         "component_count":  {"$sum": "$packets.packet_count"},
-        //"component_reserv":  {"$sum": "$packets.packet_reserv"},
-        "component_reserv":  {"$sum": "$packets.component_reserv"},
+        //"component_reserv":  {"$first": "$packets.packet_reserv"},
+        "component_reserv":  {"$first": "$packets.component_reserv"},
         "component_ordered":  {"$sum": "$packets.packet_ordered"},
         "component_price":  {"$sum": "$packets.packet_price"}
     }
