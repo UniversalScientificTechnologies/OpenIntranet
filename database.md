@@ -67,12 +67,15 @@ db.createView("category_complete", "category",
 
 View s počtem součástek v sáčcích. Každý dokument odpovídá jedné součástce a v poddokumentu jsou jednotlivé sáčky
 ```
+db.packets_count_complete.drop();
 db.createView("packets_count_complete", "stock", [
     {"$unwind": "$packets"},
     {"$lookup": { "from": 'store_positions', "localField":'packets.position', "foreignField": '_id', "as": 'packets.position'}},
     {"$lookup": { "from": 'stock_operation', "localField":'packets._id', "foreignField": 'pid', "as": 'packets.operations'}},
-    {"$project": {"packets":1} },
+    {"$lookup": { "from": 'stock_operation', "localField":'packets.cid', "foreignField": 'cid', "as": 'component.operations_cid'}},
+    {"$project": {"packets":1, "component":1} },
     {"$addFields": {
+            "component_reserv":  {"$sum": "$component.operations_cid.reserv"},
             "packet_count":  {"$sum": "$packets.operations.count"},
             "packet_reserv":  {"$sum": "$packets.operations.reserv"},
             "packet_ordered":  {"$sum": "$packets.operations.ordered"},
@@ -115,7 +118,8 @@ db.createView("packets_count_complete", "stock", [
   }, 
    {"$addFields": {
         "component_count":  {"$sum": "$packets.packet_count"},
-        "component_reserv":  {"$sum": "$packets.packet_reserv"},
+        //"component_reserv":  {"$sum": "$packets.packet_reserv"},
+        "component_reserv":  {"$sum": "$packets.component_reserv"},
         "component_ordered":  {"$sum": "$packets.packet_ordered"},
         "component_price":  {"$sum": "$packets.packet_price"}
     }
