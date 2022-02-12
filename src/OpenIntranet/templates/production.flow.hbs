@@ -135,7 +135,11 @@ F{% extends "base.hbs" %}
 		    <a class="list-group-item" href="#" onclick="openUploadModal()"><i class="bi bi-cloud-upload"></i> Nahrát data (BOM)</a>
 		    <a class="list-group-item" href="./../print/" target="_blank"><i class="bi bi-printer"></i> Tisknout osazovák</a>
 		    <a class="list-group-item text-muted" href="#" ><i class="bi bi-display"></i> Zobrazit gerber</a>
-		    <a class="list-group-item" href="#"><i class="bi bi-question-square"></i> Nastavit počet kusů <input type="number" id="production_multiplication" value="1" min="1" step="1" style="border: solid gray 1px;width: 5em;text-align: center;padding: 0pt;margin-left: 2em;" onchange="count_validation($(this).val())"></a>
+		    <a class="list-group-item" href="#"><i class="bi bi-question-square"></i> Nastavit počet kusů <input type="number" id="production_multiplication" value="1" min="1" step="1" style="border: solid gray 1px;width: 5em;text-align: center;padding: 0pt;margin-left: 2em;" onchange="count_validation($(this).val())">
+		    	<button class="btn btn-sm btn-outline-primary" onclick="doReservation()"><i class="bi bi-bookmark-plus"></i> Vytvořit rezervace </button>
+
+		    	<button class="btn btn-sm btn-outline-primary" onclick="openReservationModal()"> Spravovat rezervace </button>
+		    </a>
 		    <a class="list-group-item text-muted" href="#" ><i class="bi bi-cpu-fill"></i> Spustit výrobu</a>
 		    <a class="list-group-item text-muted" href="#" ><i class="bi bi-card-checklist"></i> Zobrazit výrobu</a>
 		  </ul>
@@ -156,13 +160,9 @@ F{% extends "base.hbs" %}
   <li class="list-group-item d-flex justify-content-between fw-bold">Skladová cena komponenty: <span><span id="pricing_price_stock">0</span> czk</span></li>
   <li class="list-group-item d-flex justify-content-between">Marže: <span><span>--</span> %</span></li>
   <li class="list-group-item d-flex justify-content-between fw-bold">Katalogová prodejní cena: <span><input id="pricing_price_sell" type="number" value="0" min="0" step="1" style="border: none; border-bottom:  solid lightgray 1px;width: 6em;text-align: right; padding: 0pt; margin: 0pt;">czk</span></li>
-  <li class="list-group-item d-flex justify-content-between">Poslední aktualizace ceny proveden: <span>--</span> <button class="btn btn-sm btn-success" onclick="update_pricelist()">Update & save</button></li>
+  <li class="list-group-item d-flex justify-content-between">Poslední aktualizace ceny proveden: <span>--</span> <button class="btn btn-sm btn-outline-success" onclick="update_pricelist()">Update & save</button></li>
 </ul> 
 		</div>
-
-
-
-
 
 		<div class="col-12">
 			<div class="card">
@@ -245,6 +245,27 @@ F{% extends "base.hbs" %}
     </div>
   </div>
 </div>
+
+
+
+<div class="modal" tabindex="-1" id="reservation_modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Správa rezervací</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavrit</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 <!-- NOVÉ POCITANI SOUCASTEK -->
@@ -440,13 +461,7 @@ $(document).on("mouseleave", "popover-body", function(e) {
     $(this).find("a").css("background-image","url('ie/imgs/btn/btn-left.png')");
 });
 
-
-
-
 </script>
-
-
-
 
 
 
@@ -454,29 +469,6 @@ $(document).on("mouseleave", "popover-body", function(e) {
 
 <script type="text/javascript">
 
-
-
-
-    //
-    // initUtils();
-    // initRender();
-    // initStorage();
-    // initDefaults();
-    // cleanGutters();
-    // populateMetadata();
-    // dbgdiv = document.getElementById("dbg");
-    // bom = document.getElementById("bombody");
-    // bomhead = document.getElementById("bomhead");
-    // filter = "";
-    // reflookup = "";
-    // initDone = true;
-    // console.log("changeBomLayout");
-    // // Triggers render
-    // changeBomLayout('left-right');
-	// //$("#component-table").tabulator();
-
-
-	//create autocomplete editor
 
 var ust_id_autocomplete = function(cell, onRendered, success, cancel){
     //cell - the cell component for the editable cell
@@ -758,6 +750,36 @@ function update_pricelist(){
             });
         }
     });
+}
+
+function doReservation(){
+	$.ajax({
+        type: "POST",
+        url: ".",
+        data: {
+        	operation: 'do_reservation',
+        	name: $('#production_name').val(),
+        	count: $('#production_multiplication').val(),
+        },
+   		async: false,
+        success: function( data, textStatus, jQxhr ){
+            Lobibox.notify('success', {
+                msg: 'Rezervace vytvorena pro '+$('#production_multiplication').val()+' ks',
+                icon: false,
+            });
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+function openReservationModal(){
+	$("#reservation_modal").modal('show');
 }
 
 function update_component_parameter(component, param, value){

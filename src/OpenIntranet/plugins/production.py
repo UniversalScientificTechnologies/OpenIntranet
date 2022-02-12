@@ -7,7 +7,7 @@ import tornado.websocket
 import tornado.httputil
 from . import Intranet
 from . import BaseHandler, BaseHandlerJson
-from .store.item_helper import get_items_last_buy_price
+from .store.item_helper import get_items_last_buy_price, create_reservation, get_reservation_components
 #from pyoctopart.octopart import Octopart
 import json
 import urllib
@@ -121,6 +121,7 @@ def get_plugin_handlers():
              (r'/{}/(.*)/edit/'.format(plugin_name), edit),
              (r'/{}/(.*)/duplicate/'.format(plugin_name), duplicate),
              (r'/{}/(.*)/get_bom_table/'.format(plugin_name), get_bom_table),
+             (r'/{}/(.*)/get_reservation/'.format(plugin_name), get_reservation),
              (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
              (r'/{}/api/productionTree/move/'.format(plugin_name), production_tree_move_elemen),
@@ -464,6 +465,14 @@ class get_bom_table(BaseHandler):
 
         self.render('production.bom_table.hbs', data = dout, bson=bson, current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), ComponentStatusTable = ComponentStatusTable)
 
+class get_reservation(BaseHandler):
+    def get(self, name):
+        name = bson.ObjectId(name)
+        components = get_reservation_components(self.mdb, name)
+
+        self.render('production.reservation.hbs', components=components)
+
+
 
 '''
    
@@ -787,6 +796,41 @@ class edit(BaseHandler):
                 }})
 
             self.write(components)
+
+
+        ##
+        ### Vytvorit rezervace
+        ##
+        ##
+
+        elif op == 'do_reservation':
+
+
+            components_list = []
+            comps = list(self.mdb.production.find({'_id': bson.ObjectId(name)}, {'components':1}))[0]
+            for item in comps['components']:
+                uid = item.get("UST_ID", None)
+                if uid and bson.ObjectId.is_valid(uid):
+                    components_list.append(uid)
+
+            component_repetition = {}
+            for component in set(components_list):
+                component_repetition[component] = components_list.count(component)
+
+            for component, repetition in component_repetition.items():
+                create_reservation(db=self.mdb, user=self.logged, cid=component,
+                    warehouse = self.get_warehouse()['_id'],
+                    reservated_count=float(self.get_argument('count', 0))*repetition,
+                    description="Reservation from production module",
+                    origin="production",
+                    origin_id=name,
+                    flag=["reservation"]
+                    )
+
+
+            self.write("")
+
+
 
 
         ##
