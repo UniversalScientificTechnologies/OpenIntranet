@@ -364,13 +364,12 @@ var popover = null;
 
 
 $(document).on("mouseenter", ".hover-packet", function(e) {
-	console.log(e.target);
 	
 	try {
 		popover.dispose();
 	}catch(e){};
 
-	popover = new bootstrap.Popover(e.target, {
+	popover = new bootstrap.Popover(e.currentTarget, {
 		placement: 'auto',
 		sanitize: false,
 		html: true,
@@ -382,7 +381,7 @@ $(document).on("mouseenter", ".hover-packet", function(e) {
 
 	$.ajax({
         type: "GET",
-        url: "/store/popover/packet/"+e.target.getAttribute("packet_id")+"/",
+        url: "/store/popover/packet/"+e.currentTarget.getAttribute("packet_id")+"/",
         data: {
         	name: $('#production_name').val(),
         },
@@ -415,7 +414,7 @@ $(document).on("mouseenter", ".hover-item", function(e) {
 		popover.dispose();
 	}catch(e){};
 
-	popover = new bootstrap.Popover(e.target, {
+	popover = new bootstrap.Popover(e.currentTarget, {
 		placement: 'auto',
 		sanitize: false,
 		html: true,

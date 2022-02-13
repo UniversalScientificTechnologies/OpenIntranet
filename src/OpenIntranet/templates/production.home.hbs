@@ -226,9 +226,13 @@ function load_production_info(id){
 				for (serie_i in data.series) {
 					var serie = data.series[serie_i]
 
-					tab = '<li class="list-group-item '+ series_color[serie['state']] +'"> <div> <span class="small text-muted"> Série: ' + serie['_id']['$oid'] + '</span> <span class="float-end mx-1" title="Vytvořeno"> <i class="bi bi-align-start"></i> ' + new Date(serie['created']['$date']).toLocaleDateString() + ' </span> <span class="float-end mx-1" title="Upraveno"> <i class="bi bi-pencil"></i> ' + '<span class="text-muted">dd-mm-yyyy</span>' + ' </span> Stav: <span>'+serie['state']+'</span> </div>';
+					tab = '<li class="list-group-item '+ series_color[serie['state']] +'"> <div> <span class="small text-muted"> Série: ' + serie['_id']['$oid'] + '</span> <span class="float-end mx-1" title="Vytvořeno"> <i class="bi bi-align-start"></i> ' + new Date(serie['created']['$date']).toLocaleDateString() + ' </span> <span class="float-end mx-1" title="Upraveno"> <i class="bi bi-pencil"></i> ' + '<span class="text-muted">dd-mm-yyyy</span>' + ' </span> <span class="text-muted small"> Stav: '+serie['state']+'</span> </div>';
 					tab += '<div class="d-flex justify-content-between">';
-					tab += '<span><a class="h5" target="_blank_" href="/production/' + serie['_id']['$oid'] + '/edit/"> ' + serie['name'] + '</a> <span class="badge bg-info">' + ' - ' + '</span></span>';
+					tab += '<span>';
+					if(serie.multiplication){
+						tab += '<span class="badge bg-primary">' + serie['multiplication'] + 'x</span>';
+    				}
+					tab += '<a class="h5" target="_blank_" href="/production/' + serie['_id']['$oid'] + '/edit/"> ' + serie['name'] + '</a> </span>';
 					tab += '<span>' + '' +'</span>';
 					tab += '<span>';
 					tab += '	<a class="bi bi-back" target="_blank_" href="production/' + serie['_id']['$oid'] + '/duplicate/" title="Vytvořit kopii"></a>';

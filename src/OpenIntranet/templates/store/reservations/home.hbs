@@ -43,7 +43,7 @@ $(document).on("mouseenter", ".hover-item", function(e) {
 		popover.dispose();
 	}catch(e){};
 
-	popover = new bootstrap.Popover(e.target, {
+	popover = new bootstrap.Popover(e.currentTarget, {
 		placement: 'auto',
 		sanitize: false,
 		html: true,

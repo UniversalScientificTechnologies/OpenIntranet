@@ -14,7 +14,12 @@
               <option value="{{warehouse['_id']}}">{{warehouse['name']}}, {{warehouse['_id']}}</option>
           {% end %}
       </select>
-      <button onclick="push_actual_store()">Nastav</button>
+      <button class="btn btn-success" onclick="push_actual_store()">Nastav</button>
+
+    </div>
+    <hr>
+    <div class="card-body">
+      <a class="btn btn-sm" href="/system/parameters">Globální nastavení systému</a>
     </div>
   </div>
   </div>

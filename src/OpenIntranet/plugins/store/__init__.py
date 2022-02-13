@@ -14,7 +14,6 @@ def get_plugin_handlers():
 
 
 def get_plugin_info():
-    print("GET PLUGIN INFO .....")
     return{
         "role": ['store-access', 'store-sudo', 'sudo', 'store-manager'],
         "name": "store",
@@ -27,7 +26,7 @@ def get_plugin_info():
             {
                 "title": "Nákup",
                 "url": "/store/orders",
-                "icon": "bi-journal-arrow-down",
+                "icon": "bi-cart4",
             },
             {
                 "title": "Rezervace",

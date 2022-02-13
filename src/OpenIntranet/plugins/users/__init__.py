@@ -70,12 +70,12 @@ def get_plugin_info():
             {
                 "url": "/attendance",
                 "title": "Docházka",
-                "icon": 'watch_later',
+                "icon": 'bi-calendar-check',
             },
             {
                 "url": "/users",
                 "title": "Uživatelé",
-                "icon": 'account_box',
+                "icon": 'bi-people',
             },
         ]
     }

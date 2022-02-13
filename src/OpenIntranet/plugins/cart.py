@@ -35,7 +35,7 @@ def get_plugin_info():
             {
                 "title": "Nákupní košíky",
                 "url": "/cart",
-                "icon": "shopping_cart",
+                "icon": "",
             }
         ],
         "role": ['sudo']

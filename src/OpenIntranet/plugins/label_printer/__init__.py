@@ -22,6 +22,22 @@ def get_plugin_handlers():
         ]
     return handlers
 
+
+def get_plugin_info():
+    return {
+        "name": "label_printer",
+        "entrypoints": [
+            {
+                "url": "/labels",
+                "title": "Tisk štítků",
+                "icon": 'bi-printer',
+            }
+        ]
+    }
+
+
+
+
 class print_home(BaseHandler):
     def get(self):
         print("Tisk home page   ...")
@@ -162,19 +178,6 @@ class set_label_group(BaseHandler):
         self.mdb.label_list.update_one({'_id': label}, {"$set":{"group":group}})
 
         self.write("ok")
-
-
-def get_plugin_info():
-    return {
-        "name": "label_printer",
-        "entrypoints": [
-            {
-                "url": "/labels",
-                "title": "Tisk štítků",
-                "icon": 'print',
-            }
-        ]
-    }
 
 
 
