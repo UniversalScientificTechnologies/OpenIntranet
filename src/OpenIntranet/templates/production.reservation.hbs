@@ -1,6 +1,19 @@
 <h3> Rezervace součástek pro výrobu</h3>
 
 <div>
-	{{components}}
+<div class="list-group">
+	{%for component in components %}
+	  <div class="list-group-item">
+		<div class="d-flex w-100 justify-content-between">
+			<span>CID: {{component.get('cid', "Není přiřazeno")}}</span>
+			<span>PID: {{component.get('pid', "Není přiřazeno")}}</span>
+		</div>
+		<div class="d-flex w-100 justify-content-between">
+			<span>popis: {{component.get('description', "")}}</span>
+			<span>Množství: {{component.get('reserved', "")}} ks</span>
+		</div>
+	  </div>
+	{%end%}
 
+</div>
 </div>

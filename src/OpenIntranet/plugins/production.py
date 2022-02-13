@@ -7,7 +7,7 @@ import tornado.websocket
 import tornado.httputil
 from . import Intranet
 from . import BaseHandler, BaseHandlerJson
-from .store.item_helper import get_items_last_buy_price, create_reservation, get_reservation_components
+from .store.item_helper import get_items_last_buy_price, create_reservation, get_reservation_components, earse_reservations
 #from pyoctopart.octopart import Octopart
 import json
 import urllib
@@ -465,11 +465,13 @@ class get_bom_table(BaseHandler):
 
         self.render('production.bom_table.hbs', data = dout, bson=bson, current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), ComponentStatusTable = ComponentStatusTable)
 
+
+# Ziskat seznam rezervaci a vratit ho jako HTML tabulku
+
 class get_reservation(BaseHandler):
     def get(self, name):
         name = bson.ObjectId(name)
         components = get_reservation_components(self.mdb, name)
-
         self.render('production.reservation.hbs', components=components)
 
 
@@ -804,8 +806,11 @@ class edit(BaseHandler):
         ##
 
         elif op == 'do_reservation':
+            if not self.mdb.production.find_one({'_id': bson.ObjectId(name)}, {"state": 1})['state'] == 0:
+                self.write("OK")
+                self.finish()
 
-
+            multiplication = float(self.get_argument('count'))
             components_list = []
             comps = list(self.mdb.production.find({'_id': bson.ObjectId(name)}, {'components':1}))[0]
             for item in comps['components']:
@@ -820,17 +825,28 @@ class edit(BaseHandler):
             for component, repetition in component_repetition.items():
                 create_reservation(db=self.mdb, user=self.logged, cid=component,
                     warehouse = self.get_warehouse()['_id'],
-                    reservated_count=float(self.get_argument('count', 0))*repetition,
+                    reservated_count=multiplication*repetition,
                     description="Reservation from production module",
                     origin="production",
                     origin_id=name,
                     flag=["reservation"]
                     )
 
-
+            # nastavit vyrobu na pripravenou 
+            self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 1, "multiplication": multiplication}})
             self.write("")
 
+        ##
+        ### Vymazat rezervace
+        ##
+        ##
 
+        elif op == 'earse_reservation':
+            if self.mdb.production.find_one({'_id': bson.ObjectId(name)}, {"state": 1})['state'] == 1:
+                earse_reservations(self.mdb, bson.ObjectId(name))
+                self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 0}})
+                self.write("")
+            self.write("Nelze smazat")
 
 
         ##

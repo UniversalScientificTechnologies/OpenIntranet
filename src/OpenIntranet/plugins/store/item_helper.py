@@ -20,7 +20,6 @@ def get_item(db, item):
 
 
 def get_items_last_buy_price(db, item):
-
     packets = list(db.stock.find({'_id': ObjectId(item)}, {'packets._id': 1}))[0]['packets']
     packets = [x['_id'] for x in packets]
 
@@ -32,8 +31,11 @@ def get_items_last_buy_price(db, item):
         {"$project": {"unit_price": 1}}
     ]
 
-    uprice = list(db.stock_operation.aggregate(item_query))[0]["unit_price"]
-    return uprice
+    uprice = list(db.stock_operation.aggregate(item_query))
+    if(len(uprice)):
+        return uprice[0]["unit_price"]
+    else:
+        return 0
 
 
 def create_reservation(db, user, warehouse=None, cid=None, pid=None, reservated_count=1, description="", origin=None, origin_id=None, flag=[]):
@@ -61,6 +63,9 @@ def create_reservation(db, user, warehouse=None, cid=None, pid=None, reservated_
             
         out = db.stock_operation.insert_one(values)
         return out
+
+def earse_reservations(db, origin_id):
+    db.stock_operation.delete_many({'origin_id': origin_id})
 
 
 def get_reservation_components(db, origin_id=None):
