@@ -113,30 +113,6 @@ function select_row_supplier(orderrow_id, supplier){
 
 }	
 
-function add_to_orderlist(cid, count = 0){
-		$.ajax({
-	        type: "POST",
-	        url: "./orders/add_to_orderlist",
-	        data: {
-	        	cid: cid,
-	        	count: count,
-	        	origin: "reservation",
-	        	description: "Added from reservation page"
-	        },
-	        success: function( data, textStatus, jQxhr ){
-	        	load_waitlist();
-
-	    	},
-	        error: function( jqXhr, textStatus, errorThrown ){
-	            console.log( errorThrown );
-	            Lobibox.notify('error', {
-	                msg: 'CHYBA!!!!: ' + errorThrown,
-	                icon: false,
-	            });
-	        }
-	    });
-}
-
 </script>
 
 {%end%}

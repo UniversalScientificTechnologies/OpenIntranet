@@ -3,8 +3,10 @@
 {% for supplier_group in wait_list %}
 
 	<h3>
-		Dodavatel: {{supplier_group['_id']}}	
+		Dodavatel: {{supplier_group['_id']}}
 	</h3>
+
+	
 
 	<table class="table table-striped">
 	<thead>
@@ -20,7 +22,7 @@
 
 	{%for i, order_row in enumerate(supplier_group['order_rows'])%}
 		<tr class="{{order_row['_id']}}" onclick="open_orderrow_info('{{order_row['_id']}}')">
-		<td>{{i}} <input type="checkbox"></td>
+		<td>{{i}} <input type="checkbox" name="{{order_row['_id']}}"></td>
 		<td><i class="bi bi-cpu"></i> {{order_row['component_info'][0]['name']}}</td>
 		<td>{% if order_row['supplier'] %} {{order_row['supplier_symbol']}} {%else%} Nepřiřazeno {%end%}</td>
 		<td>{{order_row['count']}}</td>
@@ -29,5 +31,21 @@
 		</tr>
 	{%end%}
 	</table>
+
+	<div class="card mx-4">
+		<div class="card-header">
+			Otevřené objednávky: <span class="badge bg-sm bg-primary">3</span>
+		</div>
+		<div class="card-body d-flex justify-content-between">
+			<span>
+			<div>Objednávka 1</div>
+			<div>Objednávka 2</div>
+			<div>Objednávka 3</div>
+			</span>	
+			<span>
+				<button class="btn btn-outline-success">Přidat do vybrané objednávky</button>
+			</span>
+		</div>
+	</div>
 	
 {%end%}
