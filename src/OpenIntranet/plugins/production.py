@@ -140,7 +140,7 @@ def get_plugin_info():
             {
                 "title": "production",
                 "url": "/production",
-                "icon": "work"
+                "icon": "bi-tools"
             }
         ],
         "role": ['sudo', "sudo-production", "production-manager", "production-viewer"]
@@ -784,8 +784,6 @@ class edit(BaseHandler):
                 except Exception as e:
                     print("CHYBA ....", e)
             self.write({'status': 'ok'})
-
-
 
 
         ##

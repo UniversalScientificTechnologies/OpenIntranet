@@ -48,7 +48,7 @@ def get_plugin_info():
             {
                 "title": "Inventura",
                 "url": "/stocktaking",
-                "icon": "insert_chart",
+                "icon": "bi-list-task",
             }
         ],
         "role": ["sudo", "sudo-stocktaking", 'inventory']

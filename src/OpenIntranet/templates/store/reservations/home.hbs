@@ -38,6 +38,50 @@
 	realod_reservations_table();
 
 
+$(document).on("mouseenter", ".hover-item", function(e) {	
+	try {
+		popover.dispose();
+	}catch(e){};
+
+	popover = new bootstrap.Popover(e.target, {
+		placement: 'auto',
+		sanitize: false,
+		html: true,
+		content: "Loading ...",
+		customClass: "popover-class",
+		container: 'body'
+	});
+	popover.show();
+
+	$.ajax({
+        type: "GET",
+        url: "/store/popover/item/"+e.currentTarget.getAttribute("item_id")+"/",
+        data: {
+        	name: $('#production_name').val(),
+        },
+   		//async: false,
+        success: function( data, textStatus, jQxhr ){
+			
+			popover._config.content = data;
+			popover.setContent();
+			popover.show();
+    		
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+
+			popover._config.content = "Nelze nacist";
+			popover.setContent();
+			popover.show();
+
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+
+});
 
 </script>
 {% end %}

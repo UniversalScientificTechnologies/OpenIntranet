@@ -38,7 +38,7 @@ class reservations_home(BaseHandler):
 					{"$lookup": {"from": "production", "localField": "origin_id", "foreignField": "_id", "as": "production_info"}},
 					{"$lookup": {"from": "stock", "localField": "cid", "foreignField": "_id", "as": "component_info"}},
 					{"$sort": {'_id': 1}},
-					{"$group": {'_id': '$cid', 'origin': {"$first": "$origin"}, 'reservations': {"$push": "$$ROOT"}}},
+					{"$group": {'_id': '$cid', 'component': {"$first": "$component_info"}, 'reservations': {"$push": "$$ROOT"}, 'count': {"$sum": "$reserved"}}},
 				]))
 
 			self.render('store/reservations/reservation_table_components.hbs', reservations_groups=reservations_groups)

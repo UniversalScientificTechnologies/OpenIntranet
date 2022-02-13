@@ -1,19 +1,18 @@
 
-
+Zobrazení dle komponent
 {% for reservation_group in reservations_groups %}
 
 <div class="card">
-	<div class="card-header">
-		{{reservation_group['_id']}}
-		{{reservation_group['origin']}}
+	<div class="card-header d-flex justify-content-between">
+		<span class="h4 hover-item" item_id="{{reservation_group['component'][0]['_id']}}">{{reservation_group['count']}} x - <a href="./component/{{reservation_group['component'][0]['_id']}}/" >{{reservation_group['component'][0]['name']}}</a></span> <span class="text-muted">({{reservation_group['component'][0]['_id']}})</span>
 	</div>
 
 	<div class="card-body">
 		{%for reservation in reservation_group['reservations'] %}<div>
-			{{reservation.get('cid', '--')}}
-			{{reservation.get('reserved', '--')}}
-
-			
+			<span>{{reservation.get('reserved', '--')}} ks</span> - 
+			<span>{{reservation['production_info'][0]['name'] }}</span>
+			<span>{{reservation.get('origin', '--')}} </span>
+			{{reservation.get('origin_id', '--')}}
 
 		</div>{%end%}
 	</div>

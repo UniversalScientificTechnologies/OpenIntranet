@@ -410,9 +410,7 @@ $(document).on("mouseenter", ".hover-packet", function(e) {
 
 });
 
-$(document).on("mouseenter", ".hover-item", function(e) {
-	console.log(e.target);
-	
+$(document).on("mouseenter", ".hover-item", function(e) {	
 	try {
 		popover.dispose();
 	}catch(e){};
@@ -429,11 +427,10 @@ $(document).on("mouseenter", ".hover-item", function(e) {
 
 	$.ajax({
         type: "GET",
-        url: "/store/popover/item/"+e.target.getAttribute("item_id")+"/",
+        url: "/store/popover/item/"+e.currentTarget.getAttribute("item_id")+"/",
         data: {
         	name: $('#production_name').val(),
         },
-   		//async: false,
         success: function( data, textStatus, jQxhr ){
 			
 			popover._config.content = data;
