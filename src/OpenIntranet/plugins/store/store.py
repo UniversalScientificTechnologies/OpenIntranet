@@ -51,6 +51,8 @@ def get_plugin_handlers():
              (r'/{}/operation/(.*)/'.format(plugin_name), operation)
         ]
 
+
+
 def get_plugin_info():
     return{
         "role": ['store-access', 'store-sudo', 'sudo', 'store-manager'],
@@ -59,10 +61,22 @@ def get_plugin_info():
             {
                 "title": "Sklad",
                 "url": "/store",
-                "icon": "business",
+                "icon": "bi-shop",
+            },
+            {
+                "title": "Nákup",
+                "url": "/store/orders",
+                "icon": "bi-journal-arrow-down",
+            },
+            {
+                "title": "Rezervace",
+                "url": "/store/reservations",
+                "icon": "bi-journal-bookmark",
             }
         ]
     }
+
+
 
 ascii_list_to_str = lambda input: [x.decode('ascii') for x in input]
 ascii_list_to_str = lambda input: [str(x, 'utf-8') for x in input]

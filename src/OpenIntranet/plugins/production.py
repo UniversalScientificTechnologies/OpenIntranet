@@ -148,6 +148,57 @@ def get_plugin_info():
 
 
 
+## Projde seznam vsech komponent v pricelist, a zaktualizuje ceny komponent. Vyuzivaji se ceny posledniho nakupu. 
+
+def production_upadte_pricelist(db, production_id, price_work=-1, price_sell=-1, price_consumables=-1):
+    components = db.production.find_one({'_id': bson.ObjectId(production_id)}, {'pricing':1})
+    print(components)
+
+    # Zkontroluj, jestli to jiz existuje, pokud ne, tak vytvor cenik
+    if 'pricing' not in components:
+        components = {
+            "count": 0,
+            "count_unique": 0,
+            "count_ust": 0,
+            "count_ust_unique": 0,
+            "price_components": 0,
+            "price_consumables": float(0),
+            "price_work": float(0),
+            "price_sell": float(0)
+        }
+    else:
+        components = components['pricing']
+
+
+    if price_work >= 0:
+        components['price_work'] = price_work
+    if price_sell >= 0:
+        components['price_sell'] = price_sell
+    if price_consumables >= 0:
+        components['price_consumables'] = price_consumables
+
+    # get last buy price of component
+    components_list = []
+    comps = list(db.production.find({'_id': bson.ObjectId(production_id)}, {'components':1}))[0]
+    for item in comps['components']:
+        components["count"] += 1
+        uid = item.get("UST_ID", None)
+        if uid and bson.ObjectId.is_valid(uid):
+            components["count_ust"] += 1
+            components_list.append(uid)
+            components["price_components"] += get_items_last_buy_price(db, uid)
+
+    components["count_ust_unique"] = len(set(components_list))
+    components["price_stock"] = components['price_components'] + components['price_consumables'] + components['price_work']
+    components["update"] = 0
+    db.production.update_one(
+        {'_id': bson.ObjectId(production_id)},
+        {'$set':{
+            'pricing': components
+        }})
+    return components
+
+
 def mask_array(data, mask, default = None):
     new = {}
     for x in mask:
@@ -764,41 +815,11 @@ class edit(BaseHandler):
 
         elif op == 'update_pricelist':
             print("Update pricelist")
-
-            # get last buy price of component
-            components = {
-                "count": 0,
-                "count_unique": 0,
-                "count_ust": 0,
-                "count_ust_unique": 0,
-                "price_components": 0,
-                "price_consumables": float(self.get_argument('price_consumables', 0)),
-                "price_work": float(self.get_argument('price_work', 0)),
-                "update": 0,
-                "price_sell": float(self.get_argument('price_sell', 0))
-            }
-
-            components_list = []
-            comps = list(self.mdb.production.find({'_id': bson.ObjectId(name)}, {'components':1}))[0]
-            for item in comps['components']:
-                components["count"] += 1
-                uid = item.get("UST_ID", None)
-                if uid and bson.ObjectId.is_valid(uid):
-                    components["count_ust"] += 1
-                    components_list.append(uid)
-
-                    components["price_components"] += get_items_last_buy_price(self.mdb, uid)
-
-            components["count_ust_unique"] = len(set(components_list))
-            components["price_stock"] = components['price_components'] + components['price_consumables'] + components['price_work']
-            self.mdb.production.update_one(
-                {'_id': bson.ObjectId(name)},
-                {'$set':{
-                    'pricing': components
-                }})
-
+            production_upadte_pricelist(self, bson.ObjectId(name),
+                price_consumables=float(self.get_argument('price_consumables', 0)),
+                price_work=float(self.get_argument('work', 0)),
+                price_sell=float(self.get_argument('price_sell', 0)))
             self.write(components)
-
 
         ##
         ### Vytvorit rezervace
@@ -834,6 +855,9 @@ class edit(BaseHandler):
 
             # nastavit vyrobu na pripravenou 
             self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 1, "multiplication": multiplication}})
+
+            # take zaktualizuj cenovy rozpis polozky
+            production_upadte_pricelist(self.mdb, bson.ObjectId(name))
             self.write("")
 
         ##

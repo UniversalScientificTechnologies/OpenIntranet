@@ -60,7 +60,7 @@
 <div class="entrypoints-contrainer">
     {% for entrypoint in entrypoints %}
     <a class="entrypoint-card entrypoint-link" href="{{entrypoint['url']}}">
-        <i class="material-icons entrypoint-icon">{{entrypoint.get("icon", "settings_input_component")}}</i>
+        <i class="bi fs-1 pe-2 {{entrypoint.get("icon", 'bi-help')}}"></i>
         <div>
             <div class="entrypoint-title">{{entrypoint["title"]}}</div>
             <div class="plugin-name">{{entrypoint["plugin_name"]}}</div>
