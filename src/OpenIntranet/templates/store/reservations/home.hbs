@@ -1,0 +1,43 @@
+{% extends "../../base.hbs" %}
+{% block title %}UST intranet | Reservations {%end%}
+{% block body %}
+
+<div class="container" id="wrapper">
+	<h3>Rezervace komponent ze skladu</h3>
+
+	<div id="reservations_table_container"></div>
+
+
+
+</div>
+
+
+<script type="text/javascript">
+	
+	function realod_reservations_table(){
+
+
+		$.ajax({
+			type: "POST",
+			url: "",
+			success: function( data, textStatus, jQxhr ){
+				$("#reservations_table_container").html(data)
+			},
+			error: function( jqXhr, textStatus, errorThrown ){
+				console.log( errorThrown );
+				Lobibox.notify('error', {
+					msg: 'Ukladani nove polozky nebylo uspesne: ' + errorThrown,
+					icon: false,
+				});
+			}
+		});
+	
+
+	}
+
+	realod_reservations_table();
+
+
+
+</script>
+{% end %}

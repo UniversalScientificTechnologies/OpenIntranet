@@ -815,9 +815,9 @@ class edit(BaseHandler):
 
         elif op == 'update_pricelist':
             print("Update pricelist")
-            production_upadte_pricelist(self, bson.ObjectId(name),
+            components = production_upadte_pricelist(self.mdb, bson.ObjectId(name),
                 price_consumables=float(self.get_argument('price_consumables', 0)),
-                price_work=float(self.get_argument('work', 0)),
+                price_work=float(self.get_argument('price_work', 0)),
                 price_sell=float(self.get_argument('price_sell', 0)))
             self.write(components)
 
@@ -828,8 +828,8 @@ class edit(BaseHandler):
 
         elif op == 'do_reservation':
             if not self.mdb.production.find_one({'_id': bson.ObjectId(name)}, {"state": 1})['state'] == 0:
-                self.write("OK")
-                self.finish()
+                self.write('{"state": "Nelze vytvořit"}')
+                return
 
             multiplication = float(self.get_argument('count'))
             components_list = []
@@ -858,7 +858,7 @@ class edit(BaseHandler):
 
             # take zaktualizuj cenovy rozpis polozky
             production_upadte_pricelist(self.mdb, bson.ObjectId(name))
-            self.write("")
+            self.write('{"state": "ok"}')
 
         ##
         ### Vymazat rezervace
@@ -870,7 +870,7 @@ class edit(BaseHandler):
                 earse_reservations(self.mdb, bson.ObjectId(name))
                 self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 0}})
                 self.write("")
-            self.write("Nelze smazat")
+            self.write('{"state": "Nelze smazat"}')
 
 
         ##

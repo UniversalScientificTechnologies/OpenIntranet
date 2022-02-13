@@ -785,7 +785,6 @@ function doReservation(){
         	name: $('#production_name').val(),
         	count: $('#production_multiplication').val(),
         },
-   		async: false,
         success: function( data, textStatus, jQxhr ){
         	load_components();
             Lobibox.notify('success', {
@@ -811,7 +810,6 @@ function earseReservation(){
         	operation: 'earse_reservation',
         	name: $('#production_name').val(),
         },
-   		async: false,
         success: function( data, textStatus, jQxhr ){
         	load_components();
             Lobibox.notify('success', {

@@ -1,0 +1,23 @@
+
+
+{% for reservation_group in reservations_groups %}
+
+<div class="card">
+	<div class="card-header">
+		{{reservation_group['_id']}}
+		{{reservation_group['origin']}}
+	</div>
+
+	<div class="card-body">
+		{%for reservation in reservation_group['reservations'] %}<div>
+			{{reservation.get('cid', '--')}}
+			{{reservation.get('reserved', '--')}}
+
+			
+
+		</div>{%end%}
+	</div>
+</div>
+
+
+{%end%}
