@@ -38,6 +38,132 @@ def get_items_last_buy_price(db, item):
         return 0
 
 
+def get_component_counts(db, cid, warehouse = None):
+    output = {}
+    if warehouse:
+        current_warehouse_query = [{ '$match': {"_id": cid}},
+                    { "$project": {"packets": 1}},
+                    { "$unwind": '$packets'},
+                    { "$replaceRoot": {"newRoot": {"$mergeObjects":  ["$packets", {"cid": "$_id"}]}}},
+                    { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
+                    { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
+                    { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}},
+                    { "$match": { "position": {"$not":{"$size":0}, "$elemMatch":{"warehouse": warehouse}}}},
+                    { "$addFields": {
+                            "packet_count":  {"$sum": "$operations.count"},
+                            "component_reserv":  {"$sum": "$operations_cid.reserved"},
+                            "packet_reserv":  {"$sum": "$operations.reserved"},
+                            "packet_ordered":  {"$sum": "$operations.ordered"},
+                            "packet_price": {
+                            "$function":
+                                {
+                                    "body": '''function(prices, counts) {
+                                     let total_counts = Array.sum(counts);
+                                     var tmp_count = total_counts;
+                                     var total_price = 0;
+
+                                     var c = counts.reverse();
+                                     var p = prices.reverse();
+
+                                     for(i in c){
+                                         if(c[i] > 0){
+                                             if(c[i] < tmp_count){
+                                                 total_price += (c[i]*p[i]);
+                                                 tmp_count -= c[i]
+                                              }
+                                              else{
+                                                 total_price += (tmp_count*p[i]);
+                                                 tmp_count = 0;
+                                              }
+                                          }
+
+                                      }
+                                      return total_price;
+                                    }''',
+                                    "args": ["$operations.unit_price", "$operations.count"], "lang": "js"
+                                }
+                            }
+                        }
+                    },
+                    { "$group": {
+                            '_id': 'null',
+                            'count': {"$sum": '$packet_count'},
+                            'price': {"$sum": '$packet_price'},
+                            'reserv': {"$sum": '$packet_reserv'},
+                            'creserv': {"$first": '$component_reserv'},
+                            'ordered': {"$sum": '$packet_ordered'},
+                        }
+                     }
+                     ]
+
+        output['current_warehouse'] = list(db.stock.aggregate(current_warehouse_query))
+        if(len(output['current_warehouse'])):
+            output['current_warehouse'] = output['current_warehouse'][0]
+        #print("current_warehouse")
+        print(dumps(output['current_warehouse'], indent=4, sort_keys=True))
+        if(output['current_warehouse'] == []): output['current_warehouse'] = [{}]
+
+    other_warehouse_query = [{ '$match': {"_id": cid}},
+                { "$project": {"packets": 1}},
+                { "$unwind": '$packets'},
+                { "$replaceRoot": {"newRoot": {"$mergeObjects":  ["$packets", {"cid": "$_id"}]}}},
+                { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
+                { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
+                { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}},
+                { "$addFields": {
+                        "packet_count":  {"$sum": "$operations.count"},
+                        "component_reserv":  {"$sum": "$operations_cid.reserved"},
+                        "packet_reserv":  {"$sum": "$operations.reserved"},
+                        "packet_ordered":  {"$sum": "$operations.ordered"},
+                        "packet_price": {
+                        "$function":
+                            {
+                                "body": '''function(prices, counts) {
+                                 let total_counts = Array.sum(counts);
+                                 var tmp_count = total_counts;
+                                 var total_price = 0;
+
+                                 var c = counts.reverse();
+                                 var p = prices.reverse();
+
+                                 for(i in c){
+                                     if(c[i] > 0){
+                                         if(c[i] < tmp_count){
+                                             total_price += (c[i]*p[i]);
+                                             tmp_count -= c[i]
+                                          }
+                                          else{
+                                             total_price += (tmp_count*p[i]);
+                                             tmp_count = 0;
+                                          }
+                                      }
+
+                                  }
+                                  return total_price;
+                                }''',
+                                "args": ["$operations.unit_price", "$operations.count"], "lang": "js"
+                            }
+                        }
+                    }
+                },
+                { "$group": {
+                        '_id': 'null',
+                        'count': {"$sum": '$packet_count'},
+                        'price': {"$sum": '$packet_price'},
+                        'reserv': {"$sum": '$operations_cid.reserved'},
+                        'creserv': {"$first": '$component_reserv'},
+                        'ordered': {"$sum": '$packet_ordered'},
+                    }
+                 }]
+
+    output['other_warehouse'] = list(db.stock.aggregate(other_warehouse_query))
+    if(len(output['other_warehouse'])):
+        output['other_warehouse'] = output['other_warehouse'][0]
+    if(output['other_warehouse'] == []): output['other_warehouse'] = [{}]
+
+    return output
+
+
 def create_reservation(db, user, warehouse=None, cid=None, pid=None, reservated_count=1, description="", origin=None, origin_id=None, flag=[]):
         values = {
             'pid': ObjectId(pid),
@@ -69,7 +195,6 @@ def earse_reservations(db, origin_id):
 
 
 def get_reservation_components(db, origin_id=None):
-
     data = db.stock_operation.aggregate([
             {"$match": {'type': 'reservation', 'origin_id': origin_id}},
             {"$sort": {'_id': 1}},

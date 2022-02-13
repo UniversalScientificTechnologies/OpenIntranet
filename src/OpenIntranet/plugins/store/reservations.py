@@ -6,6 +6,7 @@ import tornado.web
 import tornado.websocket
 from .. import Intranet
 from .. import BaseHandler
+from .item_helper import get_component_counts
 import json
 import bson
 from bson import ObjectId
@@ -29,17 +30,21 @@ class reservations_home(BaseHandler):
 
 
 	def post(self):
-
+		print("Type", type(self.get_warehouse()['_id']))
 		group = self.get_argument("group", "components")
-
 		if group=='components':
 			reservations_groups = list(self.mdb.stock_operation.aggregate([
 					{"$match": {'type': 'reservation'}},
 					{"$lookup": {"from": "production", "localField": "origin_id", "foreignField": "_id", "as": "production_info"}},
 					{"$lookup": {"from": "stock", "localField": "cid", "foreignField": "_id", "as": "component_info"}},
 					{"$sort": {'_id': 1}},
+		# Vytvorit skupiny podle soucastek
 					{"$group": {'_id': '$cid', 'component': {"$first": "$component_info"}, 'reservations': {"$push": "$$ROOT"}, 'count': {"$sum": "$reserved"}}},
 				]))
+
+			for component_group in reservations_groups:
+				print("...", component_group['component'][0]['_id'])
+				component_group['prices'] = get_component_counts(self.mdb, component_group['component'][0]['_id'], self.get_warehouse()['_id'])
 
 			self.render('store/reservations/reservation_table_components.hbs', reservations_groups=reservations_groups)
 		

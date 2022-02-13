@@ -6,7 +6,6 @@ from .reservations import get_plugin_handlers as handlers_4
 
 from .. import BaseHandler
 
-
 plugin_version = 2
 
 def get_plugin_handlers():
