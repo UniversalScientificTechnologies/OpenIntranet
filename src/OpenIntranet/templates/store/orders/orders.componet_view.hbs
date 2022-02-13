@@ -1,0 +1,47 @@
+{%set component = row['component_info'][0] %}
+
+<div class="h3"><a href="./component/{{component['_id']}}/"><i class="bi bi-cpu"></i> {{component['name']}}</a></div>
+
+{%if 'img_title' in component and 'url' in component['img_title']%}
+<img src="{{component['img_title']['url']}}" class="border" style="width: 150pt; height: 150pt;">
+{%end%}
+<p>{{component['description']}}</p>
+
+<h5>Historie nákupů</h5>
+<table class="table">
+	<tr>
+		<th>Dodavatel</th>
+		<th>Cena za kus</th>
+		<th>Datum relaizace</th>
+	</tr>
+</table>
+
+
+<h5>Dodavatelé</h5>
+<table class="table">
+	<tr>
+		<th></th>
+		<th>Dodavatel</th>
+		<th>Symbol</th>
+		<th>Poslední cena</th>
+		<th></th>
+	</tr>
+	{%if len(component.get('supplier',[])) > 0 %}
+	{%for supplier_i, supplier in enumerate(component['supplier']) %}
+
+	<tr>
+		<td><button class="btn btn-sm btn{%if row.get('supplier_id', -2) != supplier_i%}-outline{%end%}-success" onclick="select_row_supplier('{{row['_id']}}', {{supplier_i}})"><i class="bi bi-check-square"></i> {{supplier_i}}</button></td>
+		<td><a href="{{supplier['url']}}">{{supplier['supplier']}}</a></td>
+		<td>{{supplier['symbol']}}</td>
+		<td>Poslední cena</td>
+		<td></td>
+	</tr>
+	{%end%}
+	{%else%}
+	<tr> <td class="h4 bg-warning" colspan="5"> Součástka nemá žádného dodavatele </td></tr>
+	{%end%}
+</table>
+
+<span class="small">
+{#{row}#}
+</span>

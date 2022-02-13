@@ -1,0 +1,33 @@
+
+{{len(wait_list)}}
+{% for supplier_group in wait_list %}
+
+	<h3>
+		Dodavatel: {{supplier_group['_id']}}	
+	</h3>
+
+	<table class="table table-striped">
+	<thead>
+		<tr>
+		<td>#</td>
+		<td>Nazev</td>
+		<td>Dodavatel symbol</td>
+		<td>Počet ks</td>
+		<td>Př.cena/ks</td>
+		<td>Objednávka</td>
+		</tr>
+	</thead>
+
+	{%for i, order_row in enumerate(supplier_group['order_rows'])%}
+		<tr class="{{order_row['_id']}}" onclick="open_orderrow_info('{{order_row['_id']}}')">
+		<td>{{i}} <input type="checkbox"></td>
+		<td><i class="bi bi-cpu"></i> {{order_row['component_info'][0]['name']}}</td>
+		<td>{% if order_row['supplier'] %} {{order_row['supplier_symbol']}} {%else%} Nepřiřazeno {%end%}</td>
+		<td>{{order_row['count']}}</td>
+		<td>{{order_row['predicted_unit_price']}}</td>
+		<td>{{order_row.get('order_info', "None")}}</td>
+		</tr>
+	{%end%}
+	</table>
+	
+{%end%}

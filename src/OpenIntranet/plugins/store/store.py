@@ -64,7 +64,7 @@ def get_plugin_info():
                 "icon": "bi-shop",
             },
             {
-                "title": "Nákup",
+                "title": "Objednávky",
                 "url": "/store/orders",
                 "icon": "bi-cart4",
             },

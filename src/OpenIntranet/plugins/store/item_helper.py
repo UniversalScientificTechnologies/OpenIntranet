@@ -46,12 +46,10 @@ def get_component_counts(db, cid, warehouse = None):
                     { "$unwind": '$packets'},
                     { "$replaceRoot": {"newRoot": {"$mergeObjects":  ["$packets", {"cid": "$_id"}]}}},
                     { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
-                    { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
-                    { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}},
                     { "$match": { "position": {"$not":{"$size":0}, "$elemMatch":{"warehouse": warehouse}}}},
+                    { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
                     { "$addFields": {
                             "packet_count":  {"$sum": "$operations.count"},
-                            "component_reserv":  {"$sum": "$operations_cid.reserved"},
                             "packet_reserv":  {"$sum": "$operations.reserved"},
                             "packet_ordered":  {"$sum": "$operations.ordered"},
                             "packet_price": {
@@ -90,7 +88,6 @@ def get_component_counts(db, cid, warehouse = None):
                             'count': {"$sum": '$packet_count'},
                             'price': {"$sum": '$packet_price'},
                             'reserv': {"$sum": '$packet_reserv'},
-                            'creserv': {"$first": '$component_reserv'},
                             'ordered': {"$sum": '$packet_ordered'},
                         }
                      }
@@ -99,8 +96,6 @@ def get_component_counts(db, cid, warehouse = None):
         output['current_warehouse'] = list(db.stock.aggregate(current_warehouse_query))
         if(len(output['current_warehouse'])):
             output['current_warehouse'] = output['current_warehouse'][0]
-        #print("current_warehouse")
-        print(dumps(output['current_warehouse'], indent=4, sort_keys=True))
         if(output['current_warehouse'] == []): output['current_warehouse'] = [{}]
 
     other_warehouse_query = [{ '$match': {"_id": cid}},
@@ -109,10 +104,8 @@ def get_component_counts(db, cid, warehouse = None):
                 { "$replaceRoot": {"newRoot": {"$mergeObjects":  ["$packets", {"cid": "$_id"}]}}},
                 { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
                 { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
-                { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}},
                 { "$addFields": {
                         "packet_count":  {"$sum": "$operations.count"},
-                        "component_reserv":  {"$sum": "$operations_cid.reserved"},
                         "packet_reserv":  {"$sum": "$operations.reserved"},
                         "packet_ordered":  {"$sum": "$operations.ordered"},
                         "packet_price": {
@@ -201,3 +194,34 @@ def get_reservation_components(db, origin_id=None):
         ])
 
     return list(data)
+
+
+def add_component_to_orderlist(db, user, cid, count, warehouse=None, description=None, origin=None, origin_id=None):
+
+        values = {
+            'pid': None,
+            'cid': ObjectId(cid),
+            'count': float(count),
+            'cart': 0,
+            'predicted_unit_price': float(0),
+            'unit_price': float(0),
+            'type': "order",
+            'date': datetime.datetime.now(),
+            'user': user,
+            'order_id': None,
+            'invoice': None,
+            'supplier': None,
+            'supplier_symbol': None,
+            'description': description,
+            "origin": origin,
+            "origin_id": origin_id,
+            "state": 0
+        }
+
+        if warehouse:
+            values['warehouse'] = warehouse
+        if origin_id:
+            values['origin_id'] = bson.ObjectId(origin_id)
+
+        out = db.stock_operation.insert_one(values)
+        return out

@@ -185,7 +185,7 @@ class WebApp(tornado.web.Application):
 
             except Exception as e:
                 print("chyba", plugin_file)
-                print(e)
+                print(repr(e))
 
         return plugin_infos, handlers, ignored_files
 

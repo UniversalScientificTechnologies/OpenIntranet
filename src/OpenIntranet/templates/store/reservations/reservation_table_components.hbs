@@ -7,22 +7,28 @@ Zobrazení dle komponent
 {%set enought_current = (count_current - reservation_group['count']) > 0 %}
 {%set enought_all = (reservation_group['prices']['other_warehouse']['count'] - reservation_group['count'])>0 %}
 
-<div class="card">
+<div class="card my-2">
 	<div class="card-header d-flex justify-content-between {%if not enought_all %} bg-danger {% elif not enought_current %} bg-warning {%end%}">
 		<span class="h4">
-			<span class="badge bg-primary">{{reservation_group['count']}} x</span> 
+			<span class="badge bg-primary">{{reservation_group['count']}} x </span> 
 			<a class="badge bg-success hover-item" item_id="{{reservation_group['component'][0]['_id']}}" href="./component/{{reservation_group['component'][0]['_id']}}/"> <i class="bi bi-cpu"> </i>{{reservation_group['component'][0]['name']}}</a>
-			<span class="badge bg-success"> <i class="bi bi-cart-plus"></i> </span> 
+			<a class="badge bg-success" onclick="add_to_orderlist('{{reservation_group['component'][0]['_id']}}'{%if not enought_current %}, {{abs(count_current - reservation_group['count'])}}{%end%})"> <i class="bi bi-cart-plus"></i> </a> 
 		</span> 
-		<span class="text-muted">({{reservation_group['component'][0]['_id']}})</span>
-		<span class="h5" data-toggle="tooltip" title="Aktuální počet kusů ve skladu. Rezervace zde nejsou zahrnuty"> <span class="badge bg-secondary"> <i class="bi bi-shop"></i> {{count_current}} ks</span> <span class="badge bg-secondary"><i class="bi bi-building"></i> {{count_other}} ks</span></span>
+
+		<span> 
+			<span class="h4">
+				
+				<span class="badge bg-success" data-toggle="tooltip" title="Nevyužité množství v aktuálním skladu">{{count_current - reservation_group['count']}} ks</span> 
+			</span>
+			<span class="text-muted small"> ( 
+				<span data-toggle="tooltip" title="Počet kusů v aktuálním skladu. Rezervace zde nejsou zahrnuty"><i class="bi bi-shop"></i> {{count_current}} ks</span> 
+				<span data-toggle="tooltip" title="Počet kusů v ostatních skladech. Rezervace zde nejsou zahrnuty"><i class="bi bi-building"></i> {{count_other}} ks</span> 
+				<span data-toggle="tooltip" title="Počet objednaných kusů"><i class="bi bi-truck"></i> -- ks</span>
+			) </span>
+		</span>
 	</div>
 
-	<div class="card-body">
-
-	</div>
-
-	<div class="card-body">
+	<div class="card-body" id="list_of_usage_{{reservation_group['component'][0]['_id']}}">
 		{%for reservation in reservation_group['reservations'] %}<div>
 			<span>{{reservation.get('reserved', '--')}} ks</span> - 
 			<a href="/production/{{reservation['origin_id']}}/edit/" target="__blank__">{{reservation['production_info'][0]['name'] }}</a>

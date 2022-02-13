@@ -980,10 +980,13 @@ class duplicate(BaseHandler):
 
         product['_id'] = bson.ObjectId()
         product['name'] += " Duplicate"
+        product['state'] = 0
+        if 'pricing' in product:
+            product.pop('pricing')
+        if 'multiplication' in product:
+            product.pop('multiplication')
 
         self.mdb.production.insert_one(product)
-
-        print(product)
         self.redirect('/production/{}/edit/'.format(product['_id']))
 
 

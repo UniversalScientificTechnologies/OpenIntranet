@@ -3,13 +3,14 @@ from .store import get_plugin_handlers as handlers
 from .component import get_plugin_handlers as handlers_2
 from .popover import get_plugin_handlers as handlers_3
 from .reservations import get_plugin_handlers as handlers_4
+from .orders import get_plugin_handlers as handlers_5
 
 from .. import BaseHandler
 
 plugin_version = 2
 
 def get_plugin_handlers():
-    return handlers() + handlers_2() + handlers_3() + handlers_4()
+    return handlers() + handlers_2() + handlers_3() + handlers_4() + handlers_5()
 
 
 def get_plugin_info():

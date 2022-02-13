@@ -1,0 +1,142 @@
+{% extends "../../base.hbs" %}
+{% block title %}UST intranet | Objednávky {%end%}
+{% block body %}
+
+<div class="container-flow" id="wrapper" style="width: 90%; margin: auto;">
+	<h3>Objednávky součástek</h3>
+
+	 <div class="row">
+	    <div class="col"><div class="card">
+
+	      <select>
+
+	      	<option>Vše</option>
+	      	<option>Nepřiřazeno</option>
+	      	<option>Objednávka</option>
+	      	<option>TME</option>
+	      	<option>Mouser</option>
+	      	<option>Ecom</option>
+	      </select>
+
+	      <input type="checkbox" name=""> <label>Zobrazovat dodané</label>
+	      <input type="checkbox" name=""> <label>Zobrazovat objednané</label>
+	      <input type="checkbox" name=""> <label>Zobrazovat neobjednané</label>
+	      <input type="text" name=""><label>Vyhledat objednávku</label>
+
+	      <hr>
+
+	      <div>
+	      	<div id="container_list">
+	      		
+	      	</div>
+
+	      </div>
+
+
+	    </div></div>
+
+
+
+	    <div class="col"><div class="card"><div class="card-body">
+	    <div id="container_orderrow"></div>
+	    </div></div></div>
+	  </div>
+
+</div>
+
+<script type="text/javascript">
+	
+
+function load_waitlist(){
+	$.ajax({
+        type: "GET",
+        url: "/store/orders/orderlist",
+        data: {
+        },
+   		//async: false,
+        success: function( data, textStatus, jQxhr ){
+			$("#container_list").html(data)
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+load_waitlist();
+
+
+function open_orderrow_info(orderrow_id){
+	$.ajax({
+        type: "GET",
+        url: "/store/orders/order_row",
+        data: {
+        	'order_row': orderrow_id
+        },
+        success: function( data, textStatus, jQxhr ){
+			$("#container_orderrow").html(data);
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+
+function select_row_supplier(orderrow_id, supplier){
+	$.ajax({
+        type: "POST",
+        url: "/store/orders/order_row/select_supplier",
+        data: {
+        	'order_row': orderrow_id,
+        	'supplier': supplier
+        },
+        success: function( data, textStatus, jQxhr ){
+			open_orderrow_info(orderrow_id);
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+
+}	
+
+function add_to_orderlist(cid, count = 0){
+		$.ajax({
+	        type: "POST",
+	        url: "./orders/add_to_orderlist",
+	        data: {
+	        	cid: cid,
+	        	count: count,
+	        	origin: "reservation",
+	        	description: "Added from reservation page"
+	        },
+	        success: function( data, textStatus, jQxhr ){
+	        	load_waitlist();
+
+	    	},
+	        error: function( jqXhr, textStatus, errorThrown ){
+	            console.log( errorThrown );
+	            Lobibox.notify('error', {
+	                msg: 'CHYBA!!!!: ' + errorThrown,
+	                icon: false,
+	            });
+	        }
+	    });
+}
+
+</script>
+
+{%end%}
