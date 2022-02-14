@@ -8,7 +8,7 @@
 <p>{{component['description']}}</p>
 
 <h5>Historie nákupů</h5>
-<table class="table">
+<table class="table table-striped table-hover">
 	<tr>
 		<th>Dodavatel</th>
 		<th>Cena za kus</th>
@@ -18,7 +18,7 @@
 
 
 <h5>Dodavatelé</h5>
-<table class="table">
+<table class="table table-striped table-hover">
 	<tr>
 		<th></th>
 		<th>Dodavatel</th>
@@ -40,6 +40,26 @@
 	{%else%}
 	<tr> <td class="h4 bg-warning" colspan="5"> Součástka nemá žádného dodavatele </td></tr>
 	{%end%}
+	{%if row.get('supplier_id', -2) != -2 %}
+	<tr>
+		<td colspan="4"><button class="btn btn-sm btn-outline-danger" onclick="select_row_supplier('{{row['_id']}}', -1"><i class="bi bi-check-x"></i> Odstranit</button></td>
+	</tr>
+	{%end%}
+</table>
+
+<h5>Parametry objednávky</h5>
+<table class="table table-striped table-hover">
+	<tr>
+		<td>
+			Předpokládaná cena
+		</td>
+		<td>
+			Množství
+		</td>
+		<td>
+			Objednávka
+		</td>
+	</tr>
 </table>
 
 <span class="small">
