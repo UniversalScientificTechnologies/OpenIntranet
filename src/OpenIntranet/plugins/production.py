@@ -1336,9 +1336,13 @@ class print_bom(BaseHandler):
                     print("packet>", packet)
                     pdf.set_xy(13, rowy+15+packet_i*4)
                     pdf.cell(40, 5, str(packet['packets']['_id']))
-                    if len(packet['packets']['position'][0]['path_string']):
+                    if len(packet['packets']['position'][0].get('path_string', [])):
                         pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) + " / " + str(packet['packets']['position'][0]['path_string'][0]) + " / " + str(packet['packets']['position'][0]['name']) + " ("+str(packet['packets']['position'][0].get('text', ''))+")")
                     else:
+                        print("...", packet['packets'])
+                        print("...", packet['packets']['position'][0])
+                        print("...", packet['packets']['position'][0])
+                        #pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) )
                         pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) + " / " + str(packet['packets']['position'][0]['name']) + " ("+str(packet['packets']['position'][0].get('text', ''))+")")
                     pdf.cell(10, 5, str(packet['packet_count'])+ " ks")
 
