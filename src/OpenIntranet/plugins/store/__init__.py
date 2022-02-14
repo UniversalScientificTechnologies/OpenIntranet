@@ -2,27 +2,38 @@ from .store import hand_bi_home as home
 from .store import get_plugin_handlers as handlers
 from .component import get_plugin_handlers as handlers_2
 from .popover import get_plugin_handlers as handlers_3
+from .reservations import get_plugin_handlers as handlers_4
+from .orders import get_plugin_handlers as handlers_5
 
 from .. import BaseHandler
-
 
 plugin_version = 2
 
 def get_plugin_handlers():
-    return handlers() + handlers_2() + handlers_3()
+    return handlers() + handlers_2() + handlers_3() + handlers_4() + handlers_5()
 
 
 def get_plugin_info():
-    return {
+    return{
+        "role": ['store-access', 'store-sudo', 'sudo', 'store-manager'],
         "name": "store",
         "entrypoints": [
             {
                 "title": "Sklad",
                 "url": "/store",
-                "icon": "store",
+                "icon": "bi-shop",
+            },
+            {
+                "title": "Nákup",
+                "url": "/store/orders",
+                "icon": "bi-cart4",
+            },
+            {
+                "title": "Rezervace",
+                "url": "/store/reservations",
+                "icon": "bi-journal-bookmark",
             }
-        ],
-        "role": ["sudo", "sudo-store", "store-manager", "store-user"]
+        ]
     }
 
 def plugin_init(db):

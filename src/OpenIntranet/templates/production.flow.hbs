@@ -94,7 +94,7 @@ F{% extends "base.hbs" %}
 
 
 	<div class="row d-flex align-items-stretch">
-		<div class="col-4">
+		<div class="col-lg-4 col-sm-6 col-xs-12">
 			<div class="card">
 				<div class="card-body" style="display: table;">
 					<div class="table-row">
@@ -130,12 +130,20 @@ F{% extends "base.hbs" %}
 		</div>
 
 
-		<div class="col-4 card" style="padding: 0pt;">
+		<div class="col-lg-4 col-sm-6 col-xs-12 card" style="padding: 0pt;">
 		  <ul class="list-group list-group-flush">
 		    <a class="list-group-item" href="#" onclick="openUploadModal()"><i class="bi bi-cloud-upload"></i> Nahrát data (BOM)</a>
 		    <a class="list-group-item" href="./../print/" target="_blank"><i class="bi bi-printer"></i> Tisknout osazovák</a>
 		    <a class="list-group-item text-muted" href="#" ><i class="bi bi-display"></i> Zobrazit gerber</a>
-		    <a class="list-group-item" href="#"><i class="bi bi-question-square"></i> Nastavit počet kusů <input type="number" id="production_multiplication" value="1" min="1" step="1" style="border: solid gray 1px;width: 5em;text-align: center;padding: 0pt;margin-left: 2em;" onchange="count_validation($(this).val())"></a>
+		    <span class="list-group-item d-flex w-100 justify-content-between">
+		    	<span><i class="bi bi-question-square"></i> Plánovaný počet kusů</span>
+		    	<span><input type="number" id="production_multiplication" value="1" min="1" step="1" style="border: none; border-bottom: solid lightgray 1px;width: 3em;text-align: right; padding: 0pt; margin: 0pt;" onchange="count_validation($(this).val())"></span>
+		    	<span>
+					<button class="btn btn-sm btn-outline-primary" id="reservation_btn_do" onclick="doReservation()" style="display: none;"><i class="bi bi-bookmark-plus"></i> Vytvořit rezervace </button>
+					<button class="btn btn-sm btn-outline-danger" id="reservation_btn_earse" onclick="earseReservation()" style="display: none;"><i class="bi bi-bookmark-plus"></i> Smazat rezervace </button>
+					<button class="btn btn-sm btn-outline-success" id="reservation_btn_modal" onclick="openReservationModal()" style="display: none;">Zobrazit rezervace</button>
+				</span>
+		    </span>
 		    <a class="list-group-item text-muted" href="#" ><i class="bi bi-cpu-fill"></i> Spustit výrobu</a>
 		    <a class="list-group-item text-muted" href="#" ><i class="bi bi-card-checklist"></i> Zobrazit výrobu</a>
 		  </ul>
@@ -143,21 +151,22 @@ F{% extends "base.hbs" %}
 
 
 
-		<div class="col-4">
-			<div class="card">
-				<div class="card-body">
+		<div class="col-lg-4 col-sm-6 col-xs-12">
 
 
-					Cenotvorba - cena matiriálu, cena práce, počet komponent, ....
-
-
-				</div>
-			</div>
+ <ul class="list-group">
+  <li class="list-group-item d-flex justify-content-between">Počet komponent: <span><span id="pricing_count">--</span> ks</span>
+  <li class="list-group-item d-flex justify-content-between">Počet komponent s USTID / počet typů USTID: <span><span id="pricing_count_ust">--</span> ks / <span id="pricing_count_ust_unique">--</span> ks</span>
+</li>
+  <li class="list-group-item d-flex justify-content-between">Nákupní cena materiálu: <span><span id="pricing_price_components">--</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Cena spotřebního materiálu: <span ><input id="pricing_price_consumables" type="number" value="0" min="0" step="1" style="border: none; border-bottom: solid lightgray 1px;width: 4em;text-align: right; padding: 0pt; margin: 0pt;"> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Cena práce: <span><input id="pricing_price_work" type="number" value="0" min="0" step="1" style="border: none; border-bottom:  solid lightgray 1px;width: 4em;text-align: right; padding: 0pt; margin: 0pt;"> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between fw-bold">Skladová cena komponenty: <span><span id="pricing_price_stock">0</span> czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Marže: <span><span>--</span> %</span></li>
+  <li class="list-group-item d-flex justify-content-between fw-bold">Katalogová prodejní cena: <span><input id="pricing_price_sell" type="number" value="0" min="0" step="1" style="border: none; border-bottom: solid lightgray 1px;width: 6em;text-align: right; padding: 0pt; margin: 0pt;">czk</span></li>
+  <li class="list-group-item d-flex justify-content-between">Poslední aktualizace ceny proveden: <span>--</span> <button class="btn btn-sm btn-outline-success" onclick="update_pricelist()">Update & save</button></li>
+</ul> 
 		</div>
-
-
-
-
 
 		<div class="col-12">
 			<div class="card">
@@ -240,6 +249,28 @@ F{% extends "base.hbs" %}
     </div>
   </div>
 </div>
+
+
+
+<div class="modal" tabindex="-1" id="reservation_modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Správa rezervací</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      	<div id="reservation_modal_table"></div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zavrit</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 <!-- NOVÉ POCITANI SOUCASTEK -->
@@ -333,13 +364,12 @@ var popover = null;
 
 
 $(document).on("mouseenter", ".hover-packet", function(e) {
-	console.log(e.target);
 	
 	try {
 		popover.dispose();
 	}catch(e){};
 
-	popover = new bootstrap.Popover(e.target, {
+	popover = new bootstrap.Popover(e.currentTarget, {
 		placement: 'auto',
 		sanitize: false,
 		html: true,
@@ -351,7 +381,7 @@ $(document).on("mouseenter", ".hover-packet", function(e) {
 
 	$.ajax({
         type: "GET",
-        url: "/store/popover/packet/"+e.target.getAttribute("packet_id")+"/",
+        url: "/store/popover/packet/"+e.currentTarget.getAttribute("packet_id")+"/",
         data: {
         	name: $('#production_name').val(),
         },
@@ -379,14 +409,12 @@ $(document).on("mouseenter", ".hover-packet", function(e) {
 
 });
 
-$(document).on("mouseenter", ".hover-item", function(e) {
-	console.log(e.target);
-	
+$(document).on("mouseenter", ".hover-item", function(e) {	
 	try {
 		popover.dispose();
 	}catch(e){};
 
-	popover = new bootstrap.Popover(e.target, {
+	popover = new bootstrap.Popover(e.currentTarget, {
 		placement: 'auto',
 		sanitize: false,
 		html: true,
@@ -398,11 +426,10 @@ $(document).on("mouseenter", ".hover-item", function(e) {
 
 	$.ajax({
         type: "GET",
-        url: "/store/popover/item/"+e.target.getAttribute("item_id")+"/",
+        url: "/store/popover/item/"+e.currentTarget.getAttribute("item_id")+"/",
         data: {
         	name: $('#production_name').val(),
         },
-   		//async: false,
         success: function( data, textStatus, jQxhr ){
 			
 			popover._config.content = data;
@@ -435,13 +462,7 @@ $(document).on("mouseleave", "popover-body", function(e) {
     $(this).find("a").css("background-image","url('ie/imgs/btn/btn-left.png')");
 });
 
-
-
-
 </script>
-
-
-
 
 
 
@@ -449,29 +470,6 @@ $(document).on("mouseleave", "popover-body", function(e) {
 
 <script type="text/javascript">
 
-
-
-
-    //
-    // initUtils();
-    // initRender();
-    // initStorage();
-    // initDefaults();
-    // cleanGutters();
-    // populateMetadata();
-    // dbgdiv = document.getElementById("dbg");
-    // bom = document.getElementById("bombody");
-    // bomhead = document.getElementById("bomhead");
-    // filter = "";
-    // reflookup = "";
-    // initDone = true;
-    // console.log("changeBomLayout");
-    // // Triggers render
-    // changeBomLayout('left-right');
-	// //$("#component-table").tabulator();
-
-
-	//create autocomplete editor
 
 var ust_id_autocomplete = function(cell, onRendered, success, cancel){
     //cell - the cell component for the editable cell
@@ -652,11 +650,9 @@ function startUpload() {
 
 
 function load_components() {
-	//var components = [];
 
 	$.ajax({
         type: "POST",
-        //contentType: "application/json; charset=utf-8",
         url: ".",
         data: {
         	operation: 'get_production'
@@ -678,80 +674,6 @@ function load_components() {
             });
         }
     });
-    console.log(components);
-
-	// var selected = [];
-	// $('#parts_table_body').empty();
-	// for (i in components){
-	// 	if (selected.indexOf(i) == -1){
-	// 		var com = components[i];
-	// 		selected.push(i);
-	// 		var c_ref = [com['Ref']];
-	// 		var c_package = com['Package']  || null;
-	// 		var c_note = com['Note'] || null;
-	// 		var c_value = com['Value']  || null;
-	// 		var c_ustid = com['UST_ID'] || null;
-
-	// 		// Tato cast provede 'grouping' polozek se stejnymi parametry
-	// 		for (j in components){
-	// 			if (selected.indexOf(j) == -1){
-	// 				var com2 = components[j];
-	// 				if (c_package == com2['Package'] && c_value == com2['Value'] && c_ustid == (com2['UST_ID'] || null) && c_note == (com2['Note'] || null)) {
-	// 					c_ref.push(com2['Ref']);
-	// 					selected.push(j);
-	// 				}
-	// 			}
-	// 		}
-
-
-	// 		var row = document.createElement("tr");
-	// 		var x = row.insertCell(-1);
-	// 		x.innerHTML = "<span class='position' clk_data='"+c_ref+"'>"+i+"</span>";
-
-
-	// 		x = row.insertCell(-1);
-	// 		for (j in c_ref){
-	// 			if (j > 0){x.innerHTML += ', '}
-	// 			x.innerHTML += "<span class='position' clk_data='" +c_ref[j]+ "'>"+c_ref[j]+"</span>";
-	// 		}
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = c_value;
-
-
-	// 		//x = row.insertCell(-1);
-	// 		//x.innerHTML = str(len(c_ref));
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['MFNP'] || null;
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['Distributor'] || null;
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['Link'] || null;
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = c_package;
-	// 		x = row.insertCell(-1);
-	// 		if (c_ustid){
-	// 			x.innerHTML = '<a href = "/store/component/'+c_ustid+'/" target="_blank">'+c_ustid+'</a>';
-	// 		}
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['price_predicted'] || null;
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['price_store'] || null;
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = com['price_final'] || null;
-
-
-	// 		x = row.insertCell(-1);
-	// 		x.innerHTML = c_note || null;
-
-	// 		$('#parts_table_body').append(row);
-	// 	}
-	// }
-
-    console.log("OBECNA DATA:", production);
 
 	$('#production_name').val(production['name']);
 	$('#production_autor').val(production['author']);
@@ -759,28 +681,46 @@ function load_components() {
 	$('#production_type').val(production['type']);
 	$('#production_description').val(production['description']);
 
-    // var draw = SVG('placement_img').size('300px', '300px');
-    // for (i in placement){
-    // 	var c = placement[i];
-    // 	console.log(c);
-    // 	draw.rect(10, 20).move(c.PosX*10, c.PosY*10).rotate(c.Rot).attr({ fill: '#f06', clk_data: c.Ref }).addClass('position');
-    // }
+	$("#production_multiplication").val(1);
+	if(production.multiplication){
+		$("#production_multiplication").val(production['multiplication']);
+		count_validation(production['multiplication']);
+	}
 
-	// $('.position').click(function(){
- //        edit_component(this.getAttribute('clk_data').split(','));
- //    });
-// 	$('.position').hover(function(){
-// 		var clk = this.getAttribute('clk_data');
-// 		console.log(clk);
-//         $('.position').css('background-color', 'initial');
-//         $('.position').attr('fill', '#f06');
-//         $('[clk_data="'+clk+'"]').css('background-color', 'red');
-//         $('[clk_data="'+clk+'"]').attr('fill', '#00f');
-//     });
+	if(production['state'] == 0){
+		$("#reservation_btn_do").show();
+		$("#reservation_btn_earse").hide();
+		$("#reservation_btn_modal").hide();
+	}else if(production['state'] == 1){
+		$("#reservation_btn_do").hide();
+		$("#reservation_btn_earse").show();
+		$("#reservation_btn_modal").show();
+		$("#production_multiplication").attr('disabled', 1);
+	}else if(production['state'] == 2){
+		// TODO .. sem se zatim neumim dostat... 
+	}
+
+	if(production.pricing){
+		draw_pricing(production.pricing);
+	}
+
  }
 
-
 load_components();
+
+function draw_pricing(prices){
+	$("#pricing_count").text(prices.count);
+	$("#pricing_count_ust").text(prices.count_ust);
+	$("#pricing_count_ust_unique").text(prices.count_ust_unique);
+	$("#pricing_price_components").text(Math.round(prices.price_components));
+	$("#pricing_price_stock").text(Math.round(prices.price_stock));
+
+	$("#pricing_price_sell").val(Math.round(prices.price_sell));
+	$("#pricing_price_consumables").val(prices.price_consumables);
+	$("#pricing_price_work").val(prices.price_work);
+
+}
+
 
 
 // aktualizuje parametry, ktere jsou pouzite v tabulce s nastavenim
@@ -805,6 +745,96 @@ function update_parameters(){
             });
         }
     });
+}
+
+function update_pricelist(){
+	$.ajax({
+        type: "POST",
+        url: ".",
+        data: {
+        	operation: 'update_pricelist',
+        	name: $('#production_name').val(),
+        	price_consumables: $("#pricing_price_consumables").val(),
+        	price_work: $("#pricing_price_work").val(),
+        	price_stock: $("#pricing_price_stock").val()
+        },
+   		async: false,
+        success: function( data, textStatus, jQxhr ){
+    		load_components()
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+function doReservation(){
+	$.ajax({
+        type: "POST",
+        url: ".",
+        data: {
+        	operation: 'do_reservation',
+        	name: $('#production_name').val(),
+        	count: $('#production_multiplication').val(),
+        },
+        success: function( data, textStatus, jQxhr ){
+        	load_components();
+            Lobibox.notify('success', {
+                msg: 'Rezervace vytvorena pro '+$('#production_multiplication').val()+' ks',
+                icon: false,
+            });
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+function earseReservation(){
+	$.ajax({
+        type: "POST",
+        url: ".",
+        data: {
+        	operation: 'earse_reservation',
+        	name: $('#production_name').val(),
+        },
+        success: function( data, textStatus, jQxhr ){
+        	load_components();
+            Lobibox.notify('success', {
+                msg: 'Rezervace smazána',
+                icon: false,
+            });
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+}
+
+
+function openReservationModal(){
+	$.ajax({
+        type: "GET",
+        url: "./../get_reservation/",
+        success: function( data, textStatus, jQxhr ){
+            $("#reservation_modal_table").html(data);
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+        }
+    });
+	$("#reservation_modal").modal('show');
 }
 
 function update_component_parameter(component, param, value){

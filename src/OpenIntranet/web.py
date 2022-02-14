@@ -166,6 +166,7 @@ class WebApp(tornado.web.Application):
 
         print(tornado.options.options.plugins)
         for plugin_file in tornado.options.options.plugins:
+            #print(plugin_file)
             try:
                 if plugin_file != '':
                     module = importlib.import_module('plugins.'+plugin_file)
@@ -176,7 +177,6 @@ class WebApp(tornado.web.Application):
                     print("Automaticka inicializace")
                     module.plugin_init(mdb)
                 plugin_handlers = module.get_plugin_handlers()
-                plugin_handlers = module.get_plugin_handlers()
                 plugin_info = module.get_plugin_info()
                 plugin_name = plugin_info.get("name", module.__name__)
 
@@ -185,7 +185,7 @@ class WebApp(tornado.web.Application):
 
             except Exception as e:
                 print("chyba", plugin_file)
-                print(e)
+                print(repr(e))
 
         return plugin_infos, handlers, ignored_files
 

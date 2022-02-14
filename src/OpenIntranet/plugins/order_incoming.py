@@ -48,7 +48,7 @@ def get_plugin_info():
             {
                 "title": "Importování faktur",
                 "url": "/invoice_import",
-                "icon": "assignment_returned",
+                "icon": "bi-journal-plus",
             }
         ]
     }

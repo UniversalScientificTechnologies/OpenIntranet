@@ -39,7 +39,7 @@ def get_packet(db, id, packet):
                 { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
                 { "$addFields": {
                         "packet_count":  {"$sum": "$operations.count"},
-                        "packet_reserv":  {"$sum": "$operations.reserv"},
+                        "packet_reserv":  {"$sum": "$operations.reserved"},
                         "packet_ordered":  {"$sum": "$operations.ordered"},
                         "packet_price": {
                         "$function":
@@ -88,16 +88,15 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
         ]
 
     output['basic'] = list(db.stock.aggregate(basicdata_query))
-    #print("BASIC")
-    #print(output['basic'])
-
 
     packet_query = [{ '$match': {"_id": id}},
                 { "$project": {"packets": 1}},
                 { "$unwind": '$packets'},
                 { "$replaceRoot": {"newRoot": "$packets"}},
                 { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
-                { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}}]
+                { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
+                # { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}}
+                ]
 
     output['packets'] = list(db.stock.aggregate(packet_query))
     #print("packets")
@@ -106,14 +105,15 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
     current_warehouse_query = [{ '$match': {"_id": id}},
                 { "$project": {"packets": 1}},
                 { "$unwind": '$packets'},
-                { "$replaceRoot": {"newRoot": "$packets"}},
+                { "$replaceRoot": {"newRoot": {"$mergeObjects":  ["$packets", {"cid": "$_id"}]}}},
                 { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
                 { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
+                { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}},
                 { "$match": { "position": {"$not":{"$size":0}, "$elemMatch":{"warehouse": current_warehouse}}}},
-                #{ "$match": { "position": {"$not":{"$size":0}, "$elemMatch":{"warehouse": ObjectId("5c67444e7e875154440cc28f")}}}},
                 { "$addFields": {
                         "packet_count":  {"$sum": "$operations.count"},
-                        "packet_reserv":  {"$sum": "$operations.reserv"},
+                        "component_reserv":  {"$sum": "$operations_cid.reserved"},
+                        "packet_reserv":  {"$sum": "$operations.reserved"},
                         "packet_ordered":  {"$sum": "$operations.ordered"},
                         "packet_price": {
                         "$function":
@@ -151,6 +151,7 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
                         'count': {"$sum": '$packet_count'},
                         'price': {"$sum": '$packet_price'},
                         'reserv': {"$sum": '$packet_reserv'},
+                        'creserv': {"$first": '$component_reserv'},
                         'ordered': {"$sum": '$packet_ordered'},
                     }
                  }
@@ -158,7 +159,7 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
 
     output['current_warehouse'] = list(db.stock.aggregate(current_warehouse_query))
     #print("current_warehouse")
-    #print(dumps(output['current_warehouse'], indent=4, sort_keys=True))
+    print(dumps(output['current_warehouse'], indent=4, sort_keys=True))
     if(output['current_warehouse'] == []): output['current_warehouse'] = [{}]
 
 
@@ -166,15 +167,14 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
     other_warehouse_query = [{ '$match': {"_id": id}},
                 { "$project": {"packets": 1}},
                 { "$unwind": '$packets'},
-                { "$replaceRoot": {"newRoot": "$packets"}},
+                { "$replaceRoot": {"newRoot": {"$mergeObjects":  ["$packets", {"cid": "$_id"}]}}},
                 { "$lookup": { "from": 'store_positions', "localField":'position', "foreignField": '_id', "as": 'position'}},
                 { "$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'pid', "as": 'operations'}},
-
-                #{ "$match": { "position": {"$not":{"$size":0}, "$elemMatch":{"warehouse": ObjectId("5c67444e7e875154440cc28f")}}}},
-                #{ "$match": { "position": {"$not":{"$size":0}, "$elemMatch":{"warehouse": ObjectId("5c67444e7e875154440cc28f")}}}},
+                { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'cid', "as": 'operations_cid'}},
                 { "$addFields": {
                         "packet_count":  {"$sum": "$operations.count"},
-                        "packet_reserv":  {"$sum": "$operations.reserv"},
+                        "component_reserv":  {"$sum": "$operations_cid.reserved"},
+                        "packet_reserv":  {"$sum": "$operations.reserved"},
                         "packet_ordered":  {"$sum": "$operations.ordered"},
                         "packet_price": {
                         "$function":
@@ -211,7 +211,8 @@ def get_component(db, id, current_warehouse=ObjectId("5c67444e7e875154440cc28f")
                         '_id': 'null',
                         'count': {"$sum": '$packet_count'},
                         'price': {"$sum": '$packet_price'},
-                        'reserv': {"$sum": '$packet_reserv'},
+                        'reserv': {"$sum": '$operations_cid.reserved'},
+                        'creserv': {"$first": '$component_reserv'},
                         'ordered': {"$sum": '$packet_ordered'},
                     }
                  }]

@@ -23,7 +23,7 @@ def get_plugin_info():
             {
                 "title": "Systém",
                 "url": "/system",
-                "icon": "settings",
+                "icon": "bi-sliders",
             }
         ],
         #"role": ['sudo', 'sudo-system', 'system-user']

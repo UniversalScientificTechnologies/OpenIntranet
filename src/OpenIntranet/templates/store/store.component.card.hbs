@@ -65,19 +65,25 @@ function select_package_formatter(data) {
 
 
         <div class="row">
+          <!-- K dispozici ... Skladem ... rezervace; objednávka; očekáváme -->
           <div class="col-4" data-bs-target="popover" title="V aktuálním skladu; {{warehouse['name']}}">{{warehouse['code'].upper()}}:</div>
-          <div class="col"> <span class="badge big bg-primary" data-bs-target="popover" title="K dispozici (celkem ve skladu včetně rezervovaných)"> <span class="material-icons">store</span> {{"{} ks".format(current_warehouse.get('count', 0) - current_warehouse.get('reserv', 0))}} <span class="small">({{"{} ks".format(current_warehouse.get('count', 0))}})</span> </span>
-            <span class="badge bg-secondary"><span class="material-icons"> local_shipping </span> -- ks <span class="material-icons"> shopping_cart </span> -- ks</span>
+          <div class="col"> 
+            <span class="badge big bg-success" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="K dispozici (množství položek dostupných k okamžitému použití)"> <i class="bi bi-check2-square"></i> {{"{} ks".format(current_warehouse.get('count', 0) - current_warehouse.get('creserv', 0) )}} </span>
+            <span class="badge big bg-success" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Položek ve skladu"><span> {{"{} ks".format(current_warehouse.get('count', 0))}} </span> </span>
+            <span class="badge bg-secondary"><i class="bi bi-bookmark-plus-fill"></i> {{"{} ks".format(current_warehouse.get('creserv', "--"))}} <i class="bi bi-cart-fill"></i> -- ks</span>
+          </div>
         </div>
-        </div>
-
+ 
         <div class="row">
-          <div class="col-4" data-bs-target="popover" title="Ve všech skladech">Celkem:</div>
-          <div class="col"> <span class="badge big bg-primary"> <span class="material-icons">business</span> {{"{} ks".format(other_warehouse.get('count', 0) - other_warehouse.get('reserv', 0))}} <span class="small">({{"{} ks".format(other_warehouse.get('count', 0))}})</span> </span>
-            <span class="badge bg-secondary"><span class="material-icons"> local_shipping </span> -- ks <span class="material-icons"> shopping_cart </span> -- ks</span>
+          <div class="col-4" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Ve všech skladech včetně aktuálního">Celkem:</div>
 
+          <div class="col"> 
+            <span class="badge big bg-success" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="K dispozici (množství položek dostupných k okamžitému použití)"> <i class="bi bi-check2-square"></i> {{"{} ks".format(other_warehouse.get('count', 0) - other_warehouse.get('creserv', 0) )}} </span>
+            <span class="badge big bg-success" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="Položek ve skladu"><span> {{"{} ks".format(other_warehouse.get('count', 0))}} </span> </span>
+            <span class="badge bg-secondary"><i class="bi bi-bookmark-plus-fill"></i> {{"{} ks".format(other_warehouse.get('creserv', "--"))}} <i class="bi bi-cart-fill"></i> -- ks</span>
+          </div>
         </div>
-        </div>
+
 
 
         <div class="row">
@@ -126,7 +132,7 @@ function select_package_formatter(data) {
 
 
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="contact-tab" data-bs-toggle="pill" data-bs-target="#contact" href="#contact" role="tab" aria-controls="contact" aria-selected="false"> <i class="bi bi-clock-history"></i> Historie</button>
+          <button class="nav-link" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" href="#history" role="tab" aria-controls="history" aria-selected="false"> <i class="bi bi-clock-history"></i> Historie</button>
         </li>
 
         <li class="naw-item" role="presentation">
@@ -172,6 +178,11 @@ function select_package_formatter(data) {
         <div class="tab-pane fade" id="suppliers" role="tabpanel" aria-labelledby="suppliers-tab">
           {% try %}{% include store.component.oper.supplier.hbs %}{% except%} Chyba...   {% end%}
         </div>
+
+        <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+          {% try %}{% include store.component.oper.history.hbs %}{% except%} Chyba...   {% end%}
+        </div>
+
 
         <div class="tab-pane fade" id="oper_buy" role="tabpanel" aria-labelledby="oper-buy-tab">
           {% try %}{% include store.component.oper.buy.hbs %}{% except%} Chyba...    {% end%}
@@ -338,6 +349,13 @@ Tohle jsou moje testovací data ... ty tu nebudou:<br><br>
 }
 </style>
 <script type="text/javascript">
+
+var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl)
+})
+
+
   $('#form_set_categories').submit(function(e){
     e.preventDefault();
     $.ajax({

@@ -7,6 +7,7 @@ import tornado.websocket
 import tornado.httputil
 from . import Intranet
 from . import BaseHandler, BaseHandlerJson
+from .store.item_helper import get_items_last_buy_price, create_reservation, get_reservation_components, earse_reservations
 #from pyoctopart.octopart import Octopart
 import json
 import urllib
@@ -120,6 +121,7 @@ def get_plugin_handlers():
              (r'/{}/(.*)/edit/'.format(plugin_name), edit),
              (r'/{}/(.*)/duplicate/'.format(plugin_name), duplicate),
              (r'/{}/(.*)/get_bom_table/'.format(plugin_name), get_bom_table),
+             (r'/{}/(.*)/get_reservation/'.format(plugin_name), get_reservation),
              (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
              (r'/{}/api/productionTree/move/'.format(plugin_name), production_tree_move_elemen),
@@ -138,12 +140,63 @@ def get_plugin_info():
             {
                 "title": "production",
                 "url": "/production",
-                "icon": "work"
+                "icon": "bi-tools"
             }
         ],
         "role": ['sudo', "sudo-production", "production-manager", "production-viewer"]
     }
 
+
+
+## Projde seznam vsech komponent v pricelist, a zaktualizuje ceny komponent. Vyuzivaji se ceny posledniho nakupu. 
+
+def production_upadte_pricelist(db, production_id, price_work=-1, price_sell=-1, price_consumables=-1):
+    components = db.production.find_one({'_id': bson.ObjectId(production_id)}, {'pricing':1})
+    print(components)
+
+    # Zkontroluj, jestli to jiz existuje, pokud ne, tak vytvor cenik
+    if 'pricing' not in components:
+        components = {
+            "count": 0,
+            "count_unique": 0,
+            "count_ust": 0,
+            "count_ust_unique": 0,
+            "price_components": 0,
+            "price_consumables": float(0),
+            "price_work": float(0),
+            "price_sell": float(0)
+        }
+    else:
+        components = components['pricing']
+
+
+    if price_work >= 0:
+        components['price_work'] = price_work
+    if price_sell >= 0:
+        components['price_sell'] = price_sell
+    if price_consumables >= 0:
+        components['price_consumables'] = price_consumables
+
+    # get last buy price of component
+    components_list = []
+    comps = list(db.production.find({'_id': bson.ObjectId(production_id)}, {'components':1}))[0]
+    for item in comps['components']:
+        components["count"] += 1
+        uid = item.get("UST_ID", None)
+        if uid and bson.ObjectId.is_valid(uid):
+            components["count_ust"] += 1
+            components_list.append(uid)
+            components["price_components"] += get_items_last_buy_price(db, uid)
+
+    components["count_ust_unique"] = len(set(components_list))
+    components["price_stock"] = components['price_components'] + components['price_consumables'] + components['price_work']
+    components["update"] = 0
+    db.production.update_one(
+        {'_id': bson.ObjectId(production_id)},
+        {'$set':{
+            'pricing': components
+        }})
+    return components
 
 
 def mask_array(data, mask, default = None):
@@ -376,7 +429,7 @@ class get_production_group(BaseHandler):
                "from": "production",
                "localField": "_id",
                "foreignField": "production_group",
-               "as": "variants"
+               "as": "series"
              }}
         ])
 
@@ -389,14 +442,8 @@ class update_production_group(BaseHandler):
         name = self.get_argument('name')
         description = self.get_argument('description')
 
-        self.mdb.production_groups.update_one({'_id': group_id}, 
-            { "$set": {"name": name, "description": description}}
-        )
-
         self.write("")
             
-
-
 
 '''
     Tabulka s BOMem pro zobrazeni v production
@@ -468,6 +515,16 @@ class get_bom_table(BaseHandler):
 
 
         self.render('production.bom_table.hbs', data = dout, bson=bson, current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), ComponentStatusTable = ComponentStatusTable)
+
+
+# Ziskat seznam rezervaci a vratit ho jako HTML tabulku
+
+class get_reservation(BaseHandler):
+    def get(self, name):
+        name = bson.ObjectId(name)
+        components = get_reservation_components(self.mdb, name)
+        self.render('production.reservation.hbs', components=components)
+
 
 
 '''
@@ -729,8 +786,6 @@ class edit(BaseHandler):
             self.write({'status': 'ok'})
 
 
-
-
         ##
         #### Update production
         ##
@@ -749,6 +804,72 @@ class edit(BaseHandler):
             dout = [{'state': 'ok'}]
             output = bson.json_util.dumps(dout)
             self.write(output)
+
+        ##
+        ### Update pricelist
+        ##
+        ## aktualizuje cenu teto polozky podle aktualnich nakupnich cen
+        ##
+
+        elif op == 'update_pricelist':
+            print("Update pricelist")
+            components = production_upadte_pricelist(self.mdb, bson.ObjectId(name),
+                price_consumables=float(self.get_argument('price_consumables', 0)),
+                price_work=float(self.get_argument('price_work', 0)),
+                price_sell=float(self.get_argument('price_sell', 0)))
+            self.write(components)
+
+        ##
+        ### Vytvorit rezervace
+        ##
+        ##
+
+        elif op == 'do_reservation':
+            if not self.mdb.production.find_one({'_id': bson.ObjectId(name)}, {"state": 1})['state'] == 0:
+                self.write('{"state": "Nelze vytvořit"}')
+                return
+
+            multiplication = float(self.get_argument('count'))
+            components_list = []
+            comps = list(self.mdb.production.find({'_id': bson.ObjectId(name)}, {'components':1}))[0]
+            for item in comps['components']:
+                uid = item.get("UST_ID", None)
+                if uid and bson.ObjectId.is_valid(uid):
+                    components_list.append(uid)
+
+            component_repetition = {}
+            for component in set(components_list):
+                component_repetition[component] = components_list.count(component)
+
+            for component, repetition in component_repetition.items():
+                create_reservation(db=self.mdb, user=self.logged, cid=component,
+                    warehouse = self.get_warehouse()['_id'],
+                    reservated_count=multiplication*repetition,
+                    description="Reservation from production module",
+                    origin="production",
+                    origin_id=name,
+                    flag=["reservation"]
+                    )
+
+            # nastavit vyrobu na pripravenou 
+            self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 1, "multiplication": multiplication}})
+
+            # take zaktualizuj cenovy rozpis polozky
+            production_upadte_pricelist(self.mdb, bson.ObjectId(name))
+            self.write('{"state": "ok"}')
+
+        ##
+        ### Vymazat rezervace
+        ##
+        ##
+
+        elif op == 'earse_reservation':
+            if self.mdb.production.find_one({'_id': bson.ObjectId(name)}, {"state": 1})['state'] == 1:
+                earse_reservations(self.mdb, bson.ObjectId(name))
+                self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 0}})
+                self.write("")
+            self.write('{"state": "Nelze smazat"}')
+
 
         ##
         #### Update placement
@@ -859,10 +980,13 @@ class duplicate(BaseHandler):
 
         product['_id'] = bson.ObjectId()
         product['name'] += " Duplicate"
+        product['state'] = 0
+        if 'pricing' in product:
+            product.pop('pricing')
+        if 'multiplication' in product:
+            product.pop('multiplication')
 
         self.mdb.production.insert_one(product)
-
-        print(product)
         self.redirect('/production/{}/edit/'.format(product['_id']))
 
 

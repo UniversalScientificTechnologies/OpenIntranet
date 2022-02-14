@@ -1,0 +1,120 @@
+{% extends "../../base.hbs" %}
+{% block title %}UST intranet | Reservations {%end%}
+{% block body %}
+
+<div class="container" id="wrapper">
+	<h3>Rezervace komponent ze skladu</h3>
+
+	<div id="reservations_table_container">
+		<div class="d-flex justify-content-center">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+		</div> 
+	</div>
+
+
+
+</div>
+
+
+<script type="text/javascript">
+	
+	function realod_reservations_table(){
+
+
+		$.ajax({
+			type: "POST",
+			url: "",
+			success: function( data, textStatus, jQxhr ){
+				$("#reservations_table_container").html(data)
+			},
+			error: function( jqXhr, textStatus, errorThrown ){
+				console.log( errorThrown );
+				Lobibox.notify('error', {
+					msg: 'Ukladani nove polozky nebylo uspesne: ' + errorThrown,
+					icon: false,
+				});
+			}
+		});
+	
+
+	}
+
+	realod_reservations_table();
+
+
+$(document).on("mouseenter", ".hover-item", function(e) {	
+	try {
+		popover.dispose();
+	}catch(e){};
+
+	popover = new bootstrap.Popover(e.currentTarget, {
+		placement: 'auto',
+		sanitize: false,
+		html: true,
+		content: "Loading ...",
+		customClass: "popover-class",
+		container: 'body'
+	});
+	popover.show();
+
+	$.ajax({
+        type: "GET",
+        url: "/store/popover/item/"+e.currentTarget.getAttribute("item_id")+"/",
+        data: {
+        	name: $('#production_name').val(),
+        },
+   		//async: false,
+        success: function( data, textStatus, jQxhr ){
+			
+			popover._config.content = data;
+			popover.setContent();
+			popover.show();
+    		
+    	},
+        error: function( jqXhr, textStatus, errorThrown ){
+
+			popover._config.content = "Nelze nacist";
+			popover.setContent();
+			popover.show();
+
+            console.log( errorThrown );
+            Lobibox.notify('error', {
+                msg: 'CHYBA!!!!: ' + errorThrown,
+                icon: false,
+            });
+        }
+    });
+
+});
+
+
+
+function add_to_orderlist(cid, count = 0){
+		$.ajax({
+	        type: "POST",
+	        url: "./orders/add_to_orderlist",
+	        data: {
+	        	cid: cid,
+	        	count: count,
+	        	origin: "reservation",
+	        	description: "Added from reservation page"
+	        },
+	        success: function( data, textStatus, jQxhr ){
+	        	load_waitlist();
+
+	    	},
+	        error: function( jqXhr, textStatus, errorThrown ){
+	            console.log( errorThrown );
+	            Lobibox.notify('error', {
+	                msg: 'CHYBA!!!!: ' + errorThrown,
+	                icon: false,
+	            });
+	        }
+	    });
+}
+
+
+</script>
+{% end %}
