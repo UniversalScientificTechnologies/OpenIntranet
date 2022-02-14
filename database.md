@@ -73,6 +73,8 @@ db.createView("packets_count_complete", "stock", [
     {"$lookup": { "from": 'store_positions', "localField":'packets.position', "foreignField": '_id', "as": 'packets.position'}},
     {"$lookup": { "from": 'stock_operation', "localField":'packets._id', "foreignField": 'pid', "as": 'packets.operations'}},
     {"$lookup": { "from": 'stock_operation', "localField":'_id', "foreignField": 'cid', "as": 'operations_cid'}},
+    {"$lookup": { "from": 'stock_operation', "localField":'packets._id', "foreignField": 'pid', "as": 'packets.operations'}},
+    {"$lookup": { "from": 'stock_operation', "localField":'packets.cid', "foreignField": 'cid', "as": 'component.operations_cid'}},
     {"$project": {"packets":1, "operations_cid":1} },
     {"$addFields": {
             "component_reserv":  {"$sum": "$operations_cid.reserved"},
