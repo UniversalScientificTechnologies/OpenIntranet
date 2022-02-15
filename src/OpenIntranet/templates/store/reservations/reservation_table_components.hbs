@@ -11,7 +11,7 @@ Zobrazení dle komponent
 <div class="card my-2">
 	<div class="card-header d-flex justify-content-between {%if not enought_all %} bg-danger {% elif not enought_current %} bg-warning {% elif rest_current < 5 %} bg-warning {%end%} bg-gradient">
 		<span class="h4">
-			<span class="badge bg-primary">{{reservation_group['count']}}<i class="bi bi-x"></i></span> 
+			
 			<a class="badge bg-success hover-item" item_id="{{reservation_group['component'][0]['_id']}}" href="./component/{{reservation_group['component'][0]['_id']}}/"> <i class="bi bi-cpu"> </i>{{reservation_group['component'][0]['name']}}</a>
 			<a class="badge bg-success" onclick="add_to_orderlist('{{reservation_group['component'][0]['_id']}}'{%if not enought_current %}, {{abs(count_current - reservation_group['count'])}}{%end%})"> <i class="bi bi-cart-plus"></i> </a> 
 		</span> 
@@ -23,7 +23,8 @@ Zobrazení dle komponent
 				<span data-toggle="tooltip" title="Počet objednaných kusů"> <i class="bi bi-truck"></i> -- ks </span> 
 			</span>
 			<span class="h4">
-				<span class="badge bg-success" data-toggle="tooltip" title="Nevyužité množství v aktuálním skladu">{{rest_current}} ks</span> 
+				<span class="badge bg-success" data-toggle="tooltip" title="Nevyužité množství v aktuálním skladu">{{rest_current}} ks</span>
+				<span class="badge bg-primary" data-toggle="tooltip" title="Rezervované množství">{{reservation_group['count']}}<i class="bi bi-x"></i></span> 
 			</span>
 		</span>
 	</div>

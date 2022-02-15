@@ -66,7 +66,7 @@
 						 {%end%}
 						 <hr style="margin: 2px;">
 						 <div>
-						 	<span data-bs-toggle="tooltip" data-placement="top" title="V tomto skladě je aktuálně {{count}} ks" unit_required="{{len(row['Ref'])}}" unit_available="{{count-packet['component_reserv']}}" class="count_validation"><i class="bi bi-shop"></i> {{count-packet['component_reserv']}} ks </span>
+						 	<span data-bs-toggle="tooltip" data-placement="top" title="V tomto skladě je aktuálně {{count}} ks" unit_required="{{len(row['Ref'])}}" unit_available="{{count}}" class="count_validation"><i class="bi bi-shop"></i> {{count-packet['component_reserv']}} ks </span>
 						 	<span data-bs-toggle="tooltip" data-placement="top" title="Počet vytvořených rezervací"><i class="bi bi-bookmark-check"></i>{{packet['component_reserv']}} ks</span>
 						 	<span data-bs-toggle="tooltip" data-placement="top" title="Ostatní sklady" class="text-muted"><i class="bi bi-building"></i>{{packets['component_count'] - count}} ks</span></div>
 						 <hr style="margin: 2px;">

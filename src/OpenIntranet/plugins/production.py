@@ -168,6 +168,10 @@ def production_upadte_pricelist(db, production_id, price_work=-1, price_sell=-1,
         }
     else:
         components = components['pricing']
+        components['count'] = 0
+        components['count_unique'] = 0
+        components['count_ust'] = 0
+        components['price_components'] = 0
 
 
     if price_work >= 0:
