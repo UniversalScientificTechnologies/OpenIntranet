@@ -550,7 +550,9 @@ class edit(BaseHandler):
         print("Vyhledavam polozku", name)
         if name == 'new':
             parent = bson.ObjectId(self.get_argument('group'))
+            production_id = bson.ObjectId()
             product = self.mdb.production.insert_one({
+                    '_id': production_id,
                     'name': 'Without name',
                     'created': datetime.datetime.now(),
                     'state': 0,
@@ -563,7 +565,7 @@ class edit(BaseHandler):
                     'production_group': parent
                 })
             print(product)
-            self.redirect('/production/{}/edit/'.format(product))
+            self.redirect('/production/{}/edit/'.format(production_id))
         else:
             product = self.mdb.production.aggregate([
                     {'$match': {'_id': bson.ObjectId(name)}}
