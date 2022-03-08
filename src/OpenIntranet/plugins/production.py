@@ -446,6 +446,15 @@ class update_production_group(BaseHandler):
         name = self.get_argument('name')
         description = self.get_argument('description')
 
+        out = self.mdb.production_groups.update_one(
+            {"_id": bson.ObjectId(group_id)},
+            {
+              "$set": {
+                "name": name,
+                "description": description,
+              }
+            })
+
         self.write("")
             
 
