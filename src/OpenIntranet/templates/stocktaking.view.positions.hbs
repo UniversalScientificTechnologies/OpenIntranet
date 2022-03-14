@@ -95,9 +95,9 @@
 			{% set has_inventory = 0 %}
 			{% set has_error = 0 %}
 	    {% set component = packet.get('component', {}) %}
-	    	{% if 'component' not in packet %} {% set has_error += 1 %} {%end%}
+	    {% if 'component' not in packet %} {% set has_error += 1 %} {%end%}
 	    {% set position = packet.get('position_info', None) %}
-                {% set total_count += 1 %}
+      {% set total_count += 1 %}
 		{% for operation in packet['operations']%}{%if operation.get("inventory_id", "") == inventory['_id'] %}{%set has_inventory += 1 %}{%end%}{%end%}
 		{% if packet['packet_count'] > 0 and packet['packet_price']<= 0%} {%set has_error += 1 %}{%end%}
 
@@ -133,7 +133,7 @@
 
 		</tr>
                 {% if has_error %} {% set error_count += 1%} {% end %}
-                {% set total_price += packet.get('packet_count', 0)%}
+                {% set total_price += packet.get('packet_price', 0)%}
 		
 	{% end %}</tbody></table>
 		
