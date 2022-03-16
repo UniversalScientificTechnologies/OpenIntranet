@@ -1,7 +1,7 @@
 # UST - OpenIntranet
 
 Systém umožňující správu v organizaci zabývající se řešením projektů využívajících open-source nástroje, případně řešící přímo open-source projekty. 
-Celý systém je určen pro správu výroby a zajištění kvality výroby. Momentálně neobsahuje nástroje pro řízení projektů (project management). 
+Celý systém je určen pro správu výroby a zajištění kvality výroby. Momentálně neobsahuje nástroje pro řízení projektů (project management) a ani není v plánu tyto nástroje do OpenIntranetu implementovat. 
 
 Hlavní vlastnosti jsou:
 
