@@ -26,7 +26,7 @@ def get_items_last_buy_price(db, item):
     item_query = [
         {"$match": {"pid": {"$in": packets}}},
         {"$sort": {"_id": -1}},
-        {"$match": {"type": "buy"}},
+        {"$match": {"type": "buy", "unit_price": {"$gt" :0} }},
         {"$limit": 1},
         {"$project": {"unit_price": 1}}
     ]

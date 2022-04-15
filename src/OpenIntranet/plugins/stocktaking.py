@@ -17,7 +17,7 @@ import pandas as pd
 from fpdf import FPDF
 import os
 import sys
-
+from tornado import gen
 from plugins.helpers.warehouse import *
 
 sys.path.append("..")
@@ -414,6 +414,7 @@ class edit(BaseHandler):
             print(product)
             self.redirect('/production/{}/'.format(product))
 
+#@gen.coroutine
 class stocktaking_event_generate_basic(BaseHandlerOwnCloud):
     def post(self, id):
         bid = ObjectId(id)
@@ -559,6 +560,9 @@ def setava_01(self, stock_taking):
             #'component': { "$push": "$component" }
             }
         },
+        {
+            "$sort": {"_id": 1}
+        }
 
         #{ "$sort": {"position_info.warehouse.code": 1, "position_info.path_string": 1, "position_info.name": 1, "component.name":1}},
 
@@ -572,15 +576,21 @@ def setava_01(self, stock_taking):
         #     }
         # }
     ]
-    data = list(self.mdb.stock_operation.aggregate(query))
+    data = self.mdb.stock_operation.aggregate(query)
 
     gen_time = datetime.datetime(2018, 10, 1)
     lastOid = ObjectId.from_datetime(gen_time)
 
+    number_components = 0
+    number_packets = 0
+
 
     for i, component in enumerate(data):
         print(" ")
-        print(component['_id'], component)
+        number_components += 1
+        # print(component['_id'], component)
+        component['packets_count'] = []
+        component['packets_prices'] = []
         try:
             ## Pokud je konec stránky
             if pdf.get_y() > pdf.h-20:
@@ -618,57 +628,42 @@ def setava_01(self, stock_taking):
             price = 0
             packets = ""
             for j, packet in enumerate(component['packets']):
+                number_packets += 1
                 pcount = packet['packet_count']
                 pprice = round(packet['packet_price'], 2)
+
+                component['packets_count'].append(pcount)
+                component['packets_prices'].append(pprice)
 
                 count += pcount
                 price += pprice
                 packets += " {},".format(pprice)
+
+                #pac_info = get_packet_count(self.mdb, packet['_id'])
+                #print("C: {}, {}, ".format(pcount-pac_info['packet_count'], pprice-pac_info['packet_price']))
             price_ks = 0
             first_price = 0
 
             inventura = False
-            # for x in reversed(component.get('history', [])):
-            #     if x.get('operation', None) == 'inventory':
-            #         #TODO: tady porovnávat, jesti to patri do stejne kampane. Ne na zaklade casu ale ID
-            #         if x['_id'].generation_time > lastOid.generation_time:
-            #             inventura = True
-            #             count = x['absolute']
-            #             pdf.set_x(120)
-            #             pdf.cell(1, 5, "i")
-            #             break;
-
 
             if count > 0:
-                # rest = count
 
-                # for x in reversed(component.get('history', [])):
-
-                #     if x.get('price', 0) > 0:
-                #         if first_price == 0:
-                #             first_price = x['price']
-                #         if x['bilance'] > 0:
-                #             if x['bilance'] <= rest:
-                #                 price += x['price']*x['bilance']
-                #                 rest -= x['bilance']
-                #             else:
-                #                 price += x['price']*rest
-                #                 rest = 0
-
-                # print("Zbývá", rest, "ks, secteno", count-rest, "za cenu", price)
-                # if(count-rest): price += rest*first_price
                 money_sum += price
                 page_sum += price
 
-                if price == 0.0 and x.get('count', 0) > 0:
-                    Err.append('Polozka >%s< nulová cena, nenulový počet' %(component['_id']))
+                if price == 0.0:# and x.get('count', 0) > 0:
+                    Err.append('Polozka >%s< nulová cena, nenulový počet (%s)' %(component['_id'], component.get('name', '---')))
 
                 pdf.set_x(10)
-                pdf.cell(100, 5, "{:5.0f}  {}".format(i, packet['component']['name']))
+                pdf.cell(100, 5, "{:5.0f}  {} ({})".format(i, packet['component']['name'], len(component['packets']) ))
 
                 pdf.set_font('pt_sans', '', 10)
                 pdf.set_x(105)
                 pdf.cell(10, 5, "{} j".format(count), align='R')
+
+
+                # pdf.set_x(107)
+                # pdf.cell(10, 5, repr(component['packets_count']) + " " +repr(component['packets_prices']), align='L')
 
 
                 pdf.set_font('pt_sans-bold', '', 10)
@@ -688,9 +683,10 @@ def setava_01(self, stock_taking):
     pdf.set_x(180)
     pdf.cell(10, 5, "Konec souhrnu", align='R')
 
-    #pdf.set_font('pt_sans', '', 10)
-    #pdf.set_xy(150, pdf.get_y()+3)
-    #pdf.cell(100, 5, 'Součet strany: {:6.2f} Kč'.format(page_sum))
+    print("Celková cena", money_sum)
+    print("Probematicke", len(Err))
+    print("Polozek:", number_components)
+    print("Pocet sacku:", number_packets)
 
     pdf.page = 1
     pdf.set_xy(20,175)

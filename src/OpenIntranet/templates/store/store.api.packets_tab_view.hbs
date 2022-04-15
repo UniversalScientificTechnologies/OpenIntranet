@@ -51,7 +51,7 @@
           {% end %}
         </span>
         {%if len(row['supplier'])%}
-        <span class="text-muted">Dodavatel:</span> <span>{{row['supplier'][0]['supplier']}} ({{row['supplier'][0]['symbol']}}) <a href="{{row['supplier'][0]['url']}}"> <i class="bi bi-link-45deg"></i> </a></span> 
+        <span class="text-muted">Dodavatel:</span> <span>{{row['supplier'][0].get('supplier', 'N/A')}} ({{row['supplier'][0].get('symbol', 'N/A')}}) <a href="{{row['supplier'][0].get('url', '#')}}"> <i class="bi bi-link-45deg"></i> </a></span> 
         {%end%}
         <!-- <span class="hist_element" style="width: 15%;">{{row.get('bilance', '--')}} ks</span><span class="hist_element" style="width: 15%;">{{row.get('price', '--')}} Czk</span> -->
     </div>

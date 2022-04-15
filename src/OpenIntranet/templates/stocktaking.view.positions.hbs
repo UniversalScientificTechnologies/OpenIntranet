@@ -92,20 +92,21 @@
 {% set error_count = 0 %}
 
 	{%for pi, packet in enumerate(packets) %}
-	    {% set component = packet['component'] %}
+			{% set has_inventory = 0 %}
+			{% set has_error = 0 %}
+	    {% set component = packet.get('component', {}) %}
+	    {% if 'component' not in packet %} {% set has_error += 1 %} {%end%}
 	    {% set position = packet.get('position_info', None) %}
-                {% set total_count += 1 %}
-		{% set has_inventory = 0 %}
-		{% set has_error = 0 %}
+      {% set total_count += 1 %}
 		{% for operation in packet['operations']%}{%if operation.get("inventory_id", "") == inventory['_id'] %}{%set has_inventory += 1 %}{%end%}{%end%}
 		{% if packet['packet_count'] > 0 and packet['packet_price']<= 0%} {%set has_error += 1 %}{%end%}
 
 		<tr class="{%if has_inventory and not has_error %}table-success{% elif has_error %}table-danger{%end%}" stock="{% if position %}{{position['warehouse']['_id']}}{%end%}">
 			<td>{{pi}}</td>
 			<td>
-            	<a class="bi bi-info-square" href="/store/component/{{component['_id']}}/?packet={{packet['_id']}}" id="id_stock_link" target="_blank"></a>
+            	<a class="bi bi-info-square" href="/store/component/{{component.get('_id', "Err")}}/?packet={{packet['_id']}}" id="id_stock_link" target="_blank"></a>
             	<a class="bi bi-paperclip" href="#" onclick="copyToClipboard('{{packet['_id']}}')"></a>
-            	<span data-bs-toggle="tooltip" data-bs-placement="top" title="{{component.get('description', "")}}}">{{component['name']}}</span>   <i class="bi bi-box-seam"></i> {{packet['_id']}} ({{len(packet['operations'])}})
+            	<span data-bs-toggle="tooltip" data-bs-placement="top" title="{{component.get('description', "")}}}">{{component.get('name', "Err")}}</span>   <i class="bi bi-box-seam"></i> {{packet['_id']}} ({{len(packet['operations'])}})
             </td>
             <td> {% if position %} {{position['warehouse']['code']}}/{{"/".join(position['path_string']+[""])}}{{position['name']}}{%else%}--bez pozice--{%end%} </td>
 			<td align="right">{{"{:.2f}".format(packet['packet_count'])}}</td>
@@ -132,7 +133,7 @@
 
 		</tr>
                 {% if has_error %} {% set error_count += 1%} {% end %}
-                {% set total_price += packet.get('packet_count', 0)%}
+                {% set total_price += packet.get('packet_price', 0)%}
 		
 	{% end %}</tbody></table>
 		

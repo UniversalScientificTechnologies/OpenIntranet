@@ -2,11 +2,13 @@
 Zobrazení dle komponent
 {% for reservation_group in reservations_groups %}
 
-{%set count_current = reservation_group['prices']['current_warehouse']['count'] %}
-{%set count_other = reservation_group['prices']['other_warehouse']['count'] - count_current %}
-{%set rest_current = count_current - reservation_group['count'] %}
-{%set enought_current = (count_current - reservation_group['count']) > 0 %}
-{%set enought_all = (reservation_group['prices']['other_warehouse']['count'] - reservation_group['count'])>0 %}
+{% try %}
+
+{%set count_current = float(reservation_group['prices']['current_warehouse']['count']) %}
+{%set count_other = float(reservation_group['prices']['other_warehouse']['count'] - count_current) %}
+{%set rest_current = float(count_current - reservation_group['count']) %}
+{%set enought_current = float(count_current - reservation_group['count']) > 0 %}
+{%set enought_all = float(reservation_group['prices']['other_warehouse']['count'] - reservation_group['count'])>0 %}
 
 <div class="card my-2">
 	<div class="card-header d-flex justify-content-between {%if not enought_all %} bg-danger {% elif not enought_current %} bg-warning {% elif rest_current < 5 %} bg-warning {%end%} bg-gradient">
@@ -39,6 +41,10 @@ Zobrazení dle komponent
 		</div>{%end%}
 	</div>
 </div>
-
+{% except %}
+<div class="card my-2">
+	Chyba.. {{reservation_group.get('prices', [])}}
+</div>
+{% end %}
 
 {%end%}

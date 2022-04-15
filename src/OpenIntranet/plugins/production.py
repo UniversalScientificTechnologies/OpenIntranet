@@ -8,6 +8,7 @@ import tornado.httputil
 from . import Intranet
 from . import BaseHandler, BaseHandlerJson
 from .store.item_helper import get_items_last_buy_price, create_reservation, get_reservation_components, earse_reservations
+from .store.component import get_component
 #from pyoctopart.octopart import Octopart
 import json
 import urllib
@@ -182,6 +183,7 @@ def production_upadte_pricelist(db, production_id, price_work=-1, price_sell=-1,
         components['price_consumables'] = price_consumables
 
     # get last buy price of component
+    #wh = self.get_warehouse()['_id']
     components_list = []
     comps = list(db.production.find({'_id': bson.ObjectId(production_id)}, {'components':1}))[0]
     for item in comps['components']:
@@ -190,6 +192,7 @@ def production_upadte_pricelist(db, production_id, price_work=-1, price_sell=-1,
         if uid and bson.ObjectId.is_valid(uid):
             components["count_ust"] += 1
             components_list.append(uid)
+            print(uid, get_items_last_buy_price(db, uid))
             components["price_components"] += get_items_last_buy_price(db, uid)
 
     components["count_ust_unique"] = len(set(components_list))
@@ -446,6 +449,15 @@ class update_production_group(BaseHandler):
         name = self.get_argument('name')
         description = self.get_argument('description')
 
+        out = self.mdb.production_groups.update_one(
+            {"_id": bson.ObjectId(group_id)},
+            {
+              "$set": {
+                "name": name,
+                "description": description,
+              }
+            })
+
         self.write("")
             
 
@@ -541,7 +553,9 @@ class edit(BaseHandler):
         print("Vyhledavam polozku", name)
         if name == 'new':
             parent = bson.ObjectId(self.get_argument('group'))
+            production_id = bson.ObjectId()
             product = self.mdb.production.insert_one({
+                    '_id': production_id,
                     'name': 'Without name',
                     'created': datetime.datetime.now(),
                     'state': 0,
@@ -554,7 +568,7 @@ class edit(BaseHandler):
                     'production_group': parent
                 })
             print(product)
-            self.redirect('/production/{}/edit/'.format(product))
+            self.redirect('/production/{}/edit/'.format(production_id))
         else:
             product = self.mdb.production.aggregate([
                     {'$match': {'_id': bson.ObjectId(name)}}
