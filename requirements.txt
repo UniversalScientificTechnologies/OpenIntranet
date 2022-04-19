@@ -1,5 +1,4 @@
 glob2
-git
 pyocclient
 termcolor
 fpdf

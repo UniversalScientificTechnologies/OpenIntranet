@@ -36,6 +36,6 @@ ROLE_ACCOUNTANT = "order-view, order-manager"
 
 class HomeHandler(BaseHandler):
     def get(self):
-
+        
         self.render("../plugins/order/frontend/orders.overview.hbs")
         self.write("OK :) ... tak ted jeste tu sablonu")

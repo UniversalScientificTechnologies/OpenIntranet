@@ -18,7 +18,7 @@ def get_plugin_info():
             {
                 "url": "/order",
                 "title": "Zakázky",
-                "icon": 'queue',
+                "icon": 'bi-file-text',
             },
         ]
     }
