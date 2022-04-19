@@ -58,6 +58,9 @@ kolekce databáze `intranet` by měla obsahovat:
     "address" : "...company_address...",
     "crn" : "...company registration number - ID..."
 }
+```
+
+```
 {
     "_id" : "dpp_params",
     "year_max_hours" : 300,
@@ -66,6 +69,9 @@ kolekce databáze `intranet` by měla obsahovat:
     "tax_deduction" : 2070,
     "tax_deduction_student" : 335
 }
+```
+
+```
 {
     "_id" : "default_warehouse",
     "*" : ObjectId("..default_warehouse_id...")
