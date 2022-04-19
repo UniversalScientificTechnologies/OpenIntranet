@@ -10,3 +10,7 @@ code128
 si_prefix
 python-barcode
 gitpython
+pystrich
+redis
+pymongo
+PySocks
