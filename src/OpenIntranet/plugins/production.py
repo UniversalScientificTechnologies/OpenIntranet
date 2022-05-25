@@ -1346,23 +1346,28 @@ class print_bom(BaseHandler):
                 pdf.set_line_width(0.1)
                 pdf.set_draw_color(110,110,110)
                 pdf.set_text_color(110,110,110)
-
+                
+                
                 for packet_i, packet in enumerate(packets.get('packets', [])):
                     packet_rount += 1
 
-                    print(" ")
-                    print("packet>", packet)
-                    pdf.set_xy(13, rowy+15+packet_i*4)
-                    pdf.cell(40, 5, str(packet['packets']['_id']))
-                    if len(packet['packets']['position'][0].get('path_string', [])):
-                        pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) + " / " + str(packet['packets']['position'][0]['path_string'][0]) + " / " + str(packet['packets']['position'][0]['name']) + " ("+str(packet['packets']['position'][0].get('text', ''))+")")
-                    else:
-                        print("...", packet['packets'])
-                        print("...", packet['packets']['position'][0])
-                        print("...", packet['packets']['position'][0])
-                        #pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) )
-                        pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) + " / " + str(packet['packets']['position'][0]['name']) + " ("+str(packet['packets']['position'][0].get('text', ''))+")")
-                    pdf.cell(10, 5, str(packet['packet_count'])+ " ks")
+                    try:
+
+                        print(" ")
+                        print("packet>", packet)
+                        pdf.set_xy(13, rowy+15+packet_i*4)
+                        pdf.cell(40, 5, str(packet['packets']['_id']))
+                        if len(packet['packets']['position']) and len(packet['packets']['position'][0].get('path_string', [])):
+                            pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) + " / " + str(packet['packets']['position'][0]['path_string'][0]) + " / " + str(packet['packets']['position'][0]['name']) + " ("+str(packet['packets']['position'][0].get('text', ''))+")")
+                        else:
+                            print("...", packet['packets'])
+                            print("...", packet['packets']['position'][0])
+                            print("...", packet['packets']['position'][0])
+                            #pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) )
+                            pdf.cell(90, 5, str(packet['packets']['position'][0]['warehouse']['code']) + " / " + str(packet['packets']['position'][0]['name']) + " ("+str(packet['packets']['position'][0].get('text', ''))+")")
+                        pdf.cell(10, 5, str(packet['packet_count'])+ " ks")
+                    except Exception as e:
+                        pdf.cell(40, 5, str("Chyba sacku :"+ repr(e)))
 
                 pdf.rounded_rect(13, rowy+15, 185, 5+packet_i*4, 1)
                 pdf.set_line_width(0.01)

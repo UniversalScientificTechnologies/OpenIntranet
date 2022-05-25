@@ -462,10 +462,11 @@ function update_view(){
         var tmpl = document.getElementById('products-template_'+$('#display_select').val()).content.cloneNode(true);
         tmpl.querySelector('.product_list_element').classList.add('row_of_'+element['_id'].$oid);
         tmpl.querySelector('.product_list-name').innerHTML = " <b>"+element['name'] + "</b> ";
-        tmpl.querySelector('.product_list-baseinfo').innerHTML =  "("+element['barcode'] +") <small>"+ element['_id'].$oid+"</small>";
+        //tmpl.querySelector('.product_list-baseinfo').innerHTML =  "("+element['barcode'] +") <small>"+ element['_id'].$oid+"</small>";
         tmpl.querySelector('.product_list-select').value = element['_id'].$oid;
         tmpl.querySelector('.product_list-description').innerText = element['description'];
         tmpl.querySelector('.product_list_copyid').setAttribute('copy', element['_id'].$oid);
+        tmpl.querySelector('.ust_id').innerHTML = element['_id'].$oid
 
         try{ tmpl.querySelector('.component_image').setAttribute('src', element['img_title']['url']) } catch(e){};
 
