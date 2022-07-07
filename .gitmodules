@@ -1,33 +1,33 @@
 [submodule "src/OpenIntranet/static/lobibox"]
 	path = src/OpenIntranet/static/lobibox
-	url = git://github.com/arboshiki/lobibox.git
+	url = git@github.com:arboshiki/lobibox.git
 [submodule "src/OpenIntranet/static/jquery"]
 	path = src/OpenIntranet/static/jquery
-	url = git://github.com/jquery/jquery.git
+	url = git@github.com:jquery/jquery.git
 [submodule "src/OpenIntranet/static/select2"]
 	path = src/OpenIntranet/static/select2
-	url = git://github.com/select2/select2.git
+	url = git@github.com:select2/select2.git
 [submodule "src/OpenIntranet/static/tabulator"]
 	path = src/OpenIntranet/static/tabulator
-	url = git://github.com/olifolkerd/tabulator.git
+	url = git@github.com:olifolkerd/tabulator.git
 [submodule "src/OpenIntranet/static/material-design-icons"]
 	path = src/OpenIntranet/static/material-design-icons
-	url = git://github.com/google/material-design-icons/
+	url = git@github.com:google/material-design-icons/
 [submodule "src/OpenIntranet/static/InteractiveHtmlBom"]
 	path = src/OpenIntranet/static/InteractiveHtmlBom
-	url = git://github.com/roman-dvorak/InteractiveHtmlBom.git
+	url = git@github.com:roman-dvorak/InteractiveHtmlBom.git
 [submodule "src/OpenIntranet/static/js-cookie"]
 	path = src/OpenIntranet/static/js-cookie
-	url = git://github.com/js-cookie/js-cookie.git
+	url = git@github.com:js-cookie/js-cookie.git
 [submodule "src/OpenIntranet/static/bootstrap"]
 	path = src/OpenIntranet/static/bootstrap
-	url = git://github.com/twbs/bootstrap.git
+	url = git@github.com:twbs/bootstrap.git
 [submodule "src/OpenIntranet/static/bootstrap-select"]
 	path = src/OpenIntranet/static/bootstrap-select
-	url = git://github.com/snapappointments/bootstrap-select.git
+	url = git@github.com:snapappointments/bootstrap-select.git
 [submodule "src/OpenIntranet/static/select2-bootstrap4-theme"]
 	path = src/OpenIntranet/static/select2-bootstrap4-theme
-	url = git://github.com/ttskch/select2-bootstrap4-theme.git
+	url = git@github.com:ttskch/select2-bootstrap4-theme.git
 [submodule "src/OpenIntranet/static/bootstrap-icons"]
 	path = src/OpenIntranet/static/bootstrap-icons
-	url = git://github.com/twbs/icons.git
+	url = git@github.com:twbs/icons.git
