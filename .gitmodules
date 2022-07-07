@@ -30,4 +30,4 @@
 	url = git://github.com/ttskch/select2-bootstrap4-theme.git
 [submodule "src/OpenIntranet/static/bootstrap-icons"]
 	path = src/OpenIntranet/static/bootstrap-icons
-	url = git@github.com:twbs/icons.git
+	url = git://github.com/twbs/icons.git
