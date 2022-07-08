@@ -39,7 +39,7 @@ plugins = ['', 'store','system', 'stocktaking', 'stocktaking_view_positions', 'p
 
 Je potřeba v databázi vytvořit položku skladu. A pak tento sklad nastavit jako výchozí. 
 
-V kolekci `warehause` vytvořit položku:
+V kolekci `warehouse` vytvořit položku:
 ```
 {
     "code" : "...zkratka_skladu...",
