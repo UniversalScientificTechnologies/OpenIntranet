@@ -2,71 +2,165 @@
 {% block title %} | Produkce, uvod{% end %}
 {% block body %}
 
-<script type="text/javascript">
 
-</script>
 
 <style type="text/css">
+  .product_list_element {
+    margin: 0pt;
+    margin-top: 10pt;
+    padding: 5pt;
+  }
 
-.product_list_element {
-  margin: 0pt;
-  margin-top: 10pt;
-  padding: 5pt;
-}
+  .product_list_element_table {
+    width: 100%;
+    background: white;
+    border: #aaa solid 1pt;
+    padding: 5pt;
+    margin: 0pt;
+    display: inline-flex;
+  }
 
-.product_list_element_table{
-  width: 100%;
-  background: white;
-  border: #aaa solid 1pt;
-  padding: 5pt;
-  margin: 0pt;
-  display: inline-flex;
-}
+  .table_input {
+    width: 8em;
+    border: #ccc solid thin;
+    background: #fafafa;
+  }
 
-.table_input{
-  width: 8em;
-  border: #ccc solid thin;
-  background: #fafafa;
-}
-
-.form-group {
-  margin-bottom: 0.5rem;
-}
-
-
-.cat_top{
-  flex: 0 0 auto;
-  width: 150pt;
-}
-
-#filter_block{
-  /* display: flex; */
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  margin: 0pt;
-}
-
-.form-tab-td{
-  padding: 0px;
-}
-
-.list_name{
-  padding-left: 0.5em;
-  vertical-align: top;
-}
+  .form-group {
+    margin-bottom: 0.5rem;
+  }
 
 
+  .cat_top {
+    flex: 0 0 auto;
+    width: 150pt;
+  }
+
+  #filter_block {
+    /* display: flex; */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0pt;
+  }
+
+  .form-tab-td {
+    padding: 0px;
+  }
+
+  .list_name {
+    padding-left: 0.5em;
+    vertical-align: top;
+  }
+
+  .highlight {
+    background-color: rgb(191, 230, 191);
+  }
 </style>
 
 <div>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <table id="order_list" class="table caption-top">
+          <caption>Přehled zakázek</caption>
+          <thead>
+            <tr>
+              <th class="order_param">Drop</th>
+              <th class="order_param">Id</th>
+              <th class="order_param">Jméno</th>
+              <th class="order_param">Popis</th>
+              <th class="order_param">Zákazník</th>
+              <th class="order_param">Datum vytvoření</th>
+              <th class="order_param">Stav</th>
+              <th class="order_param">Celková částka</th>
+              <th class="order_param">Zbývá zaplatit</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider">
+            {% for order in list(orders) %}
+            <tr class="order_row">
+              <td class="order_param">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapse{{ order["_id"] }}" aria-expanded="false" aria-controls="collapse{{ order["_id"] }}">
+                  >
+                </button>
+              </td>
+              <td class="order_id">{{ order["_id"] }}</td>
+              <td class="order_name">{{ order["name"] }}</td>
+              <td class="order_description">{{ order["description"] }}</td>
+              <td class="order_customer">{{ order["customer"]["name"] }}</td>
+              <td class="order_date_of_creation">{{ order["date_of_creation"].date() }}</td>
+              <td class="order_status">not defined yet</td>
+              <td class="order_price_total">{{ order["price_total"] }}</td>
+              <td class="order_price_to_pay">{{ order["price_to_pay"] }}</td>
+            </tr>
+            <tr>
+              <div class="collapse" id="collapse{{ order["_id"] }}">
+                <div class="card card-body">
+                  Some placeholder content for the collapse component. This panel is hidden by default but revealed when
+                  the user
+                  activates the relevant trigger.
+                </div>
+              </div>
+            </tr>
+            {% end %}
+          </tbody>
+        </table>
 
-  <h1> Přehled zakázek </h2>
-  <a class="btn btn-success" href="/order/view/new">Nová</a>
 
+        <a class="btn btn-success" href="/order/view/new" role="button">Nová</a>
+        <button type="button" class="btn btn-primary">Generovat PDF ...</button>
+        <button id="delete_order" type="button" class="btn btn-outline-danger">Odstranit</button>
+        <button id="select_orders" type="button" class="btn btn-light">Vybrat vše</button>
+        <button id="deselect_orders" type="button" class="btn btn-light">Zrušit výběr</button>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="multiple_order_selection">
+          <label class="form-check-label" for="multiple_order_selection">Možnost výběru více zakázek</label>
+        </div>
+
+        <button type="button" class="btn btn-success">Upravit</button>
+
+      </div>
+    </div>
+  </div>
 </div>
 
+<script type="text/javascript">
+  $('#select_orders').click(() => {
+    $('.order_row').addClass('highlight')
+  })
 
+  $('#deselect_orders').click(() => {
+    $('.order_row').removeClass('highlight')
+  })
 
+  $('#order_list').on('click', 'tbody tr', function (event) {
+    if (!$('#multiple_order_selection').is(":checked")) {
+      $('.order_row').removeClass('highlight')
+    }
+    if ($(this).hasClass('highlight')) {
+      $(this).removeClass('highlight')
+    } else {
+      $(this).addClass('highlight')
+    }
+  })
 
+$('#delete_order').click(() => {
+    // post document (order)
+    const order_id = $('.highlight > .order_id').text()
+    $.ajax({
+      url: "/order/api/orders/"+order_id,
+      type: "DELETE",
+      success: function (data, textStatus, jQxhr) {
+        alert("Polozka byla odstranena")
+      },
+      error: function (data, status) {
+        alert("Polozka nebyla odstranena");
+      }
+    });
+  })
+
+</script>
 
 {% end %}

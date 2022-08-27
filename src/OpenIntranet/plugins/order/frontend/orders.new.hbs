@@ -1,0 +1,364 @@
+{% extends "base.hbs" %}
+{% block title %} | Produkce, uvod{% end %}
+{% block body %}
+
+
+
+<style type="text/css">
+    .product_list_element {
+        margin: 0pt;
+        margin-top: 10pt;
+        padding: 5pt;
+    }
+
+    .product_list_element_table {
+        width: 100%;
+        background: white;
+        border: #aaa solid 1pt;
+        padding: 5pt;
+        margin: 0pt;
+        display: inline-flex;
+    }
+
+    .table_input {
+        width: 8em;
+        border: #ccc solid thin;
+        background: #fafafa;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem;
+    }
+
+
+    .cat_top {
+        flex: 0 0 auto;
+        width: 150pt;
+    }
+
+    #filter_block {
+        /* display: flex; */
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        margin: 0pt;
+    }
+
+    .form-tab-td {
+        padding: 0px;
+    }
+
+    .list_name {
+        padding-left: 0.5em;
+        vertical-align: top;
+    }
+
+    .highlight {
+        background-color: rgb(191, 230, 191);
+    }
+</style>
+
+<div>
+    <div class="container">
+        <div class="row container">
+            <p class="fs-1">Nová objednávka</p>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="container border">
+                    <p class="fs-2">Základní parametry</p>
+                    <div class="mb-3 row">
+                        <label for="order_name" class="col-sm-2 col-form-label">Jméno</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="order_name">
+                        </div>
+                        <label for="order_description" class="col-sm-2 col-form-label">Popis</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="order_description">
+                        </div>
+                        <label for="order_price_total_no_dph" class="col-sm-2 col-form-label">Cena bez DPH</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="order_price_total_no_dph" value="0" disabled>
+                        </div>
+                        <label for="order_price_total" class="col-sm-2 col-form-label">Cena</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="order_price_total" value="0" disabled>
+                        </div>
+                        <label for="order_price_to_pay" class="col-sm-2 col-form-label">Zbývá zaplatit</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="order_price_to_pay" disabled>
+                        </div>
+                        <p class="fs-2">Zákazník</p>
+                        <label for="customer_name" class="col-sm-2 col-form-label">Jméno</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="customer_name">
+                        </div>
+                        <label for="customer_description" class="col-sm-2 col-form-label">Popis</label>
+                        <div class="col-sm-10 row">
+                            <input type="text" class="form-control" id="customer_description">
+                        </div>
+                    </div>
+
+                    <p class="fs-2">Položky</p>
+                    <div class="mb-3 row">
+                        <label for="item_name" class="col-sm-2 col-form-label">Jméno</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="item_name">
+                        </div>
+                        <label for="item_description" class="col-sm-2 col-form-label">Popis</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="item_description">
+                        </div>
+                        <label for="item_store_id" class="col-sm-2 col-form-label">Skladové id</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="item_store_id" value="not yet implemented"
+                                disabled>
+                        </div>
+                        <label for="item_price_piece" class="col-sm-2 col-form-label">Cena (1 ks)</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="text" class="form-control numeric" id="item_price_piece">
+                                <span class="input-group-text">Kč</span>
+                            </div>
+                        </div>
+                        <label for="item_discount" class="col-sm-2 col-form-label">Sleva</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <select id="discount_option" class="form-select">
+                                    <option class="discount_option" value="1" selected>%</option>
+                                    <option class="discount_option" value="2">Kč</option>
+                                </select>
+                                <input type="text" class="form-control" id="item_discount" value="0">
+                                <span id="discount_units" class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <label for="item_amount" class="col-sm-2 col-form-label">Počet kusů</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="item_amount" value="1">
+                        </div>
+                        <label for="item_dph" class="col-sm-2 col-form-label">Dph</label>
+                        <div class="col-sm-10">
+                            <select id="dph_form" class="form-select" aria-label="Default select example">
+                                <option value="21" selected>21 % (základní sazba)</option>
+                                <option value="15">15 % (1. snížená sazba)</option>
+                                <option value="10">10 % (2. snížená sazba)</option>
+                                <option value="0">0 % (žádná sazba)</option>
+                            </select>
+                        </div>
+                        <label for="item_price_total" class="col-sm-2 col-form-label">Cena položky</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="item_price_total" value="0" disabled>
+                        </div>
+                        <div class="container">
+                            <button id="add_item" type="button" class="btn btn-success">Přidat</button>
+                            <button type="button" class="btn btn-primary disabled">Změnit</button>
+                            <button id="delete_item" type="button" class="btn btn-outline-danger">Smazat</button>
+                        </div>
+                    </div>
+
+                    <div id="alert_placeholder"></div>
+
+                    <p class="fs-2">Seznam položek</p>
+                    <table id="item_list" class="table caption-top">
+                        <thead>
+                            <tr>
+                                <th>Jméno</th>
+                                <th>Popis</th>
+                                <th>Skladové id</th>
+                                <th>Cena ks</th>
+                                <th>Sleva %</th>
+                                <th>Sleva Kč</th>
+                                <th>Počet</th>
+                                <th>DPH sazba</th>
+                                <th>Cena celkem bez DPH</th>
+                                <th>Cena celkem s DPH</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-outline-primary">Upravit</button>
+                </div>
+
+                <button id="generate_pdf" type="button" class="btn btn-primary">Generovat PDF ...</button>
+                <button id="create_order" type="button" class="btn btn-success">Vytvořit objednávku</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    // Objects 
+    let item_current_id = 0
+    let items = []
+    let order_this = {
+        "name": "",
+        "description": "",
+        "customer": {
+            "name": "",
+            "other_info": ""
+        },
+        "price_total": 0.0,
+        "price_to_pay": 0.0,
+        "date_of_creation": "",
+        "items": items
+    }
+    // Functions
+
+    function popup_alert(message, type) {
+        const html = `
+        <div class="alert alert-` + type + ` alert-dismissible" role="alert">` + message + `
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            `
+        $('#alert_placeholder').append(html)
+    }
+
+    function refresh_itemstable() {
+        let order_price_no_dph = 0
+        order_this.price_total = 0
+
+        // clear tbody
+        $('#item_list tbody').empty()
+        // fill table with items
+        items.forEach((item, index) => {
+            const html = `<tr id="item_id_` + index + `" class="item_row">
+                <td class="item_name" >`+ item.name + `</td>
+                <td class="item_description" >`+ item.description + `</td>
+                <td class="item_store_id" >`+ item.store_id + `</td>
+                <td class="item_price_piece" >`+ item.price_per_piece + ` Kč</td>
+                <td class="item_discount_percents" >`+ item.discount_percents + ` %</td>
+                <td class="item_discount_Kc" >`+ item.discount_Kc + ` Kč</td>
+                <td class="item_amount" >`+ item.amount + ` ks</td>
+                <td class="item_dph" >`+ item.dph + ` %</td>
+                <td class="item_price_no_dph">`+ item.price_no_dph + ` Kč</td>
+                <td class="item_price_total" >`+ item.price_total + ` Kč</td>
+            </tr>`
+            $('#item_list tbody').append(html);
+            order_this.price_total += item.price_total
+            order_price_no_dph += item.price_no_dph
+        })
+        order_this.price_to_pay = order_this.price_total
+        $('#order_price_total').val(order_this.price_total)
+        $('#order_price_to_pay').val(order_this.price_to_pay)
+        $('#order_price_total_no_dph').val(order_price_no_dph)
+    }
+
+    function fill_order_object() {
+        order_this.name = $('#order_name').val()
+        order_this.description = $('#order_description').val()
+        order_this.customer.name = $('#customer_name').val()
+        order_this.customer.description = $('#customer_description').val()
+        let price_total = 0
+        items.forEach((item) => {
+            price_total += parseFloat(item.price_total)
+        })
+        order_this.price_total = price_total
+        order_this.price_to_pay = price_total
+    }
+
+    // Events
+    $('#add_item').click(() => {
+        let discount_Kc = 0
+        let discount_percents = 0
+        switch ($('#discount_option option:selected').text()) {
+            case '%':
+                discount_percents = $('#item_discount').val()
+                break
+            case 'Kč':
+                discount_Kc = $('#item_discount').val()
+                break
+            default:
+                alert('unknown unit at discount')
+                break
+        }
+        const item = {
+            "name": $('#item_name').val(),
+            "description": $('#item_description').val(),
+            "store_link": false,
+            "store_id": $('#item_store_id').val(),
+            "price_per_piece": parseFloat($('#item_price_piece').val()),
+            "discount_percents": discount_percents,
+            "discount_Kc": discount_Kc,
+            "amount": parseFloat($('#item_amount').val()),
+            "dph": parseFloat($('#dph_form option:selected').val()),
+            "price_no_dph": parseFloat($('#item_price_total').val() * (1 - $('#dph_form option:selected').val() / 100)),
+            "price_total": parseFloat($('#item_price_total').val()),
+        }
+        items.push(item)
+        refresh_itemstable()
+        popup_alert('Položka "' + item.name + '"" ceny ' + item.price_total + ' Kč přidána na seznam!', 'success')
+    })
+
+    $('#delete_item').click(() => {
+        const name = items[item_current_id].name
+        const price_total = items[item_current_id].price_total
+        items.splice(item_current_id, 1)
+        refresh_itemstable()
+        popup_alert('Item "' + name + '" of price ' + price_total + ' Kc deleted', 'danger')
+    })
+
+    // place units at right of input group (styling)
+    $('option.discount_option').on('click', () => {
+        $('#discount_units').text($('#discount_option option:selected').text())
+    })
+
+    $('.numeric').on("input", function () {
+        this.value = this.value.replace(/[^0-9\.,]/g, '').replace(/[\.,]{2}/g, '.')
+    })
+
+    $('#item_price_piece, #item_amount, #dph_form, #discount_option, #item_discount').on('input', () => {
+        // TODO validate input
+        const item_piece = $('#item_price_piece').val()
+        const item_amount = $('#item_amount').val()
+        const dph_const = $('#dph_form option:selected').val() / 100
+
+        let discount = $('#item_discount').val()
+        if (discount != 0) {
+            switch ($('#discount_option option:selected').text()) {
+                case '%':
+                    discount = item_piece * (discount / 100)
+                    break
+                case 'Kč':
+                    discount = item_piece - discount
+                    break
+                default:
+                    alert('unknown unit at discount')
+                    break
+            }
+        }
+        const total_price = (1 + dph_const) * (item_piece - discount) * item_amount
+        $('#item_price_total').val(total_price)
+    })
+
+    $('#item_list').on('click', 'tbody tr', function (event) {
+        //if (!$('#multiple_order_selection').is(":checked")) {
+        $('.item_row').removeClass('highlight')
+        //}
+        if ($(this).hasClass('highlight')) {
+            $(this).removeClass('highlight')
+        } else {
+            $(this).addClass('highlight')
+            const index = $(this).attr('id').replace(/[^0-9]/g, '')
+            item_current_id = index
+        }
+    })
+    
+    $('#create_order').click(() => {
+        fill_order_object()
+        $.ajax({
+            type: "POST",
+            contentType: 'application/json',
+            url: "/order/api/orders",
+            data: JSON.stringify(order_this),
+            success: function (data, textStatus, jQxhr) {
+                alert("Objednávka byla pridana")
+            },
+            error: function (data, status) {
+                alert("Objednávka nebyla pridana");
+            }
+        });
+    })
+</script>
+
+{% end %}

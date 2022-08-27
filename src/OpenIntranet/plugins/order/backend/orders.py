@@ -2,8 +2,12 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime, timedelta
+from pydoc import describe
+from re import I
+from typing import Dict, List
 
 import bson.json_util
+from pytz import AmbiguousTimeError
 import tornado
 import tornado.options
 from bson import ObjectId
@@ -33,9 +37,22 @@ users-sudo - Admin
 ROLE_SUDO = "users-sudo"
 ROLE_ACCOUNTANT = "order-view, order-manager"
 
+class NewOrderFormHandler(BaseHandler):
+    def get(self):
+        self.render(
+            "../plugins/order/frontend/orders.new.hbs",
+        )
+
+class ModificationOrderFormHandler(BaseHandler):
+    def get(self, id):
+        self.write("not yet prepared. Id of order (your request): "+id)
+        order: dict = self.mdb.ordcer.find_one({'_id': ObjectId(id)})
+
 
 class HomeHandler(BaseHandler):
     def get(self):
-        
-        self.render("../plugins/order/frontend/orders.overview.hbs")
-        self.write("OK :) ... tak ted jeste tu sablonu")
+        orders = self.mdb.order.find()
+        self.render(
+            "../plugins/order/frontend/orders.overview.hbs",
+            orders=orders
+        )
