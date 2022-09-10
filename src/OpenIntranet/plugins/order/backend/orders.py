@@ -37,16 +37,30 @@ users-sudo - Admin
 ROLE_SUDO = "users-sudo"
 ROLE_ACCOUNTANT = "order-view, order-manager"
 
+
 class NewOrderFormHandler(BaseHandler):
     def get(self):
+        title = "Vytváříte novou objednávku"
         self.render(
-            "../plugins/order/frontend/orders.new.hbs",
+            "../plugins/order/frontend/orders.view.hbs",
+            order=None,
+            view_title=title
         )
+
 
 class ModificationOrderFormHandler(BaseHandler):
     def get(self, id):
-        self.write("not yet prepared. Id of order (your request): "+id)
-        order: dict = self.mdb.ordcer.find_one({'_id': ObjectId(id)})
+        order: dict = self.mdb.order.find_one({'_id': ObjectId(id)})
+        title = "Upravujete objednávku '{}'".format(order["name"])
+        if order is None:
+            print("None")
+        else:
+            print(order)
+        self.render(
+            "../plugins/order/frontend/orders.view.hbs",
+            order=order,
+            view_title=title
+        )
 
 
 class HomeHandler(BaseHandler):

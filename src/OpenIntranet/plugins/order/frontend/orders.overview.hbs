@@ -3,7 +3,6 @@
 {% block body %}
 
 
-
 <style type="text/css">
   .product_list_element {
     margin: 0pt;
@@ -65,7 +64,6 @@
           <caption>Přehled zakázek</caption>
           <thead>
             <tr>
-              <th class="order_param">Drop</th>
               <th class="order_param">Id</th>
               <th class="order_param">Jméno</th>
               <th class="order_param">Popis</th>
@@ -79,12 +77,6 @@
           <tbody class="table-group-divider">
             {% for order in list(orders) %}
             <tr class="order_row">
-              <td class="order_param">
-                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#collapse{{ order["_id"] }}" aria-expanded="false" aria-controls="collapse{{ order["_id"] }}">
-                  >
-                </button>
-              </td>
               <td class="order_id">{{ order["_id"] }}</td>
               <td class="order_name">{{ order["name"] }}</td>
               <td class="order_description">{{ order["description"] }}</td>
@@ -109,6 +101,7 @@
 
 
         <a class="btn btn-success" href="/order/view/new" role="button">Nová</a>
+        <button id="change_order" type="button" class="btn btn-success" disabled>Změnit objednávku</button>
         <button type="button" class="btn btn-primary">Generovat PDF ...</button>
         <button id="delete_order" type="button" class="btn btn-outline-danger">Odstranit</button>
         <button id="select_orders" type="button" class="btn btn-light">Vybrat vše</button>
@@ -129,22 +122,33 @@
 <script type="text/javascript">
   $('#select_orders').click(() => {
     $('.order_row').addClass('highlight')
+    $('#change_order').prop("disabled", false)
   })
 
   $('#deselect_orders').click(() => {
     $('.order_row').removeClass('highlight')
+    $('#change_order').prop("disabled", true)
   })
 
   $('#order_list').on('click', 'tbody tr', function (event) {
     if (!$('#multiple_order_selection').is(":checked")) {
       $('.order_row').removeClass('highlight')
+      $('#change_order').prop("disabled", true)
     }
     if ($(this).hasClass('highlight')) {
       $(this).removeClass('highlight')
+      $('#change_order').prop("disabled", true)
     } else {
       $(this).addClass('highlight')
+      // enable order change button
+      $('#change_order').prop("disabled", false)
     }
   })
+
+$('#change_order').click(() => {
+  const order_id = $('.highlight > .order_id').text()
+  window.location.href='/order/view/'+order_id
+})
 
 $('#delete_order').click(() => {
     // post document (order)

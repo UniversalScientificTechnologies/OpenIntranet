@@ -60,7 +60,7 @@
 <div>
     <div class="container">
         <div class="row container">
-            <p class="fs-1">Nová objednávka</p>
+            <p id="subpage-title" class="fs-1">{{ view_title }}</p>
         </div>
         <div class="row">
             <div class="col">
@@ -85,7 +85,7 @@
                         </div>
                         <label for="order_price_to_pay" class="col-sm-2 col-form-label">Zbývá zaplatit</label>
                         <div class="col-sm-10 row">
-                            <input type="text" class="form-control" id="order_price_to_pay" disabled>
+                            <input type="text" class="form-control" id="order_price_to_pay">
                         </div>
                         <p class="fs-2">Zákazník</p>
                         <label for="customer_name" class="col-sm-2 col-form-label">Jméno</label>
@@ -149,9 +149,9 @@
                             <input type="text" class="form-control" id="item_price_total" value="0" disabled>
                         </div>
                         <div class="container">
-                            <button id="add_item" type="button" class="btn btn-success">Přidat</button>
-                            <button type="button" class="btn btn-primary disabled">Změnit</button>
-                            <button id="delete_item" type="button" class="btn btn-outline-danger">Smazat</button>
+                            <button id="add_item" type="button" class="btn btn-success">Přidat nový</button>
+                            <button id="modify_item" type="button" class="btn btn-primary" disabled>Změnit vybraný</button>
+                            <button id="delete_item" type="button" class="btn btn-outline-danger">Smazat vybraný</button>
                         </div>
                     </div>
 
@@ -176,11 +176,11 @@
                         <tbody class="table-group-divider">
                         </tbody>
                     </table>
-                    <button type="button" class="btn btn-outline-primary">Upravit</button>
                 </div>
 
                 <button id="generate_pdf" type="button" class="btn btn-primary">Generovat PDF ...</button>
-                <button id="create_order" type="button" class="btn btn-success">Vytvořit objednávku</button>
+                <button id="modify_order" type="button" class="btn btn-success">Upravit objednávku</button>
+                <button id="create_order" type="button" class="btn btn-outline-success">Vytvořit novou objednávku</button>
             </div>
         </div>
     </div>
@@ -189,6 +189,7 @@
 
 <script type="text/javascript">
     // Objects 
+    let order_id
     let item_current_id = 0
     let items = []
     let order_this = {
@@ -203,15 +204,58 @@
         "date_of_creation": "",
         "items": items
     }
-    // Functions
 
-    function popup_alert(message, type) {
+    {% if order is None %}
+        $('#modify_order').hide()
+    {% elif order is not None %}
+        order_id = "{{ str(order["_id"]) }}"
+        {% for item in order["items"] %}
+            items.push({
+                "name": "{{ item["name"] }}",
+                "description": "{{ item["description"] }}",
+                "store_link": {{ str(item["store_link"]).lower() }},
+                "store_id": "{{ item["store_id"] }}",
+                "price_per_piece": parseFloat({{ item["price_per_piece"] }}),
+                "discount_percents": parseFloat({{ item["discount_percents"] }}),
+                "discount_Kc": parseFloat({{ item["discount_Kc"] }}),
+                "amount": parseFloat({{ item["amount"] }}),
+                "dph": parseFloat({{ item["dph"] }}),
+                "price_no_dph": parseFloat({{ item["price_no_dph"] }}),
+                "price_total": parseFloat({{ item["price_total"] }}),
+            })
+        {% end %}
+        order_this = {
+            "name": "{{ order["name"] }}",
+            "description": "{{ order["description"] }}",
+            "customer": {
+                "name": "{{ order["customer"]["name"] }}",
+                "other_info": "{{ order["customer"]["other_info"] }}"
+            },
+            "price_total": {{ order["price_total"] }},
+            "price_to_pay": {{ order["price_to_pay"] }},
+            "items": items,
+        }
+        refresh_itemstable()
+        refresh_order_params()
+    {% end %}
+
+    // Functions
+    function popup_alert(message, type='info') {
+        $('#alert_placeholder').empty()
         const html = `
-        <div class="alert alert-` + type + ` alert-dismissible" role="alert">` + message + `
+        <div class="alert alert-` + type + ` alert-dismissible fade show" role="alert">` + message + `
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             `
         $('#alert_placeholder').append(html)
+    }
+
+    function refresh_order_params() {
+        // TODO need to be implemented
+        $('#order_name').val(order_this.name)
+        $('#order_description').val(order_this.description)
+        $('#customer_name').val(order_this.customer.name)
+        $('#customer_description').val(order_this.customer.other_info)
     }
 
     function refresh_itemstable() {
@@ -257,6 +301,52 @@
         order_this.price_to_pay = price_total
     }
 
+    function load_item_to_form(item_idx=item_current_id) {
+        const item = items[item_idx]
+
+        $('#item_name').val(item.name)
+        $('#item_description').val(item.description)
+        // TODO story link T/F
+        $('#item_store_id').val(item.store_id)
+        $('#item_price_piece').val(item.price_per_piece)
+        // TODO discount
+        $('#item_amount').val(item.amount)
+        // TODO dph switch
+        $('#item_price_total').val(item.price_total)
+        $('#modify_item').prop('disabled', false)
+        popup_alert("Načtena položka '"+item.name+"'", 'info')
+    }
+
+    function get_item_from_form() {
+        let discount_Kc = 0
+        let discount_percents = 0
+        switch ($('#discount_option option:selected').text()) {
+            case '%':
+                discount_percents = $('#item_discount').val()
+                break
+            case 'Kč':
+                discount_Kc = $('#item_discount').val()
+                break
+            default:
+                alert('unknown unit at discount')
+                break
+        }
+        const item = {
+            "name": $('#item_name').val(),
+            "description": $('#item_description').val(),
+            "store_link": false,
+            "store_id": $('#item_store_id').val(),
+            "price_per_piece": parseFloat($('#item_price_piece').val()),
+            "discount_percents": discount_percents,
+            "discount_Kc": discount_Kc,
+            "amount": parseFloat($('#item_amount').val()),
+            "dph": parseFloat($('#dph_form option:selected').val()),
+            "price_no_dph": parseFloat($('#item_price_total').val() * (1 - $('#dph_form option:selected').val() / 100)),
+            "price_total": parseFloat($('#item_price_total').val()),
+        }
+        return item
+    }
+
     // Events
     $('#add_item').click(() => {
         let discount_Kc = 0
@@ -296,6 +386,13 @@
         items.splice(item_current_id, 1)
         refresh_itemstable()
         popup_alert('Item "' + name + '" of price ' + price_total + ' Kc deleted', 'danger')
+    })
+
+    $('#modify_item').click(() => {
+        const item = get_item_from_form()
+        items[item_current_id] = item
+        refresh_itemstable()
+        popup_alert('Položka změněna.', 'success')
     })
 
     // place units at right of input group (styling)
@@ -341,6 +438,7 @@
             $(this).addClass('highlight')
             const index = $(this).attr('id').replace(/[^0-9]/g, '')
             item_current_id = index
+            load_item_to_form()
         }
     })
     
@@ -356,6 +454,23 @@
             },
             error: function (data, status) {
                 alert("Objednávka nebyla pridana");
+            }
+        });
+    })
+
+    $('#modify_order').click(() => {
+        fill_order_object()
+        order_this["_id"] = order_id
+        $.ajax({
+            type: "PUT",
+            contentType: 'application/json',
+            url: "/order/api/orders",
+            data: JSON.stringify(order_this),
+            success: function (data, textStatus, jQxhr) {
+                alert("Objednávka byla zmenena")
+            },
+            error: function (data, status) {
+                alert("Objednávka nebyla zmenena");
             }
         });
     })

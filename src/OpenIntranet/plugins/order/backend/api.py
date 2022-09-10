@@ -31,16 +31,38 @@ from plugins.users.backend.helpers.api import ApiJSONEncoder
 
 class GeneralOrderHandler(BaseHandler):
     def delete(self, id):
-        self.mdb.order.delete_one({'_id': ObjectId(id)})
+        try:
+            self.mdb.order.delete_one({'_id': ObjectId(id)})
+            print('order deleted')
+        except e as Exeption:
+            pass
         # TODO propper responses, auth
-        print('order deleted')
+
 
     def get(self, id):
-        order = self.mdb.ordcer.find_one({'_id': ObjectId(id)})
+        try:
+            order = self.mdb.ordcer.find_one({'_id': ObjectId(id)})
+        except e as Exception:
+            # TODO proper response
+            return
+        if order is None:
+            # TODO proper response
+            return
         order.update({'_id': str(order['_id'])})
         order.update({'date_of_creation': str(order['date_of_creation'])})
         print("got id", order)
         self.write(json.dumps(order))
+
+    def put(self):
+        print("putting order")
+        print("order:")
+        order = json.loads(self.request.body)
+        id = order.pop("_id")
+        print(order)
+        self.mdb.order.update_one(
+            {'_id': ObjectId(id)},
+            {'$set': order },
+        )
 
     def post(self):
         req_body: dict
