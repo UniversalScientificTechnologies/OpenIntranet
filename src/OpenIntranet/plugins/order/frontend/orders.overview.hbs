@@ -77,14 +77,14 @@
           <tbody class="table-group-divider">
             {% for order in list(orders) %}
             <tr class="order_row">
-              <td class="order_id">{{ order["_id"] }}</td>
-              <td class="order_name">{{ order["name"] }}</td>
-              <td class="order_description">{{ order["description"] }}</td>
-              <td class="order_customer">{{ order["customer"]["name"] }}</td>
-              <td class="order_date_of_creation">{{ order["date_of_creation"].date() }}</td>
+              <td class="order_id">{{ order.get("_id", "not found") }}</td>
+              <td class="order_name">{{ order.get("name", "not found") }}</td>
+              <td class="order_description">{{ order.get("description", "not found") }}</td>
+              <td class="order_customer">{{ order["customer"].get("name", "not found") }}</td>
+              <td class="order_date_of_creation">{{ order.get("date_of_creation", 0).date() }}</td>
               <td class="order_status">not defined yet</td>
-              <td class="order_price_total">{{ order["price_total"] }}</td>
-              <td class="order_price_to_pay">{{ order["price_to_pay"] }}</td>
+              <td class="order_price_total">{{ order.get("price_total", "not found") }}</td>
+              <td class="order_price_to_pay">{{ order.get("price_to_pay", "not found") }}</td>
             </tr>
             <tr>
               <div class="collapse" id="collapse{{ order["_id"] }}">

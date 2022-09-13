@@ -208,31 +208,31 @@
     {% if order is None %}
         $('#modify_order').hide()
     {% elif order is not None %}
-        order_id = "{{ str(order["_id"]) }}"
-        {% for item in order["items"] %}
+        order_id = "{{ order.get_id_as_str() }}"
+        {% for item in order.get("items", []) %}
             items.push({
-                "name": "{{ item["name"] }}",
-                "description": "{{ item["description"] }}",
-                "store_link": {{ str(item["store_link"]).lower() }},
-                "store_id": "{{ item["store_id"] }}",
-                "price_per_piece": parseFloat({{ item["price_per_piece"] }}),
-                "discount_percents": parseFloat({{ item["discount_percents"] }}),
-                "discount_Kc": parseFloat({{ item["discount_Kc"] }}),
-                "amount": parseFloat({{ item["amount"] }}),
-                "dph": parseFloat({{ item["dph"] }}),
-                "price_no_dph": parseFloat({{ item["price_no_dph"] }}),
-                "price_total": parseFloat({{ item["price_total"] }}),
+                "name": "{{ item.get("name", "not found") }}",
+                "description": "{{ item,get("description", "not found") }}",
+                "store_link": {{ str(item.get("store_link")).lower() }},
+                "store_id": "{{ item.get("store_id") }}",
+                "price_per_piece": parseFloat({{ item.get("price_per_piece") }}),
+                "discount_percents": parseFloat({{ item.get("discount_percents") }}),
+                "discount_Kc": parseFloat({{ item.get("discount_Kc") }}),
+                "amount": parseFloat({{ item.get("amount") }}),
+                "dph": parseFloat({{ item.get("dph") }}),
+                "price_no_dph": parseFloat({{ item.get("price_no_dph") }}),
+                "price_total": parseFloat({{ item.get("price_total") }}),
             })
         {% end %}
         order_this = {
-            "name": "{{ order["name"] }}",
-            "description": "{{ order["description"] }}",
+            "name": "{{ order.get("name", "not found") }}",
+            "description": "{{ order("description", "not found") }}",
             "customer": {
                 "name": "{{ order["customer"]["name"] }}",
                 "other_info": "{{ order["customer"]["other_info"] }}"
             },
-            "price_total": {{ order["price_total"] }},
-            "price_to_pay": {{ order["price_to_pay"] }},
+            "price_total": {{ order.get("price_total", "not found") }},
+            "price_to_pay": {{ order.get("price_to_pay", "not found") }},
             "items": items,
         }
         refresh_itemstable()

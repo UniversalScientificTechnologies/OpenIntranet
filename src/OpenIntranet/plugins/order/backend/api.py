@@ -26,6 +26,7 @@ from plugins.helpers.exceptions import BadInputHTTPError, MissingInfoHTTPError, 
 from plugins.helpers.mdoc_ops import find_type_in_addresses, update_workspans_contract_id
 from plugins.helpers.owncloud_utils import get_file_url, generate_contracts_directory_path, \
     generate_documents_directory_path
+from plugins.order.backend.orders import Order
 from plugins.users.backend.helpers.api import ApiJSONEncoder
 
 
@@ -41,7 +42,9 @@ class GeneralOrderHandler(BaseHandler):
 
     def get(self, id):
         try:
-            order = self.mdb.ordcer.find_one({'_id': ObjectId(id)})
+            order: Order = Order(
+                self.mdb.ordcer.find_one({'_id': ObjectId(id)})
+            )
         except e as Exception:
             # TODO proper response
             return
@@ -56,74 +59,37 @@ class GeneralOrderHandler(BaseHandler):
     def put(self):
         print("putting order")
         print("order:")
-        order = json.loads(self.request.body)
-        id = order.pop("_id")
+        order: Order = Order( json.loads(self.request.body) )
+        try:
+            order.validate_id()
+        except KeyError:
+            # TODO order can be putted cause id not found: response
+            return
+        except TypeError:
+            try:
+                order.set_id( order.get_id_as_str() )
+            except TypeError:
+                # TODO order has invalid id: response
+                return
+
+        if not order.validate():
+            # TODO responce invalid order given
+            return
         print(order)
         self.mdb.order.update_one(
-            {'_id': ObjectId(id)},
+            {'_id': order.pop("_id")},
             {'$set': order },
         )
 
+
     def post(self):
-        req_body: dict
         try:
-            req_body = json.loads(self.request.body)
+            order = Order(json.loads(self.request.body))
+            if order.validate():
+                self.mdb["order"].insert_one(order)
+                print("New Order inserted")
+                self.write("Ok")
         except Exception as e:
             print("Error:", e)
             # TODO http response
             return
-
-        name = req_body["name"]
-        description = req_body["description"]
-        customer = req_body["customer"]
-        customer_name = customer["name"]
-        customer_info = customer["other_info"]
-
-        items: list = []
-        price_total: float = 0
-        try:
-            requsted_items = req_body["items"]
-
-            for req_item in requsted_items:
-                # TODO check whether each param valid (price > 0, etc)
-                item_to_insert = {
-                    "name": req_item["name"],
-                    "description": req_item["description"],
-                    "store_link": req_item["store_link"],
-                    "store_id": req_item["store_id"],
-                    "price_per_piece": req_item["price_per_piece"],
-                    "discount_percents": req_item["discount_percents"],
-                    "discount_Kc": req_item["discount_Kc"],
-                    "amount": req_item["amount"],
-                    "dph": req_item["dph"],
-                    "price_no_dph": req_item["price_no_dph"],
-                    "price_total": req_item["price_total"],
-                }
-                items.append(item_to_insert)
-                price_total += float(item_to_insert["price_total"])
-        except Exception as e:
-            print(e)
-            # empty order
-            # TODO ask if allow empty order..?
-            items = []
-
-        new_order = {
-            "name": name,
-            "description": description,
-            "customer": {
-                "name": customer_name,
-                "other_info": customer_info
-            },
-            "price_total": price_total,
-            "price_to_pay": price_total,
-            "date_of_creation": datetime.utcnow(),
-            "items": items
-        }
-
-        try:
-            self.mdb["order"].insert_one(new_order)
-            print("New Order inserted")
-            self.write("Ok")
-        except Exception as e:
-            print("Exception when inserting new order:")
-            print(e)

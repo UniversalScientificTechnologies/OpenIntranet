@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from pydoc import describe
 from re import I
 from typing import Dict, List
+from attr import validate
 
 import bson.json_util
 from pytz import AmbiguousTimeError
@@ -38,6 +39,65 @@ ROLE_SUDO = "users-sudo"
 ROLE_ACCOUNTANT = "order-view, order-manager"
 
 
+class Order(dict):
+    """Order dict can be converted to Order type for convinient methods"""
+
+    def is_valid(self):
+        try:
+            self.validate()
+            return True
+        except:
+            return False
+
+    def validate(self, id_incluaded:bool=False, date_included:bool=False):
+        """
+        Raises exeption when order invalid.
+        id_icluded: check presence of id
+        Whether correct parameters and data values are valid:
+        - name
+        - description
+        - customer (name, other_info)
+        - items: list (for each item)
+        - prices (price_total, price_to_pay)
+        """
+        if id_incluaded:
+            self.__validate_key_general("_id", ObjectId)
+        self.__validate_key_general("name", str)
+        self.__validate_key_general("description", str)
+        self.__validate_key_general("customer", dict)
+        self.__validate_key_general("items", list)
+        self.__validate_key_general("price_total", float)
+        self.__validate_key_general("price_to_pay", float)
+        
+        # TODO validate keys:vals more specificaly (price > 0 etc)
+       
+
+    def set_id(self, id):
+        if isinstance(id, str):
+            self.update({'_id': ObjectId(id)})
+        elif isinstance(id, ObjectId):
+            self.update({'_id': id})
+        else:
+            raise TypeError('Invalid id type given (str of ObjectId required)')
+
+
+    def get_id_as_str(self, default_ret=None):
+        """gets id as str, when not found returns default_ret (None is default)"""
+        id = self.get('_id')
+        if id is not None and (isinstance(id, ObjectId) or isinstance(id, str)):
+            return str(id)
+        return default_ret
+
+
+    def __validate_key_general(self, keyname: str, type):
+        """keyname in dict and has given type; raise propper exception if not"""
+        value = self.get(keyname)
+        if value is None:
+            raise KeyError(f"key {keyname} not present in order")
+        if not isinstance(value, str):
+            raise TypeError(f"Order {keyname} is not {str(type)} type")
+
+
 class NewOrderFormHandler(BaseHandler):
     def get(self):
         title = "Vytváříte novou objednávku"
@@ -50,7 +110,9 @@ class NewOrderFormHandler(BaseHandler):
 
 class ModificationOrderFormHandler(BaseHandler):
     def get(self, id):
-        order: dict = self.mdb.order.find_one({'_id': ObjectId(id)})
+        order: Order = Order(
+            self.mdb.order.find_one({'_id': ObjectId(id)})
+        )
         title = "Upravujete objednávku '{}'".format(order["name"])
         if order is None:
             print("None")
@@ -70,3 +132,4 @@ class HomeHandler(BaseHandler):
             "../plugins/order/frontend/orders.overview.hbs",
             orders=orders
         )
+        # test_simple_order()
