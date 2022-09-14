@@ -60,9 +60,9 @@
   <div class="container">
     <div class="row">
       <div class="col">
-        <table id="order_list" class="table caption-top">
+        <table id="orders_table" class="table caption-top">
           <caption>Přehled zakázek</caption>
-          <thead>
+          <thead id="orders_table_head">
             <tr>
               <th class="order_param">Id</th>
               <th class="order_param">Jméno</th>
@@ -74,31 +74,10 @@
               <th class="order_param">Zbývá zaplatit</th>
             </tr>
           </thead>
-          <tbody class="table-group-divider">
-            {% for order in list(orders) %}
-            <tr class="order_row">
-              <td class="order_id">{{ order.get("_id", "not found") }}</td>
-              <td class="order_name">{{ order.get("name", "not found") }}</td>
-              <td class="order_description">{{ order.get("description", "not found") }}</td>
-              <td class="order_customer">{{ order["customer"].get("name", "not found") }}</td>
-              <td class="order_date_of_creation">{{ order.get("date_of_creation", 0).date() }}</td>
-              <td class="order_status">not defined yet</td>
-              <td class="order_price_total">{{ order.get("price_total", "not found") }}</td>
-              <td class="order_price_to_pay">{{ order.get("price_to_pay", "not found") }}</td>
-            </tr>
-            <tr>
-              <div class="collapse" id="collapse{{ order["_id"] }}">
-                <div class="card card-body">
-                  Some placeholder content for the collapse component. This panel is hidden by default but revealed when
-                  the user
-                  activates the relevant trigger.
-                </div>
-              </div>
-            </tr>
-            {% end %}
-          </tbody>
+          <tbody id="orders_table_body" class="table-group-divider"> </tbody>
         </table>
 
+        <button id="test" type="button" class="btn btn-danger">test</button>
 
         <a class="btn btn-success" href="/order/view/new" role="button">Nová</a>
         <button id="change_order" type="button" class="btn btn-success" disabled>Změnit objednávku</button>
@@ -113,24 +92,69 @@
         </div>
 
         <button type="button" class="btn btn-success">Upravit</button>
-
       </div>
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
-  $('#select_orders').click(function() {
+  let orders = []
+
+  $('#test').click(function () {
+    reload_orders_list()
+  })
+
+  function reload_orders_list() {
+    $.ajax({
+      url: "/order/api/orders",
+      type: "GET",
+      dataType: "json",
+      success: function (data, status) {
+        orders = data
+        display_orders()
+      },
+      error: function (data, status) {
+        alert("not getted")
+      }
+    })
+  }
+
+  function display_orders() {
+    const empty_val = "not_found"
+    let html = ""
+    orders.forEach((order) => {
+      let date
+      try {
+        let date = new Date(order["date_of_creation"]["$date"])
+        date = date.toLocaleDateString()
+      } catch(error) {
+        date = empty_val
+      }
+      html += `<tr class="order_row">
+        <td class="order_id">`+ order["_id"]["$oid"] + `</td>
+        <td class="order_name">`+ order["name"] + `</td>
+        <td class="order_description">`+ order["description"] + `</td>
+        <td class="order_customer">`+ order["customer"]["name"] + `</td>
+        <td class="order_date_of_creation">`+ date + `</td>
+        <td class="order_status">not defined yet</td>
+        <td class="order_price_total">`+ order["price_total"] + `</td>
+        <td class="order_price_to_pay">`+ order["price_to_pay"] + `</td>
+      </tr>`
+    })
+    $('#orders_table_body').html(html)
+  }
+
+  $('#select_orders').click(function () {
     $('.order_row').addClass('highlight')
     $('#change_order').prop("disabled", false)
   })
 
-  $('#deselect_orders').click(function() {
+  $('#deselect_orders').click(function () {
     $('.order_row').removeClass('highlight')
     $('#change_order').prop("disabled", true)
   })
 
-  $('#order_list').on('click', 'tbody tr', function (event) {
+  $('#orders_table').on('click', 'tbody tr', function (event) {
     if (!$('#multiple_order_selection').is(":checked")) {
       $('.order_row').removeClass('highlight')
       $('#change_order').prop("disabled", true)
@@ -145,16 +169,16 @@
     }
   })
 
-$('#change_order').click(function() {
-  const order_id = $('.highlight > .order_id').text()
-  window.location.href='/order/view/'+order_id
-})
+  $('#change_order').click(function () {
+    const order_id = $('.highlight > .order_id').text()
+    window.location.href = '/order/view/' + order_id
+  })
 
-$('#delete_order').click(function() {
+  $('#delete_order').click(function () {
     // post document (order)
     const order_id = $('.highlight > .order_id').text()
     $.ajax({
-      url: "/order/api/orders/"+order_id,
+      url: "/order/api/orders/" + order_id,
       type: "DELETE",
       success: function (data, textStatus, jQxhr) {
         alert("Polozka byla odstranena")
@@ -164,7 +188,7 @@ $('#delete_order').click(function() {
       }
     });
   })
-
+  reload_orders_list()
 </script>
 
 {% end %}

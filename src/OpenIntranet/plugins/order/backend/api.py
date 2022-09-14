@@ -5,17 +5,18 @@ from datetime import datetime, timedelta
 from pydoc import describe
 from re import I
 from typing import Dict, List
+from urllib import response
 
 import bson.json_util
 from bson.objectid import ObjectId
 from pytz import AmbiguousTimeError
 import tornado
 import tornado.options
-from bson import ObjectId
+from bson import ObjectId, is_valid
 from dateutil.relativedelta import relativedelta
 from tornado.web import HTTPError
 
-from plugins import BaseHandler, password_hash
+from plugins import BaseHandler, order, password_hash
 from plugins import BaseHandlerOwnCloud
 from plugins.helpers import database_user as udb
 from plugins.helpers import str_ops
@@ -31,65 +32,61 @@ from plugins.users.backend.helpers.api import ApiJSONEncoder
 
 
 class GeneralOrderHandler(BaseHandler):
+    def delete(self):
+        pass
+        # TODO 
+        # delete all orders
+        # propper response
+
+    def get(self):
+        orders = list(self.mdb.order.find({}))
+        if orders is None:
+            print("orders are empty")
+        self.write(bson.json_util.dumps(orders))
+
+
+    def post(self):
+        # TODO
+        try:
+            order = Order(json.loads(self.request.body))
+            order.validate()
+            self.mdb.order.insert_one(order)
+            print("New Order inserted")
+        except Exception as e:
+            # 400 invalid data in request
+            self.send_error(400)
+            print("Error:", e)
+
+
+
+class SingleOrderHandler(BaseHandler):
     def delete(self, id):
         try:
             self.mdb.order.delete_one({'_id': ObjectId(id)})
             print('order deleted')
-        except e as Exeption:
+        except Exception as e:
             pass
         # TODO propper responses, auth
 
 
     def get(self, id):
-        try:
-            order: Order = Order(
-                self.mdb.ordcer.find_one({'_id': ObjectId(id)})
-            )
-        except e as Exception:
-            # TODO proper response
-            return
+        order = self.mdb.order.find_one({'_id': ObjectId(id)})
         if order is None:
-            # TODO proper response
-            return
-        order.update({'_id': str(order['_id'])})
-        order.update({'date_of_creation': str(order['date_of_creation'])})
-        print("got id", order)
-        self.write(json.dumps(order))
+            print(f"order with id {id} not found")
+            self.send_error(404)
+        else:
+            order = Order(order)
+            self.write(bson.json_util.dumps(order))
 
-    def put(self):
-        print("putting order")
-        print("order:")
+
+    def put(self, id):
         order: Order = Order( json.loads(self.request.body) )
-        try:
-            order.validate_id()
-        except KeyError:
-            # TODO order can be putted cause id not found: response
-            return
-        except TypeError:
-            try:
-                order.set_id( order.get_id_as_str() )
-            except TypeError:
-                # TODO order has invalid id: response
-                return
-
-        if not order.validate():
-            # TODO responce invalid order given
-            return
-        print(order)
-        self.mdb.order.update_one(
-            {'_id': order.pop("_id")},
-            {'$set': order },
-        )
-
-
-    def post(self):
-        try:
-            order = Order(json.loads(self.request.body))
-            if order.validate():
-                self.mdb["order"].insert_one(order)
-                print("New Order inserted")
-                self.write("Ok")
-        except Exception as e:
-            print("Error:", e)
-            # TODO http response
-            return
+        if order.is_valid():
+            order.remove_id()
+            self.mdb.order.update_one(
+                {"_id": ObjectId(id)},
+                {'$set': order },
+            )
+            print("Order PUT completed")
+        else:
+            print("invalid order")

@@ -80,6 +80,14 @@ class Order(dict):
         else:
             raise TypeError('Invalid id type given (str of ObjectId required)')
 
+    
+    def remove_id(self):
+        """remove _id if any"""
+        try:
+            self.pop('_id')
+        except KeyError:
+            pass # Id was not set
+
 
     def get_id_as_str(self, default_ret=None):
         """gets id as str, when not found returns default_ret (None is default)"""
@@ -89,13 +97,13 @@ class Order(dict):
         return default_ret
 
 
-    def __validate_key_general(self, keyname: str, type):
+    def __validate_key_general(self, keyname: str, expected_type):
         """keyname in dict and has given type; raise propper exception if not"""
         value = self.get(keyname)
         if value is None:
             raise KeyError(f"key {keyname} not present in order")
-        if not isinstance(value, str):
-            raise TypeError(f"Order {keyname} is not {str(type)} type")
+        if not isinstance(value, expected_type):
+            raise TypeError(f"Order {keyname} is not {str(expected_type)} type. Type given: {str(type(value))}")
 
 
 class NewOrderFormHandler(BaseHandler):

@@ -10,7 +10,7 @@ def get_plugin_handlers():
         (r'/{}/view/new'.format(order_base_name), orders.NewOrderFormHandler),
         (r'/{}/view/([^/]+)?'.format(order_base_name), orders.ModificationOrderFormHandler),
         (r'/{}/api/orders'.format(order_base_name), api.GeneralOrderHandler),
-        (r'/{}/api/orders/([^/]+)?'.format(order_base_name), api.GeneralOrderHandler),
+        (r'/{}/api/orders/([^/]+)?'.format(order_base_name), api.SingleOrderHandler),
     ]
 
 

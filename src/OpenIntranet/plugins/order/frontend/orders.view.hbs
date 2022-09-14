@@ -460,11 +460,10 @@
 
     $('#modify_order').click(function() {
         fill_order_object()
-        order_this["_id"] = order_id
         $.ajax({
             type: "PUT",
             contentType: 'application/json',
-            url: "/order/api/orders",
+            url: "/order/api/orders/"+order_id,
             data: JSON.stringify(order_this),
             success: function (data, textStatus, jQxhr) {
                 alert("Objednávka byla zmenena")
