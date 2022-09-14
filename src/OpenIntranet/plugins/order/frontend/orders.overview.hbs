@@ -77,8 +77,6 @@
           <tbody id="orders_table_body" class="table-group-divider"> </tbody>
         </table>
 
-        <button id="test" type="button" class="btn btn-danger">test</button>
-
         <a class="btn btn-success" href="/order/view/new" role="button">Nová</a>
         <button id="change_order" type="button" class="btn btn-success" disabled>Změnit objednávku</button>
         <button type="button" class="btn btn-primary">Generovat PDF ...</button>
@@ -99,10 +97,6 @@
 
 <script type="text/javascript">
   let orders = []
-
-  $('#test').click(function () {
-    reload_orders_list()
-  })
 
   function reload_orders_list() {
     $.ajax({

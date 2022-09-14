@@ -46,7 +46,7 @@ class GeneralOrderHandler(BaseHandler):
 
 
     def post(self):
-        # TODO
+        """Creates new order"""
         try:
             order = Order(json.loads(self.request.body))
             order.validate()
