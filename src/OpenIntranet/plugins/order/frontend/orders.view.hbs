@@ -212,7 +212,7 @@
         {% for item in order.get("items", []) %}
             items.push({
                 "name": "{{ item.get("name", "not found") }}",
-                "description": "{{ item,get("description", "not found") }}",
+                "description": "{{ item.get("description", "not found") }}",
                 "store_link": {{ str(item.get("store_link")).lower() }},
                 "store_id": "{{ item.get("store_id") }}",
                 "price_per_piece": parseFloat({{ item.get("price_per_piece") }}),
@@ -226,7 +226,7 @@
         {% end %}
         order_this = {
             "name": "{{ order.get("name", "not found") }}",
-            "description": "{{ order("description", "not found") }}",
+            "description": "{{ order.get("description", "not found") }}",
             "customer": {
                 "name": "{{ order["customer"]["name"] }}",
                 "other_info": "{{ order["customer"]["other_info"] }}"
@@ -348,7 +348,7 @@
     }
 
     // Events
-    $('#add_item').click(() => {
+    $('#add_item').click(function() {
         let discount_Kc = 0
         let discount_percents = 0
         switch ($('#discount_option option:selected').text()) {
@@ -380,7 +380,7 @@
         popup_alert('Položka "' + item.name + '"" ceny ' + item.price_total + ' Kč přidána na seznam!', 'success')
     })
 
-    $('#delete_item').click(() => {
+    $('#delete_item').click(function() {
         const name = items[item_current_id].name
         const price_total = items[item_current_id].price_total
         items.splice(item_current_id, 1)
@@ -388,7 +388,7 @@
         popup_alert('Item "' + name + '" of price ' + price_total + ' Kc deleted', 'danger')
     })
 
-    $('#modify_item').click(() => {
+    $('#modify_item').click(function() {
         const item = get_item_from_form()
         items[item_current_id] = item
         refresh_itemstable()
@@ -396,7 +396,7 @@
     })
 
     // place units at right of input group (styling)
-    $('option.discount_option').on('click', () => {
+    $('option.discount_option').on('click', function() {
         $('#discount_units').text($('#discount_option option:selected').text())
     })
 
@@ -404,7 +404,7 @@
         this.value = this.value.replace(/[^0-9\.,]/g, '').replace(/[\.,]{2}/g, '.')
     })
 
-    $('#item_price_piece, #item_amount, #dph_form, #discount_option, #item_discount').on('input', () => {
+    $('#item_price_piece, #item_amount, #dph_form, #discount_option, #item_discount').on('input', function() {
         // TODO validate input
         const item_piece = $('#item_price_piece').val()
         const item_amount = $('#item_amount').val()
@@ -442,7 +442,7 @@
         }
     })
     
-    $('#create_order').click(() => {
+    $('#create_order').click(function() {
         fill_order_object()
         $.ajax({
             type: "POST",
@@ -458,7 +458,7 @@
         });
     })
 
-    $('#modify_order').click(() => {
+    $('#modify_order').click(function() {
         fill_order_object()
         order_this["_id"] = order_id
         $.ajax({

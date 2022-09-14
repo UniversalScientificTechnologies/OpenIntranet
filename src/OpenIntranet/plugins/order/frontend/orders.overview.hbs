@@ -120,12 +120,12 @@
 </div>
 
 <script type="text/javascript">
-  $('#select_orders').click(() => {
+  $('#select_orders').click(function() {
     $('.order_row').addClass('highlight')
     $('#change_order').prop("disabled", false)
   })
 
-  $('#deselect_orders').click(() => {
+  $('#deselect_orders').click(function() {
     $('.order_row').removeClass('highlight')
     $('#change_order').prop("disabled", true)
   })
@@ -145,12 +145,12 @@
     }
   })
 
-$('#change_order').click(() => {
+$('#change_order').click(function() {
   const order_id = $('.highlight > .order_id').text()
   window.location.href='/order/view/'+order_id
 })
 
-$('#delete_order').click(() => {
+$('#delete_order').click(function() {
     // post document (order)
     const order_id = $('.highlight > .order_id').text()
     $.ajax({
