@@ -32,6 +32,7 @@ from plugins.users.backend.helpers.api import ApiJSONEncoder
 
 
 class GeneralOrderHandler(BaseHandler):
+    """handles requests at path ../api/orders"""
     def delete(self):
         pass
         # TODO 
@@ -49,7 +50,10 @@ class GeneralOrderHandler(BaseHandler):
         """Creates new order"""
         try:
             order = Order(json.loads(self.request.body))
-            order.validate()
+            order_date = order.get("date_of_creation")
+            print(type(order_date))
+            print(order_date)
+            
             self.mdb.order.insert_one(order)
             print("New Order inserted")
         except Exception as e:
@@ -60,6 +64,7 @@ class GeneralOrderHandler(BaseHandler):
 
 
 class SingleOrderHandler(BaseHandler):
+    """handles requests at path ../api/orders/<uid>"""
     def delete(self, id):
         try:
             self.mdb.order.delete_one({'_id': ObjectId(id)})
@@ -75,18 +80,23 @@ class SingleOrderHandler(BaseHandler):
             print(f"order with id {id} not found")
             self.send_error(404)
         else:
-            order = Order(order)
-            self.write(bson.json_util.dumps(order))
-
+            try:
+                finite_order = Order(order)
+                self.write(bson.json_util.dumps(finite_order))
+            except Exception as e:
+                print("invalid record in database:", str(e))
+                self.write(bson.json_util.dumps(order))
+                
 
     def put(self, id):
-        order: Order = Order( json.loads(self.request.body) )
-        if order.is_valid():
+        try:
+            order: Order = Order( json.loads(self.request.body) )
             order.remove_id()
             self.mdb.order.update_one(
                 {"_id": ObjectId(id)},
                 {'$set': order },
             )
             print("Order PUT completed")
-        else:
-            print("invalid order")
+        except Exception as e:
+            self.send_error(404)
+            print("invalid order:", str(e))

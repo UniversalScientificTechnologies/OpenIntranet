@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timedelta
 from pydoc import describe
 from re import I
+import this
 from typing import Dict, List
 from attr import validate
 
@@ -41,6 +42,25 @@ ROLE_ACCOUNTANT = "order-view, order-manager"
 
 class Order(dict):
     """Order dict can be converted to Order type for convinient methods"""
+    def __init__(self, val):
+        def convert_date(date_to_convert: str, date_format="%Y-%m-%dT%H:%M:%S.%fZ") -> datetime:
+            """converts date from string (default js json date format) to datetime.datetime"""
+            try:
+                converted_data =  datetime.strptime(date_to_convert, date_format)
+                return convert_date
+            except ValueError:
+                raise
+
+        super().__init__(val)
+        
+        this_date = self.get("date_of_creation")
+        if isinstance(this_date, str):
+            try:
+                self.update({"date_of_creation": convert_date(this_date)})
+            except ValueError:
+                raise
+        self.validate()
+
 
     def is_valid(self):
         try:
@@ -64,12 +84,20 @@ class Order(dict):
             self.__validate_key_general("_id", ObjectId)
         self.__validate_key_general("name", str)
         self.__validate_key_general("description", str)
+        self.__validate_key_general("date_of_creation", datetime)
         self.__validate_key_general("customer", dict)
         self.__validate_key_general("items", list)
         self.__validate_key_general("price_total", float)
         self.__validate_key_general("price_to_pay", float)
         
         # TODO validate keys:vals more specificaly (price > 0 etc)
+        if self.get("price_total") < 0:
+            raise ValueError("invalid price_total: ", self.get("price_total"))
+        elif self.get("price_to_pay") < 0:
+            raise ValueError("invalid price_to_pay: ", self.get("price_to_pay"))
+
+        # for item in self.get("items"):
+
        
 
     def set_id(self, id):
@@ -82,7 +110,7 @@ class Order(dict):
 
     
     def remove_id(self):
-        """remove _id if any"""
+        """removes _id if any"""
         try:
             self.pop('_id')
         except KeyError:
@@ -118,14 +146,21 @@ class NewOrderFormHandler(BaseHandler):
 
 class ModificationOrderFormHandler(BaseHandler):
     def get(self, id):
-        order: Order = Order(
-            self.mdb.order.find_one({'_id': ObjectId(id)})
-        )
+        record = self.mdb.order.find_one({'_id': ObjectId(id)})
+        order: Order
+
+        if record is None:
+            # TODO render specific page with error message 
+            # or move db.get to frontend (ajax)
+            pass
+            
+        try:
+            order = Order(record)
+        except Exception as e:
+            order = record
+            print("invalid record in database:", str(e))
+
         title = "Upravujete objednávku '{}'".format(order["name"])
-        if order is None:
-            print("None")
-        else:
-            print(order)
         self.render(
             "../plugins/order/frontend/orders.view.hbs",
             order=order,

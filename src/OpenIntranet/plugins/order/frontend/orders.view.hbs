@@ -75,6 +75,12 @@
                         <div class="col-sm-10 row">
                             <input type="text" class="form-control" id="order_description">
                         </div>
+                        
+                        <label for="order_date_of_creation" class="col-sm-2 col-form-label">Datum vytvoření</label>
+                        <div class="col-sm-10 row">
+                            <input type="date" class="form-control" id="order_date_of_creation">
+                        </div>
+                 
                         <label for="order_price_total_no_dph" class="col-sm-2 col-form-label">Cena bez DPH</label>
                         <div class="col-sm-10 row">
                             <input type="text" class="form-control" id="order_price_total_no_dph" value="0" disabled>
@@ -150,8 +156,10 @@
                         </div>
                         <div class="container">
                             <button id="add_item" type="button" class="btn btn-success">Přidat nový</button>
-                            <button id="modify_item" type="button" class="btn btn-primary" disabled>Změnit vybraný</button>
-                            <button id="delete_item" type="button" class="btn btn-outline-danger">Smazat vybraný</button>
+                            <button id="modify_item" type="button" class="btn btn-primary" disabled>Změnit
+                                vybraný</button>
+                            <button id="delete_item" type="button" class="btn btn-outline-danger">Smazat
+                                vybraný</button>
                         </div>
                     </div>
 
@@ -180,7 +188,8 @@
 
                 <button id="generate_pdf" type="button" class="btn btn-primary">Generovat PDF ...</button>
                 <button id="modify_order" type="button" class="btn btn-success">Upravit objednávku</button>
-                <button id="create_order" type="button" class="btn btn-outline-success">Vytvořit novou objednávku</button>
+                <button id="create_order" type="button" class="btn btn-outline-success">Vytvořit novou
+                    objednávku</button>
             </div>
         </div>
     </div>
@@ -201,46 +210,46 @@
         },
         "price_total": 0.0,
         "price_to_pay": 0.0,
-        "date_of_creation": "",
+        "date_of_creation": new Date().toJSON(),
         "items": items
     }
 
     {% if order is None %}
-        $('#modify_order').hide()
+    $('#modify_order').hide()
     {% elif order is not None %}
-        order_id = "{{ order.get_id_as_str() }}"
-        {% for item in order.get("items", []) %}
-            items.push({
-                "name": "{{ item.get("name", "not found") }}",
-                "description": "{{ item.get("description", "not found") }}",
-                "store_link": {{ str(item.get("store_link")).lower() }},
-                "store_id": "{{ item.get("store_id") }}",
-                "price_per_piece": parseFloat({{ item.get("price_per_piece") }}),
-                "discount_percents": parseFloat({{ item.get("discount_percents") }}),
+    order_id = "{{ order.get_id_as_str() }}"
+    {% for item in order.get("items", []) %}
+    items.push({
+        "name": "{{ item.get("name", "not found") }}",
+        "description": "{{ item.get("description", "not found") }}",
+        "store_link": {{ str(item.get("store_link")).lower() }},
+    "store_id": "{{ item.get("store_id") }}",
+        "price_per_piece": parseFloat({{ item.get("price_per_piece") }}),
+            "discount_percents": parseFloat({{ item.get("discount_percents") }}),
                 "discount_Kc": parseFloat({{ item.get("discount_Kc") }}),
-                "amount": parseFloat({{ item.get("amount") }}),
-                "dph": parseFloat({{ item.get("dph") }}),
-                "price_no_dph": parseFloat({{ item.get("price_no_dph") }}),
-                "price_total": parseFloat({{ item.get("price_total") }}),
+                    "amount": parseFloat({{ item.get("amount") }}),
+                        "dph": parseFloat({{ item.get("dph") }}),
+                            "price_no_dph": parseFloat({{ item.get("price_no_dph") }}),
+                                "price_total": parseFloat({{ item.get("price_total") }}),
             })
-        {% end %}
-        order_this = {
-            "name": "{{ order.get("name", "not found") }}",
-            "description": "{{ order.get("description", "not found") }}",
-            "customer": {
-                "name": "{{ order["customer"]["name"] }}",
-                "other_info": "{{ order["customer"]["other_info"] }}"
+    {% end %}
+    order_this = {
+        "name": "{{ order.get("name", "not found") }}",
+        "description": "{{ order.get("description", "not found") }}",
+        "customer": {
+            "name": "{{ order["customer"]["name"] }}",
+            "other_info": "{{ order["customer"]["other_info"] }}"
             },
-            "price_total": {{ order.get("price_total", "not found") }},
-            "price_to_pay": {{ order.get("price_to_pay", "not found") }},
-            "items": items,
+        "price_total": {{ order.get("price_total", "not found") }},
+    "price_to_pay": {{ order.get("price_to_pay", "not found") }},
+    "items": items,
         }
-        refresh_itemstable()
-        refresh_order_params()
+    refresh_itemstable()
+    refresh_order_params()
     {% end %}
 
     // Functions
-    function popup_alert(message, type='info') {
+    function popup_alert(message, type = 'info') {
         $('#alert_placeholder').empty()
         const html = `
         <div class="alert alert-` + type + ` alert-dismissible fade show" role="alert">` + message + `
@@ -291,6 +300,7 @@
     function fill_order_object() {
         order_this.name = $('#order_name').val()
         order_this.description = $('#order_description').val()
+        order_this.date_of_creation = new Date($('#order_date_of_creation').val()).toJSON()
         order_this.customer.name = $('#customer_name').val()
         order_this.customer.description = $('#customer_description').val()
         let price_total = 0
@@ -301,7 +311,7 @@
         order_this.price_to_pay = price_total
     }
 
-    function load_item_to_form(item_idx=item_current_id) {
+    function load_item_to_form(item_idx = item_current_id) {
         const item = items[item_idx]
 
         $('#item_name').val(item.name)
@@ -314,7 +324,7 @@
         // TODO dph switch
         $('#item_price_total').val(item.price_total)
         $('#modify_item').prop('disabled', false)
-        popup_alert("Načtena položka '"+item.name+"'", 'info')
+        popup_alert("Načtena položka '" + item.name + "'", 'info')
     }
 
     function get_item_from_form() {
@@ -348,7 +358,7 @@
     }
 
     // Events
-    $('#add_item').click(function() {
+    $('#add_item').click(function () {
         let discount_Kc = 0
         let discount_percents = 0
         switch ($('#discount_option option:selected').text()) {
@@ -380,7 +390,7 @@
         popup_alert('Položka "' + item.name + '"" ceny ' + item.price_total + ' Kč přidána na seznam!', 'success')
     })
 
-    $('#delete_item').click(function() {
+    $('#delete_item').click(function () {
         const name = items[item_current_id].name
         const price_total = items[item_current_id].price_total
         items.splice(item_current_id, 1)
@@ -388,7 +398,7 @@
         popup_alert('Item "' + name + '" of price ' + price_total + ' Kc deleted', 'danger')
     })
 
-    $('#modify_item').click(function() {
+    $('#modify_item').click(function () {
         const item = get_item_from_form()
         items[item_current_id] = item
         refresh_itemstable()
@@ -396,7 +406,7 @@
     })
 
     // place units at right of input group (styling)
-    $('option.discount_option').on('click', function() {
+    $('option.discount_option').on('click', function () {
         $('#discount_units').text($('#discount_option option:selected').text())
     })
 
@@ -404,7 +414,7 @@
         this.value = this.value.replace(/[^0-9\.,]/g, '').replace(/[\.,]{2}/g, '.')
     })
 
-    $('#item_price_piece, #item_amount, #dph_form, #discount_option, #item_discount').on('input', function() {
+    $('#item_price_piece, #item_amount, #dph_form, #discount_option, #item_discount').on('input', function () {
         // TODO validate input
         const item_piece = $('#item_price_piece').val()
         const item_amount = $('#item_amount').val()
@@ -441,8 +451,8 @@
             load_item_to_form()
         }
     })
-    
-    $('#create_order').click(function() {
+
+    $('#create_order').click(function () {
         fill_order_object()
         $.ajax({
             type: "POST",
@@ -458,12 +468,12 @@
         });
     })
 
-    $('#modify_order').click(function() {
+    $('#modify_order').click(function () {
         fill_order_object()
         $.ajax({
             type: "PUT",
             contentType: 'application/json',
-            url: "/order/api/orders/"+order_id,
+            url: "/order/api/orders/" + order_id,
             data: JSON.stringify(order_this),
             success: function (data, textStatus, jQxhr) {
                 alert("Objednávka byla zmenena")
@@ -472,6 +482,10 @@
                 alert("Objednávka nebyla zmenena");
             }
         });
+    })
+
+    $('#generate_pdf').click(function() {
+        fill_order_object()
     })
 </script>
 
