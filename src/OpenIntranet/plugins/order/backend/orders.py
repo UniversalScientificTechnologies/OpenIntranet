@@ -47,7 +47,7 @@ class Order(dict):
             """converts date from string (default js json date format) to datetime.datetime"""
             try:
                 converted_data =  datetime.strptime(date_to_convert, date_format)
-                return convert_date
+                return converted_data
             except ValueError:
                 raise
 
