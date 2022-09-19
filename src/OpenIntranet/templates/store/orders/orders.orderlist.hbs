@@ -1,4 +1,36 @@
+<h2>Seznam objednávek <a class="btn btn-outline-primary" style="float: right;" href="./order/new"> Vytvořit novou objednávku</a>
+</h2>
+{{len(order_list)}}
 
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Identifikator</th>
+      <th scope="col">Dodavatel</th>
+      <th scope="col">Stav</th>
+      <th scope="col">Cena</th>
+      <th scope="col">Poznámky</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for i, order in enumerate(order_list) %}
+    <tr>
+      <th scope="row">{{i}}</th>
+      <td><a href="./order/{{order['_id']}}">{{order.get('order_identificator', '--identifikator--')}}</a></td>
+      <td>{{order.get('order_supplier', '--dodavatel--')}}</td>
+      <td>{{OrderStatusText[order.get('order_status', 0)] }}</td>
+      <td>0 Czk</td>
+      <td>{{order}}</td>
+    </tr>
+	
+{% end %}
+  </tbody>
+</table>
+
+
+<h2>Položky k objednání</h2>
 {{len(wait_list)}}
 {% for supplier_group in wait_list %}
 

@@ -1,0 +1,227 @@
+{% extends "../../base.hbs" %}
+{% block title %}UST intranet | Objednávky {%end%}
+{% block body %}
+
+<div class="container-flow" id="wrapper" style="width: 90%; margin: auto;">
+	<h3>Náhled objednávky</h3>
+
+	{{order}}
+
+	<div>
+		<p>
+			Tady bude seznam zaklanich parametru o objednavce. Kdy byla vytvorena, kdo je dodavatelem, 
+		</p>
+		<p>
+			
+			Mají tady být asi zase 3 sloupce. Další sloupce mají zobrazovat informace o dodávkách součástek (tj. jestli jsou už dodané nebo ještě ne. A popřípadě mít možnost to rozdělit na samostatné dodávky). Pak část, co se týče účetnictví (kolik chtějí zaplatit, kolik se zaplatilo, jakým způsobem, ..., jaký je přeplatek/nedoplatek). Měla by to být tabulka, kde bude typ/název dokladu. Pak bude sloupec bilance, který bude ukazovat kterým směrem je požadavek. A na spodním řádku bude součet. Tj. něco jako "Doplatek". 
+
+			A pak bude samotný sloupec, který bude obsahovat soubory přiřazené k této objednávce. Tam se budou dávat objednávky, faktury, dodáky,... Popřípadě i nějaké strojové zpracoatelné soubory. 
+		</p>
+
+	</div>
+
+<div class="row">
+	<div class="col-4">
+	<div class="card">
+		<div class="card-header"> Objednávka</div>
+		<div class="card-body">
+			
+			<form>
+			<div class="form-group">
+			    <label >Dodavatel</label>
+			    <input type="text" class="form-control" id="order_supplier" placeholder="Název dodavatele" value="{{order.get('order_supplier', '')}}">
+			</div>
+
+			<div class="form-group">
+			    <label >Číslo objednávky</label>
+			    <input type="text" class="form-control" id="order_number" placeholder="Číslo objednávky" value="{{order.get('order_identificator', '')}}">
+			    <small class="form-text text-muted">Označení objednávky dodavatele</small>
+			</div>
+
+			<button type="button" class="btn btn-primary" onclick="order_parameters_save()">Uložit</button>
+			<button type="button" class="btn btn-outline-secondary" onclick="order_update_from_api()">Update from API</button>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+
+	<div class="col-4">
+	<div class="card">
+		<div class="card-header"> Účetnictví <button class="btn btn-sm btn-outline-success" style="float: right;"><i class="bi bi-plus"></i></button></div>
+		<table class="table">
+			<tr>
+				<td> Faktura </td>
+				<td> 2020-10-10 </td>
+				<td> - 1343 Czk </td>
+				<td> Ne </td>
+			</tr>
+			<tr>
+				<td> Platba </td>
+				<td> 2020-10-10 </td>
+				<td> 1343 Czk </td>
+				<td> Ano (Fio) </td>
+			</tr>
+
+
+			<tr height = 20px></tr>
+			<tr>
+				<th> Celková cena </th>
+				<th> </th>
+				<th> 1343 Czk </th>
+				<th> </th>
+			</tr>
+			<tr>
+				<td> Placeno </td>
+				<td> </td>
+				<td>  1343 Czk </td>
+				<td> </td>
+			</tr>
+			<tr>
+				<td> Bilance </td>
+				<td> </td>
+				<td> 0 Czk </td>
+				<td> </td>
+			</tr>
+		</table>
+	</div>
+	</div>
+
+	<div class="col-4">
+	<div class="card">
+		<div class="card-header"> Dokumenty <button class="btn btn-sm btn-outline-success" style="float: right;"><i class="bi bi-file-plus"></i></button> </div>
+
+		<table class="table">
+			<tr>
+				<th>Název dokumentu</th>
+				<th>Datum vytvoření</th>
+				<th>Typ dokumentu</th>
+			</tr>
+			<tr>
+				<td>Objednávka</td>
+				<td>2020-10-22</td>
+				<td>pdf</td>
+			</tr>
+			<tr>
+				<td>Faktura</td>
+				<td>2020-10-22</td>
+				<td>pdf</td>
+			</tr>
+			<tr>
+				<td>Dodací list</td>
+				<td>2020-10-22</td>
+				<td>pdf</td>
+			</tr>		
+		</table>
+
+	</div>
+	</div>
+</div>
+	<div>
+		
+		<p>
+			
+			Tady pak bude přehled položek v objednávce. 
+			Bude zde název položky na faktuře. Pak bude sloupec, který říká, jestli je položka do skladu nebo ne (odkaz na součástku a pak na sáček, kam to bylo zařázené). Další slupec bude říkat počet objednaných komponent. Další sloupec bude obsahovat dodané počty ks.
+
+			Pokud nedojde k dodání celé položky najednou, tak při zapsání menšího čísla se vytvoří další položka, která bude rozdílem požadovaného počtu. 
+		</p>
+
+		<table class="w-100">
+			<thead>
+				<tr>
+					<th>
+						#
+					</th>
+					<th>
+						Položka (název dodavatele)
+					</th>
+					<th>
+						Celková cena (cena za ks)
+					</th>
+					<th>
+						Skladová položka/sáček
+					</th>
+					<th>
+						Objednaný počet (násobnost)
+					</th>
+					<th>
+						Dodáno
+					</th>
+					<th>
+						Stav
+					</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr>
+					<td>
+						1
+					</td>
+					<td>
+						SPS30-suuo (Senzor SPS30)
+					</td>
+					<td>
+						2400 czk (24.0czk)
+					</td>
+					<td>
+						Bez skladové položky
+					</td>
+					<td>
+						1000 ks (1x)
+					</td>
+					<td>
+						100 ks
+					</td>
+					<td>
+						Dokončeno
+					</td>
+				</tr></tbody>
+
+		</table>
+
+	</div>
+
+</div>
+
+
+
+<script type="text/javascript">
+	
+	function order_parameters_save(){
+		$.ajax({
+	        url: './{{order.get('_id')}}/parameters/save',
+	        type: 'POST',
+	        data: {
+	        	order_identificator: $("#order_number").val(),
+	        	order_supplier: $("#order_supplier").val()
+	        },
+	        success:function(d){
+	          alert(d);
+	          location.reload();
+	        }
+	    });
+	}
+
+</script>
+
+
+<script type="text/javascript">
+	
+	function order_update_from_api(){
+		$.ajax({
+	        url: './{{order.get('_id')}}/update_from_api',
+	        type: 'GET',
+	        success:function(d){
+	          alert(d);
+	          location.reload();
+	        }
+	    });
+	}
+
+</script>
+
+
+{%end%}

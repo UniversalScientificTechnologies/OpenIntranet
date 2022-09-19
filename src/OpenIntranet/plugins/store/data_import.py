@@ -51,10 +51,13 @@ def api_call(action, params, token, app_secret, show_header=False):
     return json.loads(html);
 
 
-def mouser_api_call(action, mouser_key, body):
+def mouser_api_call(action, mouser_key, body = {}, method = "POST", debug = True):
 	api_url = "https://api.mouser.com/api/v1/" + action + "?apiKey=" + mouser_key
-	response = request.Request(url=api_url, data=bytes(json.dumps(body), encoding='utf8'), headers={'Content-Type': 'application/json'}, method='POST'	)
-	response = json.loads(request.urlopen(response).read())['SearchResults']['Parts'][0]
+	print("Mouser api call", api_url)
+	print(body)
+	response = request.Request(url=api_url, data=bytes(json.dumps(body), encoding='utf8'), headers={'Content-Type': 'application/json'}, method=method	)
+	response = json.loads(request.urlopen(response).read())
+	print(response)
 	return response
 
 
@@ -231,7 +234,7 @@ class mouser_data_importer(BaseHandler):
 				  }
 				}
 
-				product = mouser_api_call('search/partnumber', key, body)
+				product = mouser_api_call('search/partnumber', key, body)['SearchResults']['Parts'][0]
 
 				# self.write({'files': product_files['Data'], 'parameters': parameters['Data'], 'products': products})
 				self.render('store/store.api.importer.mouser.data.hbs',product=product)
@@ -302,7 +305,7 @@ class return_data(BaseHandler):
 			  }
 			}
 
-			product = mouser_api_call('search/partnumber', key, body)
+			product = mouser_api_call('search/partnumber', key, body)['SearchResults']['Parts'][0]
 
 			# self.write({'files': product_files['Data'], 'parameters': parameters['Data'], 'products': products})
 			self.render('store/store.api.importer.mouser.data.hbs',product=product)

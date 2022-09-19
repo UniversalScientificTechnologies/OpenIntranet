@@ -19,8 +19,8 @@ def get_plugin_handlers():
     plugin_name = get_plugin_info()["name"]
 
     return [
-        (r'/%s' % plugin_name, hand_bi_home),
-        (r'/%s/' % plugin_name, hand_bi_home),
+        (r'/{}'.format(plugin_name), hand_bi_home),
+        (r'/{}/'.format(plugin_name), hand_bi_home),
     ]
 
 
@@ -30,7 +30,7 @@ def get_plugin_info():
         "entrypoints": [
             {
                 "title": "Android čtečka",
-                "url": "/payment",
+                "url": "/android_barcode",
                 "icon": "android",
             }
         ],
@@ -40,7 +40,7 @@ def get_plugin_info():
 
 class hand_bi_home(BaseHandler):
     def get(self, data=None):
-        roles = self.authorized(['andorid'], sudo=False)
+        roles = self.authorized(['andorid'], sudo=True)
         print(">>>>>", roles)
 
         self.render("android_barcode.home.hbs", title="UST intranet", parent=self)
