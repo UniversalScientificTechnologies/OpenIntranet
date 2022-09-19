@@ -1,0 +1,68 @@
+{% extends "base.hbs" %}
+{% block title %} | Produkce, uvod{% end %}
+{% block body %}
+
+{% import datetime %}
+
+<nav style="margin: 0.5rem;" style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' widtd='8' height='8'%3E%3Cpatd d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="./../">Home</a></li>
+    <li class="breadcrumb-item"><a href="#">Property manager</a></li>
+  </ol>
+</nav>
+
+<div class="container-fluid row">
+<div class="col-md-4 col-sm-12 col-12 bg-faded sidebar">
+
+
+<div class="card">
+  <div class="card-body">
+
+    <div class="card-title">
+      <h5>Kategorie</h5>
+      <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="search_by_category">
+          <label class="form-check-label" for="search_by_category">Vyhledávat dle kategorií</label>
+      </div>
+      <a href="#" class="badge bg-primary" onclick="$('#category-tree').jstree('open_all')">Rozbalit vše</a>
+      <a href="#" class="badge bg-primary" onclick="$('#category-tree').jstree('close_all')">Sbalit vše</a>
+      <a href="#" class="badge bg-primary" onclick="$('#category-tree').jstree('select_all')">Vybrat vše</a>
+      <a href="#" class="badge bg-primary" onclick="$('#category-tree').jstree('deselect_all')">Odznačit vše</a>
+    </div>
+
+    <div id="category-tree">
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+<div class="col-md-8 col-sm-12">
+
+
+
+<div class="card">
+  <div class="card-body">
+
+    <div class="card-title">
+      <h5>Seznam majetku</h5>
+
+    </div>
+
+    <div id="category-tree">
+
+    </div>
+
+  </div>
+
+</div>
+
+
+</div>
+</div>
+
+</script>
+
+{% end %}

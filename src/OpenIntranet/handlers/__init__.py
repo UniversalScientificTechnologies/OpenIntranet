@@ -138,6 +138,11 @@ class Intranet(tornado.web.RequestHandler):       #tento handler pouzivat jen pr
 
 class BaseHandler(tornado.web.RequestHandler):
     def prepare(self):
+
+        user_agent = self.request.headers["User-Agent"]
+        self.OIAPP = True if user_agent == 'OpenIntranetApp' else False
+        print("Iam running in app", self.OIAPP)
+        
         login = self.get_secure_cookie("user")
         if login:
             login = str(login, encoding="utf-8")

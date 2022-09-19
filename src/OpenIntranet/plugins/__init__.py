@@ -55,17 +55,6 @@ def parametrized(dec):
     return layer
 
 
-'''
-@parametrized
-def perm_validator(fn, permissions = [], sudo=True):
-    print("Validace opravneni.....")
-    print(permissions, sudo, fn.__dict__)
-    print(fn)
-
-    return fn
-'''
-
-
 def save_file(db, original_filename):
     path = os.path.dirname(original_filename)
     file = os.path.basename(original_filename)
@@ -115,6 +104,7 @@ def database_init():
 
 def get_company_info(database):
     return database.intranet.find_one({"_id": "company_info"}) or {}
+
 
 def get_default_warehouse(database):
     default = database.intranet.find_one({"_id": "default_warehouse"})
@@ -213,6 +203,13 @@ class BaseHandler(tornado.web.RequestHandler):
     role_module = []
 
     def prepare(self):
+
+
+        user_agent = self.request.headers["User-Agent"]
+        self.in_app = True if 'Electron' in user_agent else False
+        print("Iam running in app", self.in_app)
+        
+
         login = self.get_secure_cookie("user")
         if login:
             login = str(login, encoding="utf-8")
@@ -256,6 +253,7 @@ class BaseHandler(tornado.web.RequestHandler):
         ns = super(BaseHandler, self).get_template_namespace()
         ns.update({
             'intranet_title': tornado.options.options.intranet_name,
+            'in_app': self.in_app,
         })
 
         return ns

@@ -120,7 +120,8 @@
 	{%block head %}{%end%}
 
 </head>
-<body data-gr-c-s-loaded="true" class="h-100">
+<body data-gr-c-s-loaded="true" class="h-100" style="{%if in_app %}padding-top: 0pt;{%end%}">
+{%if not in_app %}
 {% block top-nav %}
 <nav class="top_nav_base navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
   <a href="/"><img src="/storage/logo.png" alt="Logo" style="height:4em;"></a>
@@ -131,7 +132,7 @@
   </span>
 
 </nav>
-{% end %}
+{% end %}{% end %}
 
 <div id="body" class="h-100">
 {% block body %} No content {%end%}

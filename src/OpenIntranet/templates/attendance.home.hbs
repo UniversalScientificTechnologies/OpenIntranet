@@ -792,15 +792,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"></h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
                 <button type="button" class="btn btn-primary">Uložit</button>
             </div>
         </div>
@@ -809,7 +807,7 @@
 
     const monthFormHtmlStr = `
 <form>
-    <div class="form-row">
+    <div class="row">
         <div class="col-2"></div>
         <div class="col-3">
             <label>Hodiny</label>
@@ -822,7 +820,7 @@
 `;
 
     const monthFormRowHtmlStr = `
-<div class="form-row day">
+<div class="row day">
     <div class="col-1 day-number">
         7.
     </div>
@@ -862,7 +860,7 @@
 
         formRow.setAttribute("data-date", day.format("YYYY-MM-DD"));
 
-        formRow.querySelector("div.day-number").textContent = day.date();
+        formRow.querySelector("div.day-number").textContent = day.format("D.");
         formRow.querySelector("div.day-name").textContent = day.format("ddd");
 
         let hoursInput = formRow.querySelector('input[name="hours"]');

@@ -44,5 +44,5 @@ def update_workspans_contract_id(database, user_id: ObjectId, from_date: datetim
                 "$gte": from_date,
                 "$lt": to_date,
             }}
-        ]
+        ], upsert=True
     )

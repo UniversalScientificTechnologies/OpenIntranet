@@ -100,46 +100,44 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="user-editor-title">Editor informací o uživateli</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form name="user-editor-form">
 
                     <div class="form-group">
-                        <label for="pre-name-title-input">Titul před jménem</label>
+                        <label class="form-label" for="pre-name-title-input">Titul před jménem</label>
                         <input type="text" class="form-control" id="pre-name-title-input"
                                placeholder="{{pre_name_title}}">
                     </div>
 
                     <div class="form-group">
-                        <label for="first-name-input">Jméno</label>
+                        <label class="form-label" for="first-name-input">Jméno</label>
                         <input type="text" class="form-control" id="first-name-input" placeholder="{{first_name}}">
                     </div>
 
                     <div class="form-group">
-                        <label for="surname-input">Příjmení</label>
+                        <label class="form-label" for="surname-input">Příjmení</label>
                         <input type="text" class="form-control" id="surname-input" placeholder="{{surname}}">
                     </div>
 
                     <div class="form-group">
-                        <label for="post-name-title">Titul za jménem</label>
+                        <label class="form-label" for="post-name-title">Titul za jménem</label>
                         <input type="text" class="form-control" id="post-name-title" placeholder="{{post_name_title}}">
                     </div>
 
                     <div class="form-group">
-                        <label for="birthdate-input">Datum narození</label>
+                        <label class="form-label" for="birthdate-input">Datum narození</label>
                         <input type="date" class="form-control" id="birthdate-input">
                     </div>
 
                     <div class="form-group">
-                        <label for="email-input">Email</label>
+                        <label class="form-label" for="email-input">Email</label>
                         <input type="text" class="form-control" id="email-input" placeholder="{{email}}">
                     </div>
 
                     <div class="form-group">
-                        <label for="phone-number-input">Telefon</label>
+                        <label class="form-label" for="phone-number-input">Telefon</label>
                         <input type="text" class="form-control" id="phone-number-input" placeholder="{{phone_number}}">
                     </div>
 
@@ -147,25 +145,25 @@
                     <div class="address-form-part">
 
                         <div class="form-group">
-                            <label for="residence-street-input">Ulice, Č.P.</label>
+                            <label class="form-label" for="residence-street-input">Ulice, Č.P.</label>
                             <input type="text" class="form-control" id="residence-street-input"
                                    placeholder="{{residence_street}}">
                         </div>
 
                         <div class="form-group">
-                            <label for="residence-city-input">Město</label>
+                            <label class="form-label" for="residence-city-input">Město</label>
                             <input type="text" class="form-control" id="residence-city-input"
                                    placeholder="{{residence_city}}">
                         </div>
 
                         <div class="form-group">
-                            <label for="residence-state-input">Stát</label>
+                            <label class="form-label" for="residence-state-input">Stát</label>
                             <input type="text" class="form-control" id="residence-state-input"
                                    placeholder="{{residence_state}}">
                         </div>
 
                         <div class="form-group">
-                            <label for="residence-zip-input">PSČ</label>
+                            <label class="form-label" for="residence-zip-input">PSČ</label>
                             <input type="text" class="form-control" id="residence-zip-input"
                                    placeholder="{{residence_zip}}">
                         </div>

@@ -264,19 +264,19 @@ class UserPageHandler(BaseHandler):
         possible_type = {
             "dpp": "Dohoda o provedení práce",
             "dpc": "Dohoda o pracovní činnosti",
-            "ps": "Pracovní smlouva",
+            "ps": "Pracovní smlouva"
         }
 
         result = []
 
         for contract in contracts:
             new = {}
-            contract_type = possible_type[contract["type"]]
+            contract_type = possible_type.get(contract["type"], contract["type"])
             valid_from = contract["valid_from"]
             valid_until = contract["valid_until"]
 
             new["_id"] = contract["_id"]
-            new["type"] = possible_type[contract["type"]]
+            new["type"] = contract_type
             new["signing_date"] = str_ops.date_to_str(contract["signing_date"])
             new["valid_from_iso"] = str_ops.date_to_iso_str(valid_from)
             new["valid_until_iso"] = str_ops.date_to_iso_str(valid_until)
