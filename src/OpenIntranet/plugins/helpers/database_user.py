@@ -33,7 +33,7 @@ def get_user_contracts(coll: pymongo.collection.Collection, user_id: ObjectId, s
     cursor = coll.aggregate([
         {"$match": {"_id": user_id}},
         {"$unwind": "$contracts"},
-        {"$match": {"contracts.type": "dpp"}},  # TODO udělat to obecně ne jen pro dpp
+        #{"$match": {"contracts.type": "dpp"}},  # TODO udělat to obecně ne jen pro dpp
         {"$sort": {f"contracts.{sort_by}": -1}},
         {"$group": {"_id": "$_id", "contracts": {"$push": "$contracts"}}}
     ])
@@ -106,7 +106,7 @@ def add_users(coll: pymongo.collection.Collection, ids: list):
     users = [{"_id": _id,
               "user": _id,
               "role": [],
-              "workpans": [],
+              "workspans": [],
               "created": datetime.now().replace(microsecond=0),
               "type": "user",
               "email_validated": "no",
