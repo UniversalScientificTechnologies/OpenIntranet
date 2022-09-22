@@ -6,7 +6,7 @@ from pydoc import describe
 from re import I
 import this
 from typing import Dict, List
-from attr import validate
+#from attr import validate
 
 import bson.json_util
 from pytz import AmbiguousTimeError
