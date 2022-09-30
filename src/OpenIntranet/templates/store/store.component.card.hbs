@@ -259,9 +259,7 @@ Tohle jsou moje testovací data ... ty tu nebudou:<br><br>
         <form id="form_set_name"> {% module xsrf_form_html() %}
       <div class="modal-header">
         <h5 class="modal-title">Upravit název položky</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="form-group row">
@@ -279,7 +277,7 @@ Tohle jsou moje testovací data ... ty tu nebudou:<br><br>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
       </form>
     </div>
@@ -308,9 +306,7 @@ Tohle jsou moje testovací data ... ty tu nebudou:<br><br>
         <form id="form_set_categories"> {% module xsrf_form_html() %}
       <div class="modal-header">
         <h5 class="modal-title">Upravit kategorie položky</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="form-group row">
@@ -329,7 +325,7 @@ Tohle jsou moje testovací data ... ty tu nebudou:<br><br>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
       </form>
     </div>
@@ -390,6 +386,7 @@ $('#categories_edit').select2({
     width: '100%',
     tags: true,
     multiple: true,
+    dropdownParent: $('#modal_set_categories'),
     ajax: {
       url: '/store/api/get_categories/list/?type=select',
       type: "POST",
@@ -435,9 +432,7 @@ $("#categories_edit").select2("trigger", "select", {
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Upravit popis položky</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="form-group row">
@@ -455,7 +450,7 @@ $("#categories_edit").select2("trigger", "select", {
       </div>
       <div class="modal-footer">
         <button submit="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
     </form>
