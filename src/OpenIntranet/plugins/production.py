@@ -120,8 +120,10 @@ def get_plugin_handlers():
              (r'/{}/(.*)/upload/bom/ust/'.format(plugin_name), ust_bom_upload),
              (r'/{}/(.*)/print/'.format(plugin_name), print_bom),
              (r'/{}/(.*)/edit/'.format(plugin_name), edit),
+             (r'/{}/(.*)/close/'.format(plugin_name), close_production),
              (r'/{}/(.*)/duplicate/'.format(plugin_name), duplicate),
              (r'/{}/(.*)/get_bom_table/'.format(plugin_name), get_bom_table),
+             (r'/{}/(.*)/get_close_table/'.format(plugin_name), get_close_table),
              (r'/{}/(.*)/get_reservation/'.format(plugin_name), get_reservation),
              (r'/{}/api/getProductionTree/'.format(plugin_name), get_production_tree),
              (r'/{}/api/getProductionList'.format(plugin_name), get_production_list),
@@ -532,6 +534,77 @@ class get_bom_table(BaseHandler):
 
         self.render('production.bom_table.hbs', data = dout, bson=bson, current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), ComponentStatusTable = ComponentStatusTable)
 
+'''
+    Tabulka se seznamem komponent pro zavreni vyroby
+'''
+
+class get_close_table(BaseHandler):
+    def get(self, name):
+
+        group_by_ustid = False
+        group_by_components = False
+    
+        query = [
+            {'$match': {'_id': bson.ObjectId(name)}},
+            {'$unwind': '$components'},
+            {'$project': {'components': 1}},
+            {'$sort': {'components.Ref': 1}}]
+
+        if group_by_ustid:
+            query += [{'$group':{
+                '_id': {'UST_ID': '$components.UST_ID'},
+                'Ref': {'$push': '$components.Ref'},
+                'count': {'$sum': 1},
+            }}]
+        else:
+            query += [{'$group':{
+                '_id': {'UST_ID': '$components.UST_ID',
+                        'Value': '$components.Value',
+                        'Footprint': '$components.Footprint',
+                        'status': '$components.status',
+                        # 'Distributor': '$components.Distributor',
+                        # 'Datasheet': '$components.Datasheet',
+                        # 'MFPN': '$components.MFPN',
+                        # 'stock_count': '$components.stock_count',
+                        # 'note': '$components.note',
+                        },
+                'Ref': {'$push': '$components.Ref'},
+                'count': {'$sum': 1},
+            }}]
+
+        query += [{"$addFields":{"cUST_ID": {"$convert":{
+                     "input": '$_id.UST_ID',
+                     "to": 'objectId',
+                     "onError": "Err",
+                     "onNull": "null"
+            }}}}]
+        
+        query += [{"$lookup":{
+                "from": 'stock',
+                "localField": 'cUST_ID',
+                "foreignField": '_id',
+                "as": 'stock'
+            }}]
+
+        query += [{"$lookup":{
+                "from": 'packets_count_complete',
+                "localField": 'cUST_ID',
+                "foreignField": '_id',
+                "as": 'packets'
+            }}]
+
+        query += [
+                {"$sort": {'Ref':1}}
+            ]
+            
+        
+        print(query)
+        dout = list(self.mdb.production.aggregate(query))
+        #out = bson.json_util.dumps(dout)
+
+
+        self.render('production.close_table.hbs', data = dout, bson=bson, current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), ComponentStatusTable = ComponentStatusTable)
+
 
 # Ziskat seznam rezervaci a vratit ho jako HTML tabulku
 
@@ -571,7 +644,8 @@ class edit(BaseHandler):
             self.redirect('/production/{}/edit/'.format(production_id))
         else:
             product = self.mdb.production.aggregate([
-                    {'$match': {'_id': bson.ObjectId(name)}}
+                    {'$match': {'_id': bson.ObjectId(name)}},
+                    {'$unset': 'components'}
                 ])
             self.render('production.flow.hbs', id = name, product = list(product))
 
@@ -984,6 +1058,25 @@ class edit(BaseHandler):
             data = list(data)
             output = bson.json_util.dumps(data)
             self.write(output)
+
+'''
+   
+   Ukoncit vyrobu a odecist soucastky ze skladu.. 
+   
+'''
+class close_production(BaseHandler):
+    def get(self, name):
+        print("Přehled polozek pred ukoncenim, name")
+        
+        product = self.mdb.production.aggregate([
+                {'$match': {'_id': bson.ObjectId(name)}},
+                {'$unset': 'components'}
+            ])
+
+        self.render('production.close.hbs', id = name, product = list(product))
+
+
+
 
 '''
    

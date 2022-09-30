@@ -7,6 +7,7 @@
     <title>{{intranet_title}} {% block title %}{% end %}</title>
 
     <script src="/static/jquery/dist/jquery.js"></script>
+    <script>if (typeof module === 'object') {window.jQuery = window.$ = module.exports;};</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/latest/js.cookie.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="/static/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
