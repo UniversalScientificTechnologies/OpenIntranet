@@ -540,67 +540,16 @@ class get_close_table(BaseHandler):
 
         group_by_ustid = False
         group_by_components = False
+
+        name = bson.ObjectId(name)
+
+        components = get_reservation_components(self.mdb, name, extend=True)
+        print("NAME", name)
+        print(components)
     
-        query = [
-            {'$match': {'_id': bson.ObjectId(name)}},
-            {'$unwind': '$components'},
-            {'$project': {'components': 1}},
-            {'$sort': {'components.Ref': 1}}]
-
-        if group_by_ustid:
-            query += [{'$group':{
-                '_id': {'UST_ID': '$components.UST_ID'},
-                'Ref': {'$push': '$components.Ref'},
-                'count': {'$sum': 1},
-            }}]
-        else:
-            query += [{'$group':{
-                '_id': {'UST_ID': '$components.UST_ID',
-                        'Value': '$components.Value',
-                        'Footprint': '$components.Footprint',
-                        'status': '$components.status',
-                        # 'Distributor': '$components.Distributor',
-                        # 'Datasheet': '$components.Datasheet',
-                        # 'MFPN': '$components.MFPN',
-                        # 'stock_count': '$components.stock_count',
-                        # 'note': '$components.note',
-                        },
-                'Ref': {'$push': '$components.Ref'},
-                'count': {'$sum': 1},
-            }}]
-
-        query += [{"$addFields":{"cUST_ID": {"$convert":{
-                     "input": '$_id.UST_ID',
-                     "to": 'objectId',
-                     "onError": "Err",
-                     "onNull": "null"
-            }}}}]
-        
-        query += [{"$lookup":{
-                "from": 'stock',
-                "localField": 'cUST_ID',
-                "foreignField": '_id',
-                "as": 'stock'
-            }}]
-
-        query += [{"$lookup":{
-                "from": 'packets_count_complete',
-                "localField": 'cUST_ID',
-                "foreignField": '_id',
-                "as": 'packets'
-            }}]
-
-        query += [
-                {"$sort": {'Ref':1}}
-            ]
-            
-        
-        print(query)
-        dout = list(self.mdb.production.aggregate(query))
-        #out = bson.json_util.dumps(dout)
 
 
-        self.render('production.close_table.hbs', data = dout, bson=bson, current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), ComponentStatusTable = ComponentStatusTable)
+        self.render('production.close_table.hbs', current_warehouse = bson.ObjectId(self.get_cookie('warehouse')), reservations = components)
 
 
 # Ziskat seznam rezervaci a vratit ho jako HTML tabulku

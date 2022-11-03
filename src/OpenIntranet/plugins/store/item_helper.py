@@ -187,11 +187,55 @@ def earse_reservations(db, origin_id):
     db.stock_operation.delete_many({'origin_id': origin_id})
 
 
-def get_reservation_components(db, origin_id=None):
-    data = db.stock_operation.aggregate([
+def get_reservation_components(db, origin_id=None, extend=False):
+
+    query = [
             {"$match": {'type': 'reservation', 'origin_id': origin_id}},
             {"$sort": {'_id': 1}},
-        ])
+        ]
+
+    if extend:
+        query += [
+        { "$lookup": { "from": 'stock', "localField":'cid', "foreignField": '_id', "as": 'component'}},
+        { "$lookup": { "from": 'store_positions', "localField":'component.position', "foreignField": '_id', "as": 'position'}},
+        { "$lookup": { "from": 'stock_operation', "localField":'cid', "foreignField": 'pid', "as": 'operations'}},
+        { "$addFields": {
+                "packet_count":  {"$sum": "$operations.count"},
+                "packet_reserv":  {"$sum": "$operations.reserved"},
+                "packet_ordered":  {"$sum": "$operations.ordered"},
+                "packet_price": {
+                "$function":
+                    {
+                        "body": '''function(prices, counts) {
+                         let total_counts = Array.sum(counts);
+                         var tmp_count = total_counts;
+                         var total_price = 0;
+
+                         var c = counts.reverse();
+                         var p = prices.reverse();
+
+                         for(i in c){
+                             if(c[i] > 0){
+                                 if(c[i] < tmp_count){
+                                     total_price += (c[i]*p[i]);
+                                     tmp_count -= c[i]
+                                  }
+                                  else{
+                                     total_price += (tmp_count*p[i]);
+                                     tmp_count = 0;
+                                  }
+                              }
+
+                          }
+                          return total_price;
+                        }''',
+                        "args": ["$operations.unit_price", "$operations.count"], "lang": "js"
+                    }
+                }
+            }
+        }]
+
+    data = db.stock_operation.aggregate(query)
 
     return list(data)
 
