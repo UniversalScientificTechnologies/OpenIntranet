@@ -5,7 +5,7 @@ services:
     restart: always
     volumes:
       - /home/roman/docker_test/db:/data/db
-      - /home/roman/Dokumenty/dump_mongodb_20221111/USTintranet:/data/dump
+    #  - /home/roman/Dokumenty/dump_mongodb_20221111/USTintranet:/data/dump
     ports:
       - 27017:27017
     networks:
@@ -17,7 +17,7 @@ services:
   intranet:
     build: .
     volumes:
-      - /home/roman/docker_test/intranet:/data/ust
+      - /home/roman/docker_test/intranet:/data/
     ports:
       - 8888:8888
     networks:

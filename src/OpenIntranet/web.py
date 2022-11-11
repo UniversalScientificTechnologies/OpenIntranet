@@ -16,8 +16,8 @@ from tornado import web
 from plugins import BaseHandler
 import plugins as plugins_init
 
-tornado.options.define("port", default=10020, help="port", type=int)
-tornado.options.define("config", default="/data/ust/intranet.conf", help="Intranet config file")
+tornado.options.define("port", default=8888, help="port", type=int)
+tornado.options.define("config", default="/data/intranet.conf", help="Intranet config file")
 tornado.options.define("debug", default=True, help="debug mode", type=bool)
 tornado.options.define("octopart_api", default=None, help="OCTOPART api key")
 
@@ -29,7 +29,7 @@ tornado.options.define("owncloud_pass", default=None, help="URL address of owncl
 tornado.options.define("owncloud_root", default='/OpenIntranet/', help="URL address of owncloud server")
 
 tornado.options.define("mdb_database", default='OpenIntranet', help="MongoDB database name")
-tornado.options.define("mdb_url", default='localhost', help="MongoDB URL")
+tornado.options.define("mdb_url", default='mongo', help="MongoDB URL")
 tornado.options.define("mdb_port", default=27017, help="MongoDB port")
 tornado.options.define("mdb_user", default=None, help="MongoDB user-name")
 tornado.options.define("mdb_pass", default=None, help="MongoDB passworld")

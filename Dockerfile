@@ -9,4 +9,4 @@ WORKDIR /app
 COPY src .
 
 WORKDIR /app/OpenIntranet
-ENTRYPOINT ["python3", "web.py", "--config=/data/ust/intranet.conf"]
+ENTRYPOINT ["python3", "web.py", "--config=/data/intranet.conf"]
