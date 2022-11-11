@@ -1,0 +1,32 @@
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - /home/roman/docker_test/db:/data/db
+      - /home/roman/Dokumenty/dump_mongodb_20221111/USTintranet:/data/dump
+    ports:
+      - 27017:27017
+    networks:
+      - internal
+    #environment:
+    #  MONGO_INITDB_ROOT_USERNAME: root
+    #  MONGO_INITDB_ROOT_PASSWORD: example
+
+  intranet:
+    build: .
+    volumes:
+      - /home/roman/docker_test/intranet:/data/ust
+    ports:
+      - 8888:8888
+    networks:
+      - internal
+      - external
+
+networks:
+  internal:
+    driver: bridge
+  external:
+    driver: bridge
+
