@@ -53,7 +53,7 @@ def perm_validator(method, permissions = [], sudo = True):
 
 
 def database_init():
-    return pymongo.MongoClient('mongo', 27017).USTintranet
+    return pymongo.MongoClient(tornado.options.options.mdb_url, tornado.options.options.mdb_port).USTintranet
 
 class Intranet(tornado.web.RequestHandler):       #tento handler pouzivat jen pro veci, kde je potreba vnitrni autorizace - tzn. jen sprava systemu
     def prepare(self):
