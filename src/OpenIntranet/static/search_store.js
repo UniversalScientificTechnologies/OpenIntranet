@@ -49,78 +49,6 @@ const MODAL = `
     </div> <!-- modal -->`;
 
 // based on searchbar content
-    function searchForCorespondingProducts() {
-      $("#loading-products-container").show();
-  
-      const search_phrase = $("#productNameInput").val();
-  
-      $.ajax({
-        type: "POST",
-        url: "/store/api/products/",
-        data: {
-          'categories': "0", // 0 == false
-          'search_by_category': "0", // 0 == False
-          //   'positions': active_positions(),
-          'search_by_position': "0", // 0 == False
-          'search': search_phrase,
-          'polarity': false,
-          'tag_polarity': false,
-          // 'tag_search': $("#tag-search").val(),
-          //   'in_stock': $("#filter-instock").val(),
-          'page': 0
-        },
-        success: function (data, textStatus, jQxhr) {
-          console.log('/products/', data, textStatus);
-          const num_of_items_found = data.count;
-  
-          $('#coresponding-products').empty();
-          Object.values(data.data).forEach((value, idx, arr) => {
-  
-            const img_url = (value.img_title == null || value.img_title.url == null) ? DEFAULT_IMG : value.img_title.url;
-            let desc = value.description ? value.description : "";
-            if (desc.length > 120) {
-              desc = desc.substring(0,100)+' ...';
-            }
-            
-            $('#coresponding-products').append(
-              `<div id="` + value._id.$oid + `" class="coresponding-product card mb-3" style="max-width: 540px;">
-                <div class="row g-0">
-                  <div class="col-md-4">
-                    <img class="img-thumbnail" style="width:100%; " src="`+img_url+`"> 
-                  </div>
-                  <div class="col-md-8">
-                    <div class="card-body">
-                      <a href="`+ "/store/component/" + value._id.$oid + `" class="card-title fs-3">` + value.name + `</a>
-                      <h6 class="card-subtitle mb-2 text-muted">ID: `+ value._id.$oid + `</h6>
-                      <p class="card-text">`+ desc + `</p>
-                    </div>
-  
-                    <div class="card-footer">
-                      <button type="button" data-bs-dismiss="modal" class="selection-confirm-button btn btn-success">Zvolit součástku</button>
-                    </div>
-  
-                  </div>
-                </div>
-              </div>`);
-          });
-  
-          $(".selection-confirm-button").click(function(){
-            let id = $(this).closest('.coresponding-product').attr('id');
-            this.id = id;
-          });
-        },
-        error: function (jqXhr, textStatus, errorThrown) {
-          console.log('ERR, /store/api/products/');
-          console.log(errorThrown);
-        }
-      });
-    }
-
-class ProductSelectionModal {
-  
-  // initialize hidden modal in current document
-  constructor() {
-// based on searchbar content
 function searchForCorespondingProducts() {
   $("#loading-products-container").show();
 
@@ -188,6 +116,10 @@ function searchForCorespondingProducts() {
   });
 }
 
+class ProductSelectionModal {
+  
+  // initialize hidden modal in current document
+  constructor() {
     // id of selected product
     this.id = null;
     $("body").append(MODAL);
