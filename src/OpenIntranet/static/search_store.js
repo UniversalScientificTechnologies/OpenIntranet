@@ -144,8 +144,4 @@ class ProductSelectionModal {
   getId() {
     return this.id;
   }
-
-  getSelectedProduct() {
-    return this.id != null ? idToProduct(this.id) : null;
-  }
 }
