@@ -1,69 +1,69 @@
 /**
  * RECOMANDED USAGE
  * 
- * // run modal
- * search_product_id()
+ * // insert modal to html
+ * const modal = new ProductSelectionModal();
+ * 
+ * // show modal to user 
+ * modal.showModal()
  * 
  * // setup event for product selection completition
- * $("#selection-confirm-button").click(function() {
+ * $(".selection-confirm-button").click(function() {
       // store selected value where you like
       const id_of_selected_product = $(".coresponding-product.selected").attr('id');
     })
  */
 
-/**
- * get product from store corresponding to search
- * - run modal with search bar
- * - user types phrase (name of product)
- * - user confirms selection
- * - extraction of id is described in the header of this file
- */
- function search_product_id() {
-  $(document).ready(function () {
-    let modal = `
-  <!-- Modal -->
-  <div id="myModal" class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">skladové součástky</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div> <!-- modal header -->
-        <div class="modal-body">
-          <div class="input-group mb-3">
-            <input id="productNameInput" type="text" class="form-control"
-            placeholder="Název součástky" aria-label="Název součástky" aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="searchButton">Vyhledej</button>
-    
-          </div>
-          <!-- list of products found -->
-          <div id="coresponding-products" class="container">
-            <div id="loading-products-container">
-              <div class="d-flex mt-3 align-items-center">
-                <strong>Hledám součástky...</strong>
-                <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+let modal = `
+    <!-- Modal -->
+    <div id="productSelectionModal" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">skladové součástky</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div> <!-- modal header -->
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <input id="productNameInput" type="text" class="form-control"
+              placeholder="Název součástky" aria-label="Název součástky" aria-describedby="button-addon2">
+              <button class="btn btn-outline-secondary" type="button" id="searchButton">Vyhledej</button>
+      
+            </div>
+            <!-- list of products found -->
+            <div id="coresponding-products" class="container">
+              <div id="loading-products-container">
+                <div class="d-flex mt-3 align-items-center">
+                  <strong>Hledám součástky...</strong>
+                  <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+                </div>
               </div>
             </div>
-          </div>
-        </div> <!-- modal body -->
+          </div> <!-- modal body -->
+  
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+          </div> <!-- modal footer -->
+        </div> <!-- modal content -->
+      </div> <!-- modal dialog -->
+    </div> <!-- modal -->`
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
-          <button id="selection-confirm-button" type="button" class="btn btn-primary">Potvrdit výběr</button>
-        </div> <!-- modal footer -->
-      </div> <!-- modal content -->
-    </div> <!-- modal dialog -->
-  </div> <!-- modal -->`
+function idToProduct(id) {
+  // convert id to js object
+  return null
+}
 
+class ProductSelectionModal {
+  // initialize hidden modal in current document
+  constructor() {
+    // id of selected product
+    this.id = null;
     $("body").append(modal);
-    $("#myModal").modal("show");
-    $("#loading-products-container").hide();
 
     $('#searchButton').click(function () {
       $("#loading-products-container").show();
 
       const search_phrase = $("#productNameInput").val();
-
 
       $.ajax({
         type: "POST",
@@ -87,29 +87,37 @@
           $('#coresponding-products').empty();
           Object.values(data.data).forEach((value, idx, arr) => {
 
+            let desc = value.description ? value.description : "";
+            if (desc.length > 120) {
+              desc = desc.substring(0,100)+' ...';
+            }
             $('#coresponding-products').append(
               `<div id="` + value._id.$oid + `" class="coresponding-product card mb-3" style="max-width: 540px;">
                 <div class="row g-0">
                   <div class="col-md-4">
-                    <img class="img-thumbnail" src="...image url here..." alt="W3Schools.com"> 
+                    <img class="img-thumbnail" src="...image url here..."> 
                   </div>
                   <div class="col-md-8">
                     <div class="card-body">
-                      <a href="`+ "/store/component/" + value._id.$oid + `" class="card-title">` + value.name + `</a>
+                      <a href="`+ "/store/component/" + value._id.$oid + `" class="card-title fs-3">` + value.name + `</a>
                       <h6 class="card-subtitle mb-2 text-muted">ID: `+ value._id.$oid + `</h6>
-                      <p class="card-text">`+ value.description + `</p>
+                      <p class="card-text">`+ desc + `</p>
                     </div>
+
+                    <div class="card-footer">
+                      <button type="button" data-bs-dismiss="modal" class="selection-confirm-button btn btn-success">Zvolit součástku</button>
+                    </div>
+
                   </div>
                 </div>
               </div>`);
           })
 
-          $(".coresponding-product").click(function(){
-            $("#coresponding-products").children().each(function() {
-              $(this).removeClass('selected border-success');
-            })
-            $(this).addClass('selected border-success');
+          $(".selection-confirm-button").click(function(){
+            let id = $(this).closest('.coresponding-product').attr('id');
+            this.id = id;
           })
+
         },
         error: function (jqXhr, textStatus, errorThrown) {
           console.log('ERR, /store/api/products/')
@@ -117,5 +125,22 @@
         }
       });
     })
-  });
+  }
+  
+  showModal() {
+    $("#productSelectionModal").modal("show");
+    $("#loading-products-container").hide();
+  }
+
+  setId(newId) {
+    this.id = newId;
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  getSelectedProduct() {
+    return this.id != null ? idToProduct(this.id) : null;
+  }
 }
