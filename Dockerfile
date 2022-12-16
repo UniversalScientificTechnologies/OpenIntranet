@@ -3,7 +3,7 @@ FROM debian:stable-slim
 RUN apt-get update
 RUN apt-get install -y curl python3 python3-pip htop mc nano git
 COPY requirements.txt requirements.txt
-RUN pip3 install -e --no-cache-dir --upgrade -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 WORKDIR /app
 COPY src .
