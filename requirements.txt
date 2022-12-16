@@ -2,7 +2,7 @@ tornado
 glob2
 gitpython
 #pyocclient==0.5
-git+https://github.com/owncloud/pyocclient.git@v0.5
+git+https://github.com/owncloud/pyocclient.git@7a5c9f09426cca2bdb29e85fdff877f482d90cf5
 termcolor
 fpdf
 pandas
