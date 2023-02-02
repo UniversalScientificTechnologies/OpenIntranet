@@ -66,6 +66,7 @@ class view_positions(BaseHandler):
         #print(data)
 
         query = [
+            { "$match": {"type": {"$ne":"reservation"}}}, # Vyjimka pro rezervace, ktere nejsou prirazene k sackum
             { "$group": {
                 '_id': '$pid',
                 'operations': { "$push": "$$ROOT" }
