@@ -1,16 +1,21 @@
-from .backend import orders, api
+from .backend import orders, api_invoice, invoices
 
 def get_plugin_handlers():
     order_base_name = "order"
+    invoice_endpoint_name = "invoices"
 
     return [
-        #(r'/{}/u/(.*)'.format(order_base_name), users.UserPageHandler),
+        # orders:
         (r'/{}'.format(order_base_name), orders.HomeHandler),
         (r'/{}/'.format(order_base_name), orders.HomeHandler),
-        (r'/{}/view/new'.format(order_base_name), orders.NewOrderFormHandler),
-        (r'/{}/view/([^/]+)?'.format(order_base_name), orders.ModificationOrderFormHandler),
-        (r'/{}/api/orders'.format(order_base_name), api.GeneralOrderHandler),
-        (r'/{}/api/orders/([^/]+)?'.format(order_base_name), api.SingleOrderHandler),
+        (r'/{}/view([^/]+)?'.format(order_base_name), orders.ViewHandler),
+        (r'/{}/view/([^/]+)?'.format(order_base_name), orders.ViewHandler),
+        
+        # invoices:
+        (r'/{}/{}'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceOverview),
+        (r'/{}/{}/'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceOverview),
+        (r'/{}/{}/new'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceView),
+        (r'/{}/{}/new/'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceView),
     ]
 
 

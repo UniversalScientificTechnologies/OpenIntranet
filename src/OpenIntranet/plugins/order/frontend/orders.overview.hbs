@@ -4,185 +4,32 @@
 
 
 <style type="text/css">
-  .product_list_element {
-    margin: 0pt;
-    margin-top: 10pt;
-    padding: 5pt;
-  }
-
-  .product_list_element_table {
-    width: 100%;
-    background: white;
-    border: #aaa solid 1pt;
-    padding: 5pt;
-    margin: 0pt;
-    display: inline-flex;
-  }
-
-  .table_input {
-    width: 8em;
-    border: #ccc solid thin;
-    background: #fafafa;
-  }
-
-  .form-group {
-    margin-bottom: 0.5rem;
-  }
-
-
-  .cat_top {
-    flex: 0 0 auto;
-    width: 150pt;
-  }
-
-  #filter_block {
-    /* display: flex; */
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    margin: 0pt;
-  }
-
-  .form-tab-td {
-    padding: 0px;
-  }
-
-  .list_name {
-    padding-left: 0.5em;
-    vertical-align: top;
-  }
-
-  .highlight {
-    background-color: rgb(191, 230, 191);
+  .hidden {
+    display: none;
   }
 </style>
 
 <div>
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <table id="orders_table" class="table caption-top">
-          <caption>Přehled zakázek</caption>
-          <thead id="orders_table_head">
-            <tr>
-              <th class="order_param">Id</th>
-              <th class="order_param">Jméno</th>
-              <th class="order_param">Popis</th>
-              <th class="order_param">Zákazník</th>
-              <th class="order_param">Datum vytvoření</th>
-              <th class="order_param">Stav</th>
-              <th class="order_param">Celková částka</th>
-              <th class="order_param">Zbývá zaplatit</th>
-            </tr>
-          </thead>
-          <tbody id="orders_table_body" class="table-group-divider"> </tbody>
-        </table>
+  <div class="dropdown">
+    <a class="btn btn-outline-primary dropdown-toggle btn-lg" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      Zakázky
+    </a>
 
-        <a class="btn btn-success" href="/order/view/new" role="button">Nová</a>
-        <button id="change_order" type="button" class="btn btn-success" disabled>Změnit objednávku</button>
-        <button type="button" class="btn btn-primary">Generovat PDF ...</button>
-        <button id="delete_order" type="button" class="btn btn-outline-danger">Odstranit</button>
-        <button id="select_orders" type="button" class="btn btn-light">Vybrat vše</button>
-        <button id="deselect_orders" type="button" class="btn btn-light">Zrušit výběr</button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item active" href="/order">Zakázky</a></li>
+      <li><a class="dropdown-item" href="/order/invoices">Faktury</a></li>
+      <li><a class="dropdown-item" href="#">...</a></li>
+    </ul>
 
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="multiple_order_selection">
-          <label class="form-check-label" for="multiple_order_selection">Možnost výběru více zakázek</label>
-        </div>
+    <ul id="invoice-list">
 
-        <button type="button" class="btn btn-success">Upravit</button>
-      </div>
-    </div>
+    </ul>
   </div>
+  <a href="/order/view/test" class="btn btn-primary hidden" >Go To Order Test View</a>
 </div>
 
 <script type="text/javascript">
-  let orders = []
-
-  function reload_orders_list() {
-    $.ajax({
-      url: "/order/api/orders",
-      type: "GET",
-      dataType: "json",
-      success: function (data, status) {
-        orders = data
-        display_orders()
-      },
-      error: function (data, status) {
-        alert("not getted")
-      }
-    })
-  }
-
-  function display_orders() {
-    const empty_val = "not_found"
-    let html = ""
-    orders.forEach((order) => {
-      let date
-      try {
-        let date = new Date(order["date_of_creation"]["$date"])
-        date = date.toLocaleDateString()
-      } catch(error) {
-        date = empty_val
-      }
-      html += `<tr class="order_row">
-        <td class="order_id">`+ order["_id"]["$oid"] + `</td>
-        <td class="order_name">`+ order["name"] + `</td>
-        <td class="order_description">`+ order["description"] + `</td>
-        <td class="order_customer">`+ order["customer"]["name"] + `</td>
-        <td class="order_date_of_creation">`+ date + `</td>
-        <td class="order_status">not defined yet</td>
-        <td class="order_price_total">`+ order["price_total"] + `</td>
-        <td class="order_price_to_pay">`+ order["price_to_pay"] + `</td>
-      </tr>`
-    })
-    $('#orders_table_body').html(html)
-  }
-
-  $('#select_orders').click(function () {
-    $('.order_row').addClass('highlight')
-    $('#change_order').prop("disabled", false)
-  })
-
-  $('#deselect_orders').click(function () {
-    $('.order_row').removeClass('highlight')
-    $('#change_order').prop("disabled", true)
-  })
-
-  $('#orders_table').on('click', 'tbody tr', function (event) {
-    if (!$('#multiple_order_selection').is(":checked")) {
-      $('.order_row').removeClass('highlight')
-      $('#change_order').prop("disabled", true)
-    }
-    if ($(this).hasClass('highlight')) {
-      $(this).removeClass('highlight')
-      $('#change_order').prop("disabled", true)
-    } else {
-      $(this).addClass('highlight')
-      // enable order change button
-      $('#change_order').prop("disabled", false)
-    }
-  })
-
-  $('#change_order').click(function () {
-    const order_id = $('.highlight > .order_id').text()
-    window.location.href = '/order/view/' + order_id
-  })
-
-  $('#delete_order').click(function () {
-    // post document (order)
-    const order_id = $('.highlight > .order_id').text()
-    $.ajax({
-      url: "/order/api/orders/" + order_id,
-      type: "DELETE",
-      success: function (data, textStatus, jQxhr) {
-        alert("Polozka byla odstranena")
-      },
-      error: function (data, status) {
-        alert("Polozka nebyla odstranena");
-      }
-    });
-  })
-  reload_orders_list()
+  
 </script>
 
 {% end %}

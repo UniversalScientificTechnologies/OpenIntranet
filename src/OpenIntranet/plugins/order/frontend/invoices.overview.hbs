@@ -1,0 +1,101 @@
+{% extends "base.hbs" %}
+{% block title %} | Produkce, uvod{% end %}
+{% block body %}
+
+
+<style type="text/css">
+  .product_list_element {
+    margin: 0pt;
+    margin-top: 10pt;
+    padding: 5pt;
+  }
+
+  .product_list_element_table {
+    width: 100%;
+    background: white;
+    border: #aaa solid 1pt;
+    padding: 5pt;
+    margin: 0pt;
+    display: inline-flex;
+  }
+
+  .table_input {
+    width: 8em;
+    border: #ccc solid thin;
+    background: #fafafa;
+  }
+
+  .form-group {
+    margin-bottom: 0.5rem;
+  }
+
+
+  .cat_top {
+    flex: 0 0 auto;
+    width: 150pt;
+  }
+
+  #filter_block {
+    /* display: flex; */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0pt;
+  }
+
+  .form-tab-td {
+    padding: 0px;
+  }
+
+  .list_name {
+    padding-left: 0.5em;
+    vertical-align: top;
+  }
+
+  .highlight {
+    background-color: rgb(191, 230, 191);
+  }
+</style>
+
+<div>
+  <div class="dropdown">
+    <a class="btn btn-outline-primary dropdown-toggle btn-lg" href="#" role="button" data-bs-toggle="dropdown"
+      aria-expanded="false">
+      Faktury
+    </a>
+
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="/order">Zakázky</a></li>
+      <li><a class="dropdown-item active" href="/order/invoices">Faktury</a></li>
+      <li><a class="dropdown-item" href="#">...</a></li>
+    </ul>
+  </div>
+  <a href="/order/invoices/new" class="btn btn-primary">Go To Invoice Test View</a>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $.ajax({
+      type: "GET",
+      url: "/order/api/invoices/",
+      dataType: "json",
+      success: function (data) {
+        var list = $('#invoice-list'); // select the list element by its ID
+        list.empty(); // remove any existing list items
+        if (data.length === 0) { // if no data is returned, add an empty invoice to the list
+          var emptyInvoice = { title: '', amount: 0 };
+          data.push(emptyInvoice);
+        }
+        $.each(data, function (index, item) { // loop through the data array
+          var listItem = $('<li>').text(item.title); // create a new list item with the item's title
+          list.append(listItem); // add the new list item to the list
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error(error); // log any errors to the console
+      }
+    });
+    console.log("Where is problem")
+  })
+</script>
+
+{% end %}
