@@ -1,8 +1,11 @@
 import json
+import pprint
 from bson import ObjectId
 import bson
 from plugins import BaseHandler
 
+ROLE_INVOICE_MODIFY ='invoice-sudo'
+ROLE_INVOICE_VIEW = 'invoice-access'
 
 class InvoiceSingleHandler(BaseHandler):
     def get(self, id):
@@ -55,10 +58,17 @@ class InvoiceMultipleHandler(BaseHandler):
 
     def get(self):
         '''get all invoices'''
-        print("AMMA HERE")
+        roles_current_user = self.get_current_user()["role"]
+
+        if not ROLE_INVOICE_VIEW in roles_current_user:
+            FORBIDDEN_403 = 403
+            self.send_error(FORBIDDEN_403)
         try:
-            all_invoices = list(json.loads(self.request.body))
-            self.mdb.order.insert_one(all_invoices)
+            all_invoices = self.mdb.invoices.find({})
+            invoices_json = json.dumps(list(all_invoices))
+            self.set_header("Content-Type", "application/json")
+            self.write(invoices_json)
+            self.finish()
         except Exception as e:
             print(str(e))
             self.send_error(404)

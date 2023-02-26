@@ -16,6 +16,9 @@ def get_plugin_handlers():
         (r'/{}/{}/'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceOverview),
         (r'/{}/{}/new'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceView),
         (r'/{}/{}/new/'.format(order_base_name, invoice_endpoint_name), invoices.InvoiceView),
+
+        # api invoices
+        (r'/{}/api/{}'.format(order_base_name, invoice_endpoint_name), api_invoice.InvoiceMultipleHandler),
     ]
 
 

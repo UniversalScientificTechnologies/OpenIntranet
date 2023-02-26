@@ -69,11 +69,17 @@
       <li><a class="dropdown-item" href="#">...</a></li>
     </ul>
   </div>
+
+  <!-- list of invoices -->
+  <ul id="invoice-list"></ul>
+
+  <button class="btn btn-outline-primary" id="fill-invoices">Fill invoice list (test button)</button>
   <a href="/order/invoices/new" class="btn btn-primary">Go To Invoice Test View</a>
 </div>
 
 <script type="text/javascript">
   $(document).ready(function () {
+    /*
     $.ajax({
       type: "GET",
       url: "/order/api/invoices/",
@@ -94,7 +100,42 @@
         console.error(error); // log any errors to the console
       }
     });
+    */
     console.log("Where is problem")
+
+
+    $('#fill-invoices').click(function () {
+      $.ajax({
+        type: "GET",
+        url: "/order/api/invoices",
+        dataType: "json",
+        success: function (data, status) {
+          // alert("Data: " + data + "\nStatus: " + status);
+          var ul = $('#invoice-list');
+          ul.empty();
+          if (data.length > 0) {
+            $.each(data, function(index, element) {
+              var li = $('<li></li>').text(element);
+              ul.append(li);
+            })
+          } else {
+              var li = $('<li></li>').text("no invoices in database");
+              ul.append(li);
+          }
+          //var jsonData = JSON.parse(data);
+          var ul = $('<ul></ul>');
+
+          
+          $.each(data, function (index, element) {
+            var li = $('<li></li>').text(element);
+            ul.append(li);
+          });
+
+          // Append the filled ul element to a container in the DOM
+          $('#container').append(ul);
+        }
+      })
+    })
   })
 </script>
 
