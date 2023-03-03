@@ -86,7 +86,12 @@
     $(document).ready(function () {
         //sample invoice
         let invoice = {
-            "..." : "..."
+            "pog": "pogvoice",
+            "pog": "ajsd",
+            "pog": {
+                "pog": "pogvoice",
+                "pog": "ajsd",
+            },
         }
         // generate invoice ID
         $("#invoice-id").val("F12023020001");
@@ -111,13 +116,13 @@
             $.ajax({
                 type: "POST",
                 url: "/order/api/invoices",
-                data: invoice,
-                dataType: "json",
+                data: JSON.stringify(invoice),
+                contentType: "application/json",
                 success: function (data, status) {
-                    alert("Faktura ulozena");
+                    console.log("Faktura ulozena [debug] need to be implemented");
                 },
-                error: function (data, status) {
-                    alert("Faktura nebyla ulozena");
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Error: " + textStatus + "\n" + jqXHR.responseText);
                 }
             })
         })

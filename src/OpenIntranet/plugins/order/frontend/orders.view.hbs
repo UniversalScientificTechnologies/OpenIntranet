@@ -75,12 +75,12 @@
                         <div class="col-sm-10 row">
                             <input type="text" class="form-control" id="order_description">
                         </div>
-                        
+
                         <label for="order_date_of_creation" class="col-sm-2 col-form-label">Datum vytvoření</label>
                         <div class="col-sm-10 row">
                             <input type="date" class="form-control" id="order_date_of_creation">
                         </div>
-                 
+
                         <label for="order_price_total_no_dph" class="col-sm-2 col-form-label">Cena bez DPH</label>
                         <div class="col-sm-10 row">
                             <input type="text" class="form-control" id="order_price_total_no_dph" value="0" disabled>
@@ -241,7 +241,7 @@
             "other_info": "{{ order["customer"]["other_info"] }}"
             },
         "price_total": {{ order.get("price_total", "not found") }},
-    "price_to_pay": {{ order.get("price_to_pay", "not found") }},
+    "price_to_pay": { { order.get("price_to_pay", "not found") } },
     "items": items,
         }
     refresh_itemstable()
@@ -484,7 +484,7 @@
         });
     })
 
-    $('#generate_pdf').click(function() {
+    $('#generate_pdf').click(function () {
         fill_order_object()
     })
 </script>

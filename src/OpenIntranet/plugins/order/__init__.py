@@ -8,7 +8,6 @@ def get_plugin_handlers():
         # orders:
         (r'/{}'.format(order_base_name), orders.HomeHandler),
         (r'/{}/'.format(order_base_name), orders.HomeHandler),
-        (r'/{}/view([^/]+)?'.format(order_base_name), orders.ViewHandler),
         (r'/{}/view/([^/]+)?'.format(order_base_name), orders.ViewHandler),
         
         # invoices:
@@ -19,6 +18,7 @@ def get_plugin_handlers():
 
         # api invoices
         (r'/{}/api/{}'.format(order_base_name, invoice_endpoint_name), api_invoice.InvoiceMultipleHandler),
+        (r'/{}/api/{}/([^/]+)?'.format(order_base_name, invoice_endpoint_name), api_invoice.InvoiceSingleHandler),
     ]
 
 
