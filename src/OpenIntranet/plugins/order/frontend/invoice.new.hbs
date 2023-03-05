@@ -2,79 +2,33 @@
 {% block title %} | Produkce, uvod{% end %}
 {% block body %}
 
-
-
 <style type="text/css">
+    .label {
+        margin: 10px;
+    }
 </style>
 
 <div>
     <div class="container">
-        <div class="row container">
-            <p id="subpage-title" class="fs-1">Faktura</p>
-        </div>
+        <p id="subpage-title" class="fs-1">Tvorba nové faktury</p>
         <div class="row">
             <div class="col">
-
-                <div class="input-group mb-3">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="invoice-id" disabled>
-                        <label for="floatingInput">číslo faktury</label>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="invoice-id">
+                    <label for="floatingInput">číslo faktury</label>
+                    <div id="invoice-id-help" class="form-text">Nastavte unikátní označení nové faktury. Označení, které
+                        vidíte, je automaticky navržené.</div>
                     </div>
-                    <button class="btn btn-outline-secondary" type="button" id="edit-invoice-id">Upravit</button>
+                <div class="alert alert-success" style="display : none" role="alert">
+                    Číslo faktury úspěšně přiřazeno!
                 </div>
             </div>
 
-
-            <p id="subpage-title" class="fs-2">Dodavatel</p>
-            <div class="form-floating">
-                <textarea class="form-control" id="floatingTextarea2" style="height: 100px"></textarea>
-                <label for="floatingTextarea2">Dodavatel</label>
+            <div class="inline">
+                <button id="create-invoice" type="button" class="btn btn-success">Vytvořit fakturu</button>
+                <button id="go-back" type="button" class="btn btn-secondary">Zrušit</button>
+                <a href="/order/invoices/new" id="edit-invoice"style="display : none" class="btn btn-success">Pokračovat</a>
             </div>
-
-            <p id="subpage-title" class="fs-2">Obderatel</p>
-            <div class="form-floating">
-                <textarea class="form-control" id="floatingTextarea2" style="height: 100px"></textarea>
-                <label for="floatingTextarea2">Obderatel </label>
-            </div>
-
-            <select class="form-select" aria-label="Mena">
-                <option selected>Měna</option>
-                <option value="1">CZK</option>
-                <option value="2">USD</option>
-                <option value="3">EUR</option>
-            </select>
-
-            <label for="order_date_of_creation" class="col-sm-2 col-form-label">Datum splatnosti</label>
-            <div class="col-sm-10 row">
-                <input type="date" class="form-control" id="order_date_of_creation">
-            </div>
-
-            <label for="order_date_of_creation" class="col-sm-2 col-form-label">Datum vystavení</label>
-            <div class="col-sm-10 row">
-                <input type="date" class="form-control" id="order_date_of_creation">
-            </div>
-
-            <label for="order_date_of_creation" class="col-sm-2 col-form-label">Datum zdanitelného plnění</label>
-            <div class="col-sm-10 row">
-                <input type="date" class="form-control" id="order_date_of_creation">
-            </div>
-
-            Udaje k platbe
-            - Variabilní symbol platby
-            - Číslo účtu/kód
-            - IBAN:
-            - SWIFT:
-            Forma uhrady
-
-            Tabulka vyrobku
-
-            peněžní suma
-            den vyhotovení účetního dokladu
-
-
-            <button id="generate_pdf" type="button" class="btn btn-primary">Generovat PDF ...</button>
-            <button id="modify_order" type="button" class="btn btn-success">Uložit</button>
-            <button id="create_order" type="button" class="btn btn-outline-success">Uzavřít fakturu</button>
         </div>
     </div>
 </div>
@@ -82,51 +36,44 @@
 
 
 <script type="text/javascript">
-
     $(document).ready(function () {
-        //sample invoice
-        let invoice = {
-            "pog": "pogvoice",
-            "pog": "ajsd",
-            "pog": {
-                "pog": "pogvoice",
-                "pog": "ajsd",
-            },
-        }
-        // generate invoice ID
+        // generate invoice id
         $("#invoice-id").val("F12023020001");
 
+        //sample invoice
+        let invoice = {
+            "_id": $("#invoice-id").val(),
+        };
 
-        $("#edit-invoice-id").click(function () {
-            const disabled = $("#invoice-id").is(":disabled");
-            //alert(disabled)
-            if (disabled) {
-                $("#edit-invoice-id").text("Uloži změnu");
-            } else {
-                $("#edit-invoice-id").text("Upravit");
+        $("#invoice-id").on("input", function () {
+            invoice._id = $(this).val();
+        });
 
-            }
-
-            $("#invoice-id").prop(
-                'disabled', !disabled
-            );
-        })
-
-        $("#modify_order").click(function () {
+        $("#create-invoice").click(function () {
             $.ajax({
                 type: "POST",
                 url: "/order/api/invoices",
                 data: JSON.stringify(invoice),
                 contentType: "application/json",
                 success: function (data, status) {
-                    console.log("Faktura ulozena [debug] need to be implemented");
+                    $("#invoice-id").prop("disabled", true);
+                    $('button').hide();
+                    $('#invoice-id-help').hide();
+                    $("#edit-invoice").attr("href", "/order/invoices/"+invoice._id);
+                    $('#edit-invoice').show();
+                    $('.alert-success').show();
+                    // display confirmation
+                    // redirect to page where invoce to be modified
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert("Error: " + textStatus + "\n" + jqXHR.responseText);
+                    if (jqXHR.status == 400) {
+                        alert("Invoice with this id already exists.");
+                    } else {
+                        alert("Error: " + textStatus + "\n" + jqXHR.responseText);
+                    }
                 }
             })
         })
-
     });
 </script>
 

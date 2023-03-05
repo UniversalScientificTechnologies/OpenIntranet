@@ -21,7 +21,10 @@ class InvoiceSingleHandler(BaseHandler):
             self.send_error(FORBIDDEN_403)
 
         try:
-            invoice = self.mdb.invoice.find_one({'_id': ObjectId(id)})
+            print(id)
+            invoice = self.mdb.invoice.find_one({'_id': id})
+            print(invoice)
+            pprint.pprint(bson.json_util.dumps(invoice))
             self.write(bson.json_util.dumps(invoice))
         except Exception as e:
             print(str(e))
@@ -37,13 +40,11 @@ class InvoiceSingleHandler(BaseHandler):
 
         try:
             updated_invoice = json.loads(self.request.body)
-            self.mdb.invoice.update_one({"_id": ObjectId(id)}, {"$set": updated_invoice})
+            self.mdb.invoice.update_one({"_id": id}, {"$set": updated_invoice})
             self.set_header("Content-Type", "application/json")
             self.write(json.dumps(updated_invoice))
         except ValueError:
             self.send_error(BAD_REQUEST_400)
-        except pymongo.errors.NotFound:
-            self.send_error(404)
         except Exception as e:
             print(str(e))
             self.send_error(404)
@@ -56,8 +57,7 @@ class InvoiceSingleHandler(BaseHandler):
             self.send_error(FORBIDDEN_403)
 
         try:
-            invoice_id = ObjectId(id)
-            result = self.mdb.invoice.delete_one({'_id': invoice_id})
+            result = self.mdb.invoice.delete_one({'_id': id})
             
             if result.deleted_count == 1:
                 self.write('Invoice deleted successfully')
@@ -76,9 +76,15 @@ class InvoiceMultipleHandler(BaseHandler):
         if not ROLE_INVOICE_MODIFY in roles_current_user:
             self.send_error(FORBIDDEN_403)
 
+
         try:
             new_invoice = json.loads(self.request.body)
-            pprint.pprint(new_invoice)
+
+            existing_invoice = self.mdb.invoice.find_one({"_id":new_invoice["_id"]})
+            if existing_invoice:
+                self.send_error(400, message="Invoice with this ID already exists")
+                return
+            
             self.mdb.invoice.insert_one(new_invoice)
             self.write("ok")
         except Exception as e:

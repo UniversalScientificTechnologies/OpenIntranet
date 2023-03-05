@@ -1,0 +1,331 @@
+{% extends "base.hbs" %}
+{% block title %} | Produkce, uvod{% end %}
+{% block body %}
+
+<style type="text/css">
+    div#feedback-alert {
+        position: static;
+        width: fit-content;
+        height: fit-content;
+    }
+
+    div#message-box {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+    }
+</style>
+
+<div>
+    <div class="container">
+        <p id="subpage-title" class="fs-1">Faktura č. {{id}}</p>
+        <div class="row">
+
+
+
+            <p class="fs-3">Dodavatel</p>
+            <textarea class="form-control" id="supplier" style="height: 200px"></textarea>
+
+            <p class="fs-3">Obděratel</p>
+            <textarea class="form-control" id="subscriber" style="height: 200px">
+Universal Scientific Technologies s.r.o. U Jatek 19
+39201 Soběslav
+
+IČ: 28155319 DIČ: CZ28155319
+
+Společnost zapsaná v obchodním rejstříku vedeném Krajským soudem v Českých Budějovicích, oddíl C, vložka 20687
+            </textarea>
+
+            <div class="input-group mb-3">
+                <select id="currency" class="form-select" aria-label="Měna">
+                    <option value="1">CZK</option>
+                    <option value="2">USD</option>
+                    <option value="3">EUR</option>
+                </select>
+                <span class="input-group-text">Měna</span>
+            </div>
+
+            <!-- dates -->
+            <label for="due-date" class="col-sm-2 col-form-label">Datum splatnosti</label>
+            <div class="col-sm-10 row">
+                <input type="date" class="form-control" id="due-date">
+            </div>
+
+            <label for="date-of-issue" class="col-sm-2 col-form-label">Datum vyhotovení účetního dokladu</label>
+            <div class="col-sm-10 row">
+                <input type="date" class="form-control" id="date-of-issue">
+            </div>
+
+            <label for="date-of-taxable-supply" class="col-sm-2 col-form-label">Datum zdanitelného plnění</label>
+            <div class="col-sm-10 row">
+                <input type="date" class="form-control" id="date-of-taxable-supply">
+            </div>
+
+
+
+            <p class="fs-3">Údaje k platbě</p>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="var-symbol" placeholder="Variabilní symbol">
+                <label for="floatingInput">Variabilní symbol</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="account-number" placeholder="Číslo účtu/kód">
+                <label for="floatingInput">Číslo účtu/kód</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="iban" placeholder="IBAN">
+                <label for="floatingInput">IBAN</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="swift" placeholder="SWIFT">
+                <label for="floatingInput">SWIFT</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="payment-form" placeholder="Forma úhrady">
+                <label for="floatingInput">Forma úhrady</label>
+            </div>
+
+            <p class="fs-3">Tabulka vyrobku</p>
+            <table id="table-items" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price per piece</th>
+                        <th>Discount units</th>
+                        <th>Discount percent</th>
+                        <th>Amount</th>
+                        <th>DPH</th>
+                        <th>From store</th>
+                        <th>Price no DPH</th>
+                        <th>Price total</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- dynammicaly managed -->
+                    <tr>
+                        <td>žádné položky</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="fs-4">Celkova suma [to be added]</p>
+
+            <button id="add-new-item" type="button" class="btn btn-primary">Add new item [sample item for
+                debugging]</button>
+            <button id="refresh-invoice" type="button" class="btn btn-primary">Načíst stav z databáze.
+                [debugging]</button>
+            <button id="generate-pdf" type="button" class="btn btn-primary">Generovat PDF ... [to be
+                implemented]</button>
+            <button id="close-invoice" type="button" class="btn btn-outline-success">Uzavřít fakturu [to be
+                implemented]</button>
+
+
+            <div id="message-box">
+                <div id="feedback-alert" class="alert alert-warning" role="alert" style="display : none">
+                    <!-- message to be here -->
+                    sample message
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script type="text/javascript">
+    let invoice = {};
+    let docInited = false;
+    $(document).ready(function () {
+        loadInvoice();
+
+        $('#subscriber').change(function () {
+            invoice.subscriber = $('#subscriber').val();
+            updateInvoice();
+        })
+
+        $('#supplier').change(function () {
+            invoice.supplier = $('#supplier').val();
+            updateInvoice();
+        })
+
+        $("#currency").on("change", function () {
+            invoice.currency = $("#currency option:selected").text();
+            updateInvoice();
+        })
+
+        $("#due-date").change(function () {
+            let newDate = new Date($(this).val());
+            invoice.due_date = newDate.toISOString();
+            updateInvoice();
+        })
+
+        $("#date-of-issue").change(function () {
+            let newDate = new Date($(this).val());
+            invoice.date_of_issue = newDate.toISOString();
+            updateInvoice();
+        })
+
+        $("#date-of-taxable-supply").change(function () {
+            let newDate = newDate.toISOString();
+            invoice.date_of_taxable_supply = new Date($(this).val());
+            updateInvoice();
+        })
+
+
+        $("#var-symbol").change(function () {
+            invoice.varible_symbol = $(this).val();
+            updateInvoice();
+        })
+
+        $("#account-number").change(function () {
+            invoice.account_number = $(this).val();
+            updateInvoice();
+        })
+
+        $("#iban").change(function () {
+            invoice.iban = $(this).val();
+            updateInvoice();
+        })
+
+        $("#swift").change(function () {
+            invoice.swift = $(this).val();
+            updateInvoice();
+        })
+
+        $("#payment-form").change(function () {
+            invoice.payment_form = $(this).val();
+            updateInvoice();
+        })
+
+        // debug button
+        $('#refresh-invoice').click(loadInvoice);
+
+        function dateIsoToInputFormat(dateString) {
+            var myDate = new Date(invoice.due_date);
+            var day = ("0" + myDate.getDate()).slice(-2);
+            var month = ("0" + (myDate.getMonth() + 1)).slice(-2);
+            return myDate.getFullYear()+"-"+(month)+"-"+(day);
+        }
+
+        function loadInvoice() {
+            // ajax get RQ
+            $.ajax({
+                type: "GET",
+                url: "/order/api/invoices/" + "{{ id }}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data, status) {
+                    invoice = data;
+                    console.log(invoice);
+                    if (invoice.items) {
+                        refreshItems();
+                    }
+
+                    if (docInited == false) {
+                        $('#subscriber').val(invoice.subscriber);
+                        $('#supplier').val(invoice.supplier);
+                        $('#currency option[value='+invoice.currency+']').attr('selected','selected');
+                        $("#due-date").val(dateIsoToInputFormat(invoice.due_date));
+                        $("#date-of-issue").val(dateIsoToInputFormat(invoice.date_of_issue));
+                        $("#date-of-taxable-supply").val(dateIsoToInputFormat(invoice.date_of_taxable_supply));
+                        $("#var-symbol").val(invoice.varible_symbol);
+                        $("#account-number").val(invoice.account_number);
+                        $("#iban").val(invoice.iban);
+                        $("#swift").val(invoice.swift);
+                        $("#payment-form").val(invoice.payment_form);
+                        docInited = true;
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error updating invoice: " + textStatus);
+                }
+            });
+        }
+
+        function refreshItems() {
+            $('#table-items > tbody').empty()
+            invoice.items.forEach(item => {
+                $('#table-items > tbody:last-child').append(`
+                    <tr>
+                    <td>${item.name}</td>
+                    <td>${item.description}</td>
+                    <td>${item.price_per_piece}</td>
+                    <td>${item.discount_units}</td>
+                    <td>${item.discount_percent}</td>
+                    <td>${item.amount}</td>
+                    <td>${item.dph}</td>
+                    <td>${item.from_store}</td>
+                    <td>${item.price_no_dph}</td>
+                    <td>${item.price_total}</td>
+                    <td><button class="edit btn btn-outline-primary">Upravit</button></td>
+                    <td><button class="delete btn btn-outline-danger">Smazat</button></td>
+                    </tr>
+                `);
+            })
+
+            // setup events for new buttons
+            $("button.edit").click(function () {
+                const index = $(this).closest('tr').index();
+                // edit this: invoice.items[index].name
+                console.log(index);
+                updateInvoice();
+            })
+
+            $("button.delete").click(function () {
+                const index = $(this).closest('tr').index();
+                invoice.items.splice(index, 1);
+                updateInvoice();
+            })
+        }
+
+        $('#add-new-item').click(function () {
+            if (!invoice.items) {
+                invoice.items = [];
+            }
+            invoice.items.push({
+                name: "Example item 3",
+                description: "This is an example item",
+                price_per_piece: 10,
+                discount_units: 0,
+                discount_percent: 0,
+                amount: 1,
+                dph: 21,
+                from_store: false,
+                price_no_dph: 10,
+                price_total: 12.10
+            });
+            updateInvoice();
+        })
+
+        function showMessage(msg) {
+            $('#feedback-alert').text(msg);
+            $('#feedback-alert').show();
+            setTimeout(function () {
+                $('#feedback-alert').fadeOut('slow');
+            }, 3000);
+        }
+
+        function updateInvoice() {
+            $.ajax({
+                type: "PUT",
+                url: "/order/api/invoices/" + invoice._id,
+                data: JSON.stringify(invoice),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data, status) {
+                    console.log("Invoice updated successfully");
+                    showMessage("Změny uloženy.");
+                    loadInvoice();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error updating invoice: " + textStatus);
+                }
+            });
+        }
+    });
+</script>
+
+{% end %}

@@ -21,12 +21,22 @@ class InvoiceOverview(BaseHandler):
             print(e)
 
 
-class InvoiceView(BaseHandler):
+class InvoiceNew(BaseHandler):
     def get(self):
+        try:
+            self.render(
+                "../plugins/order/frontend/invoice.new.hbs",
+            )
+        except Exception as e:
+            print(e)
+
+class InvoiceEdit(BaseHandler):
+    def get(self, id):
         try:
             print("here")
             self.render(
-                "../plugins/order/frontend/invoice.new.hbs",
+                "../plugins/order/frontend/invoice.edit.hbs",
+                id=id,
             )
         except Exception as e:
             print(e)

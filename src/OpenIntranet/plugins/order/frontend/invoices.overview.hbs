@@ -4,171 +4,128 @@
 
 
 <style type="text/css">
-  .product_list_element {
-    margin: 0pt;
-    margin-top: 10pt;
-    padding: 5pt;
-  }
-
-  .product_list_element_table {
-    width: 100%;
-    background: white;
-    border: #aaa solid 1pt;
-    padding: 5pt;
-    margin: 0pt;
-    display: inline-flex;
-  }
-
-  .table_input {
-    width: 8em;
-    border: #ccc solid thin;
-    background: #fafafa;
-  }
-
-  .form-group {
-    margin-bottom: 0.5rem;
-  }
-
-
-  .cat_top {
-    flex: 0 0 auto;
-    width: 150pt;
-  }
-
-  #filter_block {
-    /* display: flex; */
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    margin: 0pt;
-  }
-
-  .form-tab-td {
-    padding: 0px;
-  }
-
-  .list_name {
-    padding-left: 0.5em;
-    vertical-align: top;
-  }
-
-  .highlight {
-    background-color: rgb(191, 230, 191);
-  }
 </style>
 
 <div>
-  <div class="dropdown">
-    <a class="btn btn-outline-primary dropdown-toggle btn-lg" href="#" role="button" data-bs-toggle="dropdown"
-      aria-expanded="false">
-      Faktury
-    </a>
+	<div class="dropdown">
+		<ul class="nav nav-tabs">
+			<li class="nav-item"><a class="nav-link" href="/order">Zakázky</a></li>
+			<li class="nav-item"><a class="nav-link active" href="/order/invoices">Faktury</a></li>
+			<li class="nav-item"><a class="nav-link" href="#">...</a></li>
+		</ul>
 
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="/order">Zakázky</a></li>
-      <li><a class="dropdown-item active" href="/order/invoices">Faktury</a></li>
-      <li><a class="dropdown-item" href="#">...</a></li>
-    </ul>
-  </div>
+		<table id="invoice-table" class="table ">
+			<thead>
+				<tr>
+					<th>_id</th>
+					<th>currency</th>
+					<th>supplier</th>
+					<th>date_of_issue</th>
+					<th>due_date</th>
+					<th>varible_symbol</th>
+					<th>account_number</th>
+					<th>iban</th>
+					<th>swift</th>
+					<th>payment_form</th>
+					<th>subscriber</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- invoices to be added dynamicaly -->
+			</tbody>
+		</table>
 
-  <!-- list of invoices -->
-  <ul id="invoice-list"></ul>
+	</div>
 
-  <button class="btn btn-outline-primary" id="fill-invoices">Fill invoice list (test button)</button>
-  <button class="btn btn-outline-danger" id="delete-invoices">Delete ALL invoices (test button)</button>
-  <button class="btn btn-outline-danger" id="delete-invoice">Delete Random invoice (test button)</button>
-  <button class="btn btn-outline-success" id="update-invoice">Update Random invoice (test button)</button>
-  <a href="/order/invoices/new" class="btn btn-primary">Go To New Invoice [still in development]</a>
+	<!-- list of invoices -->
+	<ul id="invoice-list"></ul>
+
+	<a href="/order/invoices/new" class="btn btn-primary">Vytvořit novou fakturu</a>
+	<button class="btn btn-outline-danger" id="delete-invoices">Smazat všechny faktury [testing purposes]</button>
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function () {
+	$(document).ready(function () {
 
-    let invoices = []
+		let invoices = []
 
-    refreshInvoiceList();
+		refreshInvoiceList();
 
+		function refreshInvoiceList() {
+			$.ajax({
+				type: "GET",
+				url: "/order/api/invoices",
+				dataType: "json",
+				success: function (data, status) {
+					// alert("Data: " + data + "\nStatus: " + status);
+					if (data.length > 0) {
+						invoices = data;
+						
+						$("#invoice-table tbody").empty();
+						invoices.forEach(function (invoice) {
+							$("#invoice-table tbody").append(`<tr>
+							<td>${invoice._id}</td>
+							<td>${invoice.currency}</td>
+							<td>${invoice.supplier}</td>
+							<td>${invoice.date_of_issue}</td>
+							<td>${invoice.due_date}</td>
+							<td>${invoice.varible_symbol}</td>
+							<td>${invoice.account_number}</td>
+							<td>${invoice.iban}</td>
+							<td>${invoice.swift}</td>
+							<td>${invoice.payment_form}</td>
+							<td>${invoice.subscriber}</td>
+							<td>
+								<a href='/order/invoices/${invoice._id}' class="btn btn-sm 
+								btn-primary btn-edit" type="button" data-id="${invoice._id}">Upravit</a>
+							</td>
+							<td>
+								<button class="btn btn-sm btn-danger btn-delete" type="button" 
+								data-id="${invoice._id}">Smazat</button>
+							</td>
+							</tr>`);
 
-    function refreshInvoiceList() {
-      $.ajax({
-        type: "GET",
-        url: "/order/api/invoices",
-        dataType: "json",
-        success: function (data, status) {
-          // alert("Data: " + data + "\nStatus: " + status);
-          var ul = $('#invoice-list');
-          ul.empty();
-          if (data.length > 0) {
-            $.each(data, function (index, element) {
-              var li = $('<li></li>').text("Faktura " + element["_id"]);
-              ul.append(li);
-            })
-            invoices = data;
-          } else {
-            var li = $('<li></li>').text("no invoices in database");
-            ul.append(li);
-          }
-          $('#container').append(ul);
-        }
-      })
-    }
+							// setup events for new buttons
+							$('button.btn-delete').click(function () {
+								const invoiceId = $(this).attr("data-id");
+								$.ajax({
+									type: "DELETE",
+									url: "/order/api/invoices/" + invoiceId,
+									success: function (data, status) {
+										alert("Invoice " + invoiceId + " deleted");
+										refreshInvoiceList();
+									},
+									error: function (jqXHR, textStatus, errorThrown) {
+										alert("Error: " + textStatus + "\n" + jqXHR.responseText);
+									}
+								});
+							})
 
-    $('#fill-invoices').click(function () {
-      refreshInvoiceList();
-    });
+						});
 
-    $('#update-invoice').click(function () {
-      var invoiceId = invoices[0]._id;
-      const invoice_sample = {
-        "updated" : "updated",
-        "updated" : {
-          "updated" : "updated",
-        }
-      }
-      $.ajax({
-        type: "PUT",
-        url: "/order/api/invoices/" + invoiceId,
-        data: JSON.stringify(invoice_sample),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (data, status) {
-          console.log("Invoice updated successfully");
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.log("Error updating invoice: " + textStatus);
-        }
-      });
-    })
+					} else {
+						var li = $('<li></li>').text("no invoices in database");
+						ul.append(li);
+					}
+					$('#container').append(ul);
+				}
+			})
+		}
 
-    $('#delete-invoices').click(function () {
-      $.ajax({
-        type: "DELETE",
-        url: "/order/api/invoices",
-        success: function (data, status) {
-          alert("All invoices deleted");
-          refreshInvoiceList();
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          alert("Error: " + textStatus + "\n" + jqXHR.responseText);
-        }
-      });
-    });
-
-    $('#delete-invoice').click(function () {
-      var invoiceId = invoices[0]._id; // replace with the ID of the invoice to delete
-      alert(invoiceId)
-      $.ajax({
-        type: "DELETE",
-        url: "/order/api/invoices/" + invoiceId,
-        success: function (data, status) {
-          alert("Invoice " + invoiceId + " deleted");
-          refreshInvoiceList();
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          alert("Error: " + textStatus + "\n" + jqXHR.responseText);
-        }
-      });
-    });
-  })
+		$('#delete-invoices').click(function () {
+			$.ajax({
+				type: "DELETE",
+				url: "/order/api/invoices",
+				success: function (data, status) {
+					alert("All invoices deleted");
+					refreshInvoiceList();
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					alert("Error: " + textStatus + "\n" + jqXHR.responseText);
+				}
+			});
+		});
+	})
 </script>
 
 {% end %}
