@@ -441,7 +441,7 @@ class api_move_category(BaseHandler):
         if parent == '':
             print("CHYBA neni nastaven rodic")
             parent = '#'
-        if parent is not '#': parent = bson.ObjectId(parent.split('_')[0])
+        if parent != '#': parent = bson.ObjectId(parent.split('_')[0])
         print("new parent", parent)
         print("Object", self.get_argument("id", None))
 
@@ -462,7 +462,7 @@ class api_move_position(BaseHandler):
         if parent == '':
             print("CHYBA neni nastaven rodic")
             parent = '#'
-        if parent is not '#': parent = bson.ObjectId(parent.split('_')[0])
+        if parent != '#': parent = bson.ObjectId(parent.split('_')[0])
         print("new parent", parent)
         print("Object", self.get_argument("id", None))
 
