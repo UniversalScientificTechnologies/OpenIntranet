@@ -1,5 +1,7 @@
 FROM debian:stable-slim
 
+ENV PIP_BREAK_SYSTEM_PACKAGES 1
+
 RUN apt-get update
 RUN apt-get install -y curl python3 python3-pip htop mc nano git
 COPY requirements.txt requirements.txt
