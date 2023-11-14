@@ -1,6 +1,8 @@
 {%for i, row in enumerate(data) %}
 {% set valid = bson.objectid.ObjectId.is_valid(row['cUST_ID']) %}
 
+
+{% if not row.get("exclude_from_bom", False) %}
 <tr>
 	<td>
 		<div>#{{i+1}}</div>
@@ -40,7 +42,7 @@
 	</td>
 
 	<td>
-		
+
 		<div>
 			{%try%}
 				{% if not valid %}
@@ -75,14 +77,12 @@
 					{%end%}
 				{%end%}
 			{% except%}
-				ERROR... 
+				ERROR...
 			{%end%}
 		</div>
 
 	</td>
 
 </tr>
-
-
-
-{% end %} <!-- Konec cele smycky for -->
+{% endif %}
+{% endfor %}
