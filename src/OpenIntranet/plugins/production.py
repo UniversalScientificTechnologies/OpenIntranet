@@ -27,7 +27,7 @@ class round_fpdf(FPDF):
             style = 'FD'
         elif fill:
             style = 'F'
-        self.rounded_rect(self.get_x() + (cellspacing / 2.0), 
+        self.rounded_rect(self.get_x() + (cellspacing / 2.0),
             self.get_y() +  (cellspacing / 2.0),
             w - cellspacing, h, radius, corners, style)
         self.cell(w, h + cellspacing, txt, 0, ln, align, False, link)
@@ -43,7 +43,7 @@ class round_fpdf(FPDF):
             op='S'
         my_arc = 4/3 * (math.sqrt(2) - 1)
         self._out('%.2F %.2F m' % ((x+r)*k,(hp-y)*k ))
-        xc = x+w-r 
+        xc = x+w-r
         yc = y+r
         self._out('%.2F %.2F l' % (xc*k,(hp-y)*k ))
         if 2 not in corners:
@@ -81,7 +81,7 @@ class round_fpdf(FPDF):
 
 
 class ComponentStatus(Enum):
-    Err = -1 # Nějaká chyba.. 
+    Err = -1 # Nějaká chyba..
     Actual = 0  # polozka je nahrana z BOMu
     Obsolete = 1 # Byl nahran novy BOM, ale polozka se v nem nevyskytuje
     ModifiedManually = 2 # Polozka byla rucne upravena
@@ -151,7 +151,7 @@ def get_plugin_info():
 
 
 
-## Projde seznam vsech komponent v pricelist, a zaktualizuje ceny komponent. Vyuzivaji se ceny posledniho nakupu. 
+## Projde seznam vsech komponent v pricelist, a zaktualizuje ceny komponent. Vyuzivaji se ceny posledniho nakupu.
 
 def production_upadte_pricelist(db, production_id, price_work=-1, price_sell=-1, price_consumables=-1):
     components = db.production.find_one({'_id': bson.ObjectId(production_id)}, {'pricing':1})
@@ -333,7 +333,7 @@ class get_production_tree(BaseHandler):
                 #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
                 #pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
                 #pos['li_attr'] = {"name": out['name'], 'text': out['description']}
-                
+
                 pos['parent'] = str(out.get('parent', '#'))
                 new.append(pos)
 
@@ -461,7 +461,7 @@ class update_production_group(BaseHandler):
             })
 
         self.write("")
-            
+
 
 '''
     Tabulka s BOMem pro zobrazeni v production
@@ -472,7 +472,7 @@ class get_bom_table(BaseHandler):
 
         group_by_ustid = False
         group_by_components = False
-    
+
         query = [
             {'$match': {'_id': bson.ObjectId(name)}},
             {'$unwind': '$components'},
@@ -507,7 +507,7 @@ class get_bom_table(BaseHandler):
                      "onError": "Err",
                      "onNull": "null"
             }}}}]
-        
+
         query += [{"$lookup":{
                 "from": 'stock',
                 "localField": 'cUST_ID',
@@ -525,8 +525,8 @@ class get_bom_table(BaseHandler):
         query += [
                 {"$sort": {'Ref':1}}
             ]
-            
-        
+
+
         print(query)
         dout = list(self.mdb.production.aggregate(query))
         #out = bson.json_util.dumps(dout)
@@ -543,7 +543,7 @@ class get_close_table(BaseHandler):
 
         group_by_ustid = False
         group_by_components = False
-    
+
         query = [
             {'$match': {'_id': bson.ObjectId(name)}},
             {'$unwind': '$components'},
@@ -578,7 +578,7 @@ class get_close_table(BaseHandler):
                      "onError": "Err",
                      "onNull": "null"
             }}}}]
-        
+
         query += [{"$lookup":{
                 "from": 'stock',
                 "localField": 'cUST_ID',
@@ -596,8 +596,8 @@ class get_close_table(BaseHandler):
         query += [
                 {"$sort": {'Ref':1}}
             ]
-            
-        
+
+
         print(query)
         dout = list(self.mdb.production.aggregate(query))
         #out = bson.json_util.dumps(dout)
@@ -617,9 +617,9 @@ class get_reservation(BaseHandler):
 
 
 '''
-   
+
    EDitační stránka pro production
-   
+
 '''
 class edit(BaseHandler):
     def get(self, name):
@@ -943,7 +943,7 @@ class edit(BaseHandler):
                     flag=["reservation"]
                     )
 
-            # nastavit vyrobu na pripravenou 
+            # nastavit vyrobu na pripravenou
             self.mdb.production.update_one({"_id": bson.ObjectId(name)}, {"$set": {"state": 1, "multiplication": multiplication}})
 
             # take zaktualizuj cenovy rozpis polozky
@@ -1060,14 +1060,14 @@ class edit(BaseHandler):
             self.write(output)
 
 '''
-   
-   Ukoncit vyrobu a odecist soucastky ze skladu.. 
-   
+
+   Ukoncit vyrobu a odecist soucastky ze skladu..
+
 '''
 class close_production(BaseHandler):
     def get(self, name):
         print("Přehled polozek pred ukoncenim, name")
-        
+
         product = self.mdb.production.aggregate([
                 {'$match': {'_id': bson.ObjectId(name)}},
                 {'$unset': 'components'}
@@ -1079,9 +1079,9 @@ class close_production(BaseHandler):
 
 
 '''
-   
+
    Vytvoř duplikat vyrobniho postupu a nech ho ve stejne slozce
-   
+
 '''
 class duplicate(BaseHandler):
     def get(self, name):
@@ -1129,6 +1129,7 @@ class ust_bom_upload(BaseHandler):
                 "Value": element.findall('value')[0].text,
                 "UST_ID": '',
                 "stock_count": None,
+                "exclude_from_bom": any(prop.find("name").text == "exclude_from_bom" for prop in element.findall("property")),
                 "status": ComponentStatus.Actual.value
             }
 
@@ -1275,7 +1276,7 @@ class print_bom(BaseHandler):
                     "foreignField": '_id',
                     "as": 'packets'
                 }},
-                # {"$lookup":{            # tohle nefunguje jak by melo.. 
+                # {"$lookup":{            # tohle nefunguje jak by melo..
                 #     "from": 'category_complete',
                 #     "localField": 'components.stock.category',
                 #     "foreignField": '_id',
@@ -1439,8 +1440,8 @@ class print_bom(BaseHandler):
                 pdf.set_line_width(0.1)
                 pdf.set_draw_color(110,110,110)
                 pdf.set_text_color(110,110,110)
-                
-                
+
+
                 for packet_i, packet in enumerate(packets.get('packets', [])):
                     packet_rount += 1
 
