@@ -1133,7 +1133,7 @@ class ust_bom_upload(BaseHandler):
                 "status": ComponentStatus.Actual.value
             }
 
-        update = {x.get('name'):x.get('value') for x in element.findall('property')}
+        update = {x.get('name'):x.get('value', True) for x in element.findall('property')}
 
         try:
             component['UST_ID'] = bson.ObjectId(component['UST_ID'])
