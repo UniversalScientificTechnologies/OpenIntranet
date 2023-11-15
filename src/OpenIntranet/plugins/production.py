@@ -1129,7 +1129,7 @@ class ust_bom_upload(BaseHandler):
                 "Value": element.findall('value')[0].text,
                 "UST_ID": '',
                 "stock_count": None,
-                "exclude_from_bom": any(prop.find("name").text == "exclude_from_bom" for prop in element.findall("property")),
+                # "exclude_from_bom": any(prop.find("name").text == "exclude_from_bom" for prop in element.findall("property")),
                 "status": ComponentStatus.Actual.value
             }
 
