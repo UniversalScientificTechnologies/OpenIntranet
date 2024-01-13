@@ -334,6 +334,7 @@
 
         var sku_s = $('#sku_search').val();
         sku_s = extractString(sku_s);
+        $('#sku_search').val(sku_s);
 
         $.ajax({
           type: "POST",
