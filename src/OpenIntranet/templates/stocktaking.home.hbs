@@ -316,6 +316,15 @@
       });
     }
 
+    function extractString(input) {
+        // Regulární výraz pro nalezení stringu mezi [GS]S a [GS]
+        const regex = /\[GS\]S(.*?)\[GS\]/;
+        const match = input.match(regex);
+    
+        // Pokud byl nalezen shodný vzor, vrátí první skupinu (.*?), jinak vrátí null
+        return match ? match[1] : input;
+    }
+    
     $("#sku_search").on("change", reload_sku());
     function reload_sku(){
         clear_form();
@@ -323,11 +332,14 @@
         $(".old_val_spinner").show();
         $(".old_val_text").hide();
 
+        var sku_s = $('#sku_search').val();
+        sku_s = extractString(sku_s);
+
         $.ajax({
           type: "POST",
           url: "/stocktaking/get_packet/",
           data: {
-            '_id': $('#sku_search').val(),
+            '_id': sku_s,
             'stocktaking_position': $('#position_select').val(),
             'add_position': $('#position_add').is(':checked'),
           },
