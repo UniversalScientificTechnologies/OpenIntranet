@@ -15,13 +15,23 @@ services:
     #  MONGO_INITDB_ROOT_USERNAME: root
     #  MONGO_INITDB_ROOT_PASSWORD: example
 
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
+
   intranet:
     build: .
-    #depends_on:
-    #  - mongo
+    depends_on:
+      - mongo
+      - redis 
     volumes:
       - intranet_data:/data
-      # - /home/roman/docker_test/intranet:/data/
+      - type: bind
+        source: ./src
+        target: /app
     ports:
       - 8888:8888
     networks:

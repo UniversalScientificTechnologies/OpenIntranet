@@ -25,7 +25,7 @@ def api_call(action, params, token, app_secret, show_header=False):
 
     hm = hmac.new(bytes(app_secret, encoding='utf8'), signature_base.encode('utf-8'), hashlib.sha1).digest()
     print(hm)
-    api_signature = base64.encodestring(hm).rstrip();
+    api_signature = base64.encodebytes(hm).rstrip();
     params['ApiSignature'] = api_signature;
 
     opts = {
@@ -66,7 +66,7 @@ class tme(BaseHandler):
 	#role_module = ['store-sudo', 'store-access', 'store-manager', 'store_read']
 
 	def get(self, component_id = None):
-		r = redis.Redis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+		r = redis.Redis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
 
 
 		if component_id:
@@ -204,7 +204,7 @@ class mouser_data_importer(BaseHandler):
 
 		if self.get_argument('symbol', None):	
 			key = self.mdb.intranet_plugins.find_one({'_id': 'store'})['data']['data_import']['mouser_api_key']			
-			r = redis.Redis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+			r = redis.Redis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
 
 			if component_id:
 				component_id = bson.ObjectId(component_id)
@@ -261,7 +261,7 @@ class return_data(BaseHandler):
 	#role_module = ['store-sudo', 'store-access', 'store-manager', 'store_read']
 
 	def get(self):
-		r = redis.Redis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+		r = redis.Redis(host='redis', port=6379, db=0, charset="utf-8", decode_responses=True)
 
 
 		sesid = self.get_argument('sesid', None)
