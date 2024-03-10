@@ -31,9 +31,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      -
-        name: Build and push
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: |
+            romandvorak/open-intranet
+            ghcr.io/${{ github.repository }}
+            
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: romandvorak/open-intranet:latest
+          context: .
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
