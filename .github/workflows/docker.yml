@@ -33,7 +33,7 @@ jobs:
 
       -
         name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: romandvorak/open-intranet:latest
