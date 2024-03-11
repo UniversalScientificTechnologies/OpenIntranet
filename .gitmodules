@@ -31,3 +31,9 @@
 [submodule "src/OpenIntranet/static/bootstrap-icons"]
 	path = src/OpenIntranet/static/bootstrap-icons
 	url = https://github.com/twbs/icons.git
+[submodule "src/OpenIntranet/static/electronic-symbols"]
+	path = src/OpenIntranet/static/electronic-symbols
+	url = git@github.com:UniversalScientificTechnologies/electronic-symbols.git
+[submodule "src/OpenIntranet/static/select2-bootstrap-5-theme"]
+	path = src/OpenIntranet/static/select2-bootstrap-5-theme
+	url = git@github.com:apalfrey/select2-bootstrap-5-theme.git

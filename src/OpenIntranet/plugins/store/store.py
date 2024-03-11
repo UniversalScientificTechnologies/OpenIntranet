@@ -399,7 +399,7 @@ class api_categories_list(BaseHandler):
         print("api_categories_list .. ", type)
 
         if type == 'jstree':
-            dout = list(self.mdb.category.find({}))
+            dout = list(self.mdb.category_complete.find({}))
             new = []
             for i, out in enumerate(dout):
                 pos = {}
@@ -408,6 +408,8 @@ class api_categories_list(BaseHandler):
                 pos['text'] = "{} <small>({})</small>".format(out['name'], out['description'])
                 pos['li_attr'] = {"name": out['name'], 'text': out['description']}
                 pos['parent'] = str(out.get('parent', '#'))
+                if out.get('icon_url') and not out.get('icon_url') == 'null':
+                    pos['icon'] = out.get('icon_url')
                 new.append(pos)
             output = bson.json_util.dumps(new)
 
@@ -423,12 +425,12 @@ class api_categories_list(BaseHandler):
                     {'description': { '$regex': q, '$options': 'i'}} ]}
                 }]
 
-            dout = list(self.mdb.category.aggregate(query))
+            dout = list(self.mdb.category_complete.aggregate(query))
             output = bson.json_util.dumps(dout)
 
         else:
             dout = list(self.mdb.category.find({}))
-            output = bson.json_util.dumps(list(self.mdb.category.find({})))
+            output = bson.json_util.dumps(list(self.mdb.category_complete.find({})))
 
         self.write(output)
 
@@ -515,7 +517,9 @@ class api_update_category(BaseHandler):
 
         if cid != parent:
             data = {'name': self.get_argument('name'),
-                    'description': self.get_argument('description', ''),}
+                    'description': self.get_argument('description', ''),
+                    'icon': self.get_argument('icon', ''),
+                    'icon_source': self.get_argument('icon_source', None),}
 
             if parent:
                 data['parent'] = parent

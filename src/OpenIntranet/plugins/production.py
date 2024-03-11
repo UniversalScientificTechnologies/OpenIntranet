@@ -1349,7 +1349,7 @@ class print_bom(BaseHandler):
 
             place_str = ""
             for i, place in enumerate(item_places):
-                if place['info'][0]['parent'] is not "#":
+                if place['info'][0]['parent'] != "#":
                     place_details = self.get_position(place['posid'], True)
                     print(place_details)
                     print(i, "> ", place_details)

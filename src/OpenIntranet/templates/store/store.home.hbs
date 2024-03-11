@@ -250,24 +250,24 @@
 <script type="text/javascript">
 
 function load_category_tree(){
-    $('#category-tree').jstree({
-        'core' : {
-           'data' : {
-              'type': "POST",
-              'url' : "/store/api/get_categories/list/?jstree=True"
-            }
-        },
-        "plugins" : [
-            "checkbox",
-            "massload",
-            "sort",
-            "state",
-            "types",
-        ],
-        'checkbox':{
-            'whole_node': false,
-        }
-    });
+	$('#category-tree').jstree({
+		'core' : {
+		   'data' : {
+			  'type': "POST",
+			  'url' : "/store/api/get_categories/list/?jstree=True"
+			}
+		},
+		"plugins" : [
+			"checkbox",
+			"massload",
+			"sort",
+			"state",
+			"types",
+		],
+		'checkbox':{
+			'whole_node': false,
+		},
+	});
 }
 load_category_tree();
 
