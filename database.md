@@ -127,3 +127,59 @@ db.createView("packets_count_complete", "stock", [
 }
 ])
 ```
+
+
+### Kategorie a view
+
+```
+db.category_complete.drop();
+
+db.category.aggregate([
+    {
+        "$graphLookup": {
+            "from": "store_positions",
+            "startWith": "$parent",
+            "connectFromField": "parent",
+            "connectToField": "_id",
+            "as": "path"
+        }
+    },
+    {
+        "$set": {
+            "path": {
+                "$reverseArray": "$path"
+            }
+        }
+    },
+    {
+        "$addFields": {
+            "path_string": "$path.name"
+        }
+    },
+    {
+        "$addFields": {
+            "icon_url": {
+                "$switch": {
+                    "branches": [
+                        {
+                            "case": {
+                                "$eq": ["$icon_source", "null"]
+                            },
+                            "then": "null"
+                        },
+                        {
+                            "case": {
+                                "$eq": ["$icon_source", "electronic-symbols"]
+                            },
+                            "then": {
+                                "$concat": ["/static/electronic-symbols/SVG/", "$icon", ".svg"]
+                            }
+                        }
+                    ],
+                    "default": "null"
+                }
+            }
+        }
+    }
+]).saveAsView("category_complete");
+```
