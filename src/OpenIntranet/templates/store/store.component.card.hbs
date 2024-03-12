@@ -55,7 +55,7 @@ function select_package_formatter(data) {
         </div>
 
         <div class="row">
-          <div class="col editable editable-categories">Categories: {% for cat in component['categories'] %} <span class="badge bg-info">{{'/'.join(cat.get('path_string', [])+[cat['name']])}}</span>{% end %} </div>
+          <div class="col editable editable-categories">Categories: {% for cat in component['categories'] %} <span class="badge text-bg-light">{% if cat.get('icon_url') and cat.get('icon_url') != 'null'%} <img src="{{cat.get('icon_url')}}" style="height: 1.25 em;"> {% end %} {{'/'.join(cat.get('path_string', [])+[cat['name']])}}</span>{% end %} </div>
         </div>
 
 

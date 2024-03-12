@@ -471,6 +471,13 @@ function update_view(){
 
         try{ tmpl.querySelector('.component_image').setAttribute('src', element['img_title']['url']) } catch(e){};
 
+        try{
+			if(element['category'][0]['icon_url'].length > 2){
+				tmpl.querySelector('.component_image_category').setAttribute('src', element['category'][0]['icon_url'])
+				tmpl.querySelector('.component_image_category').style.display = 'block';
+			}
+		} catch(e){};
+
         // zaskrtavatko vybaraných polozek
         if(selected.indexOf(element['_id'].$oid) >= 0){
             tmpl.querySelector('.product_list-select').checked = true;

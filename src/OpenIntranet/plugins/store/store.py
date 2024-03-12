@@ -240,7 +240,7 @@ class api_products_json(BaseHandler):
                     '$limit' : int(page_len)
                 },{
                     "$lookup":{
-                        "from": "category",
+                        "from": "category_complete",
                         "localField": "category",
                         "foreignField": "_id",
                         "as": "category"
